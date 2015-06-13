@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="jpct">
+    <CLASSES>
+      <root url="jar://C:/Stuff/jpct/libs/jpct/jpct.jar!/" />
+      <root url="jar://C:/Stuff/jpct/libs/lwjgl-2.9.1/jar/lwjgl.jar!/" />
+      <root url="jar://C:/Stuff/jpct/libs/lwjgl-2.9.1/jar/lwjgl_util.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://C:/Stuff/jpct/doc/javadoc" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

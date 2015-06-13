@@ -22,5 +22,7 @@
     </orderEntry>
     <orderEntry type="library" name="x64" level="project" />
     <orderEntry type="library" name="commons-math3-3.5" level="project" />
+    <orderEntry type="library" name="jpct" level="project" />
+    <orderEntry type="library" name="windows" level="project" />
   </component>
 </module>
