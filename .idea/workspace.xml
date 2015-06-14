@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e695c9f-d525-4d52-a2e3-09d5d54462fe" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/rec3d/depth/triangulation/TriangulationLayer.java" />
-      <change type="DELETED" beforePath="C:\Users\Егор\IdeaProjects\OpenCVFirst\map — копия (3).png" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\Егор\IdeaProjects\OpenCVFirst\map — копия.png" afterPath="" />
-      <change type="MOVED" beforePath="C:\Users\Егор\IdeaProjects\OpenCVFirst\src\MainTemp.java" afterPath="$PROJECT_DIR$/src/rec3d/depth/MainTemp.java" />
-      <change type="MOVED" beforePath="C:\Users\Егор\IdeaProjects\OpenCVFirst\src\core\Point.java" afterPath="$PROJECT_DIR$/src/rec3d/core/Point.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/joined.png" afterPath="$PROJECT_DIR$/joined.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/points.ser" afterPath="$PROJECT_DIR$/points.ser" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MasterPojectApp.iml" afterPath="$PROJECT_DIR$/MasterPojectApp.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java" afterPath="$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/rec3d/depth/MainTemp.java" afterPath="$PROJECT_DIR$/src/rec3d/depth/MainTemp.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="OpenCVFirst.iws" />
@@ -39,8 +34,8 @@
       <file leaf-file-name="MainTemp.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5777" max-vertical-offset="7021">
-              <caret line="554" column="0" selection-start-line="554" selection-start-column="0" selection-end-line="554" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="204" max-vertical-offset="7157">
+              <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#joinBufferedImage#0;class#MainTemp#0" expanded="false" />
@@ -63,22 +58,16 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VRMLTerrainScript.java" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_Computational-geometry-master.zip/Computational-geometry-master/6) Point set Delaunay triangulation/src/ru/dubov/delaunay/VRMLTerrainScript.java">
+      <file leaf-file-name="JPCTVisualizer.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="696" max-vertical-offset="2074">
-              <caret line="62" column="71" selection-start-line="62" selection-start-column="71" selection-end-line="62" selection-end-column="71" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Delaunay.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Delaunay.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3315508" vertical-offset="4619" max-vertical-offset="6613">
-              <caret line="281" column="0" selection-start-line="281" selection-start-column="0" selection-end-line="281" selection-end-column="0" />
-              <folding />
+            <state vertical-scroll-proportion="0.2985972" vertical-offset="820" max-vertical-offset="3247">
+              <caret line="57" column="55" selection-start-line="57" selection-start-column="55" selection-end-line="57" selection-end-column="55" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1854#2228#0" expanded="true" />
+                <element signature="e#2227#2228#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -86,24 +75,27 @@
       <file leaf-file-name="MainFrame.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/MainFrame.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="646" max-vertical-offset="1870">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1717" max-vertical-offset="1870">
               <caret line="289" column="32" selection-start-line="289" selection-start-column="32" selection-end-line="289" selection-end-column="32" />
               <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TriangulationLayer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/TriangulationLayer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-              <caret line="21" column="25" selection-start-line="21" selection-start-column="25" selection-end-line="21" selection-end-column="25" />
-              <folding>
-                <element signature="e#350#357#0" expanded="true" />
-                <element signature="e#633#634#0" expanded="true" />
-                <element signature="e#665#666#0" expanded="true" />
+                <element signature="e#614#703#0" expanded="false" />
+                <element signature="e#759#1876#0" expanded="false" />
+                <element signature="e#1875#1876#0" expanded="false" />
+                <element signature="e#2506#2677#0" expanded="false" />
+                <element signature="e#2676#2677#0" expanded="false" />
+                <element signature="e#3283#3464#0" expanded="false" />
+                <element signature="e#3463#3464#0" expanded="false" />
+                <element signature="e#3566#3747#0" expanded="false" />
+                <element signature="e#3746#3747#0" expanded="false" />
+                <element signature="e#3884#4065#0" expanded="false" />
+                <element signature="e#4064#4065#0" expanded="false" />
+                <element signature="e#4145#4326#0" expanded="false" />
+                <element signature="e#4325#4326#0" expanded="false" />
+                <element signature="e#4400#4581#0" expanded="false" />
+                <element signature="e#4580#4581#0" expanded="false" />
+                <element signature="e#11270#11357#0" expanded="false" />
+                <element signature="e#12701#12824#0" expanded="false" />
+                <element signature="e#12823#12824#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -112,9 +104,30 @@
       <file leaf-file-name="Point.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Point.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-10.551724" vertical-offset="0" max-vertical-offset="2635">
+            <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="2635">
               <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
-              <folding />
+              <folding>
+                <element signature="e#657#658#0" expanded="false" />
+                <element signature="e#695#696#0" expanded="false" />
+                <element signature="e#829#830#0" expanded="false" />
+                <element signature="e#853#854#0" expanded="false" />
+                <element signature="e#987#988#0" expanded="false" />
+                <element signature="e#1011#1012#0" expanded="false" />
+                <element signature="e#1192#1193#0" expanded="false" />
+                <element signature="e#1222#1223#0" expanded="false" />
+                <element signature="e#2484#2485#0" expanded="false" />
+                <element signature="e#2537#2538#0" expanded="false" />
+                <element signature="e#2919#2920#0" expanded="false" />
+                <element signature="e#2972#2973#0" expanded="false" />
+                <element signature="e#3290#3291#0" expanded="false" />
+                <element signature="e#3359#3360#0" expanded="false" />
+                <element signature="e#3568#3569#0" expanded="false" />
+                <element signature="e#3642#3643#0" expanded="false" />
+                <element signature="e#3854#3855#0" expanded="false" />
+                <element signature="e#3929#3930#0" expanded="false" />
+                <element signature="e#4118#4119#0" expanded="false" />
+                <element signature="e#4175#4176#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -132,7 +145,6 @@
         <option value="$PROJECT_DIR$/src/MainTemp.java" />
         <option value="$PROJECT_DIR$/src/Visualization/JPCTVisualizer.java" />
         <option value="$PROJECT_DIR$/src/visualization/JPCTVisualizer.java" />
-        <option value="$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java" />
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/Triangle.java" />
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/Segment.java" />
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/Line.java" />
@@ -145,8 +157,9 @@
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/Polygon.java" />
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/Point.java" />
         <option value="$PROJECT_DIR$/src/rec3d/depth/triangulation/TriangulationLayer.java" />
-        <option value="$PROJECT_DIR$/src/rec3d/depth/MainTemp.java" />
         <option value="$USER_HOME$/AppData/Local/Temp/Temp1_Computational-geometry-master.zip/Computational-geometry-master/6) Point set Delaunay triangulation/src/ru/dubov/delaunay/VRMLTerrainScript.java" />
+        <option value="$PROJECT_DIR$/src/rec3d/depth/MainTemp.java" />
+        <option value="$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java" />
       </list>
     </option>
   </component>
@@ -179,7 +192,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -233,26 +245,8 @@
               <option name="myItemId" value="rec3d" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="OpenCVFirst" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="OpenCVFirst" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="rec3d" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="depth" />
+              <option name="myItemId" value="visualization" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -277,13 +271,28 @@
               <option name="myItemId" value="depth" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+          </PATH>
+          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="triangulation" />
+              <option name="myItemId" value="OpenCVFirst" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="OpenCVFirst" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rec3d" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -308,6 +317,8 @@
     <property name="Downloaded.Files.Path.Enabled" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="OverrideImplement.overriding.sorted" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -318,7 +329,7 @@
       <recent name="main" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Unnamed">
+  <component name="RunManager" selected="Application.JPCTVisualizer">
     <configuration default="false" name="JPCTVisualizer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -558,8 +569,8 @@
     </list>
     <recent_temporary>
       <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Application.MainFrame" />
-        <item index="1" class="java.lang.String" itemvalue="Application.JPCTVisualizer" />
+        <item index="0" class="java.lang.String" itemvalue="Application.JPCTVisualizer" />
+        <item index="1" class="java.lang.String" itemvalue="Application.MainFrame" />
       </list>
     </recent_temporary>
   </component>
@@ -588,9 +599,10 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="92" y="92" width="1182" height="544" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23307087" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17007874" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17203514" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -598,41 +610,13 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36692914" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33700788" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="92" y="92" width="1182" height="544" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
-    <layout-to-restore>
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.062992126" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" x="92" y="92" width="1182" height="544" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4929134" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17203514" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-    </layout-to-restore>
   </component>
   <component name="Vcs.Log.UiProperties">
     <option name="RECENTLY_FILTERED_USER_GROUPS">
@@ -655,19 +639,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java</url>
-          <line>524</line>
+          <line>530</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java</url>
-          <line>105</line>
-          <properties />
-          <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java</url>
-          <line>554</line>
+          <line>560</line>
           <properties />
           <option name="timeStamp" value="12" />
         </line-breakpoint>
@@ -677,22 +655,44 @@
           <properties />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java</url>
+          <line>98</line>
+          <properties />
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java</url>
+          <line>568</line>
+          <properties />
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java</url>
+          <line>169</line>
+          <properties />
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java</url>
+          <line>177</line>
+          <properties />
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java</url>
+          <line>63</line>
+          <properties />
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="14" />
+      <option name="time" value="20" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="getClass()" language="JAVA" custom="" />
-        <watch expression="getClass().getResource(&quot;/lena1.png&quot;).getPath()" language="JAVA" custom="" />
-        <watch expression="cmlFile.getAbsolutePath()" language="JAVA" custom="" />
-        <watch expression="file.getAbsolutePath()" language="JAVA" custom="" />
-        <watch expression="V.getColumnDimension()" language="JAVA" custom="" />
-        <watch expression="vertDisp" language="JAVA" custom="" />
-        <watch expression="(-coeffs[2] - (coeffs[1]*i))/coeffs[0]" language="JAVA" custom="" />
-        <watch expression="coeffs[1]*i" language="JAVA" custom="" />
-        <watch expression="coeffs[1]*715" language="JAVA" custom="" />
-        <watch expression="-coeffs[2]-coeffs[1]*i" language="JAVA" custom="" />
-        <watch expression="0.502207477/coeffs[0]" language="JAVA" custom="" />
+        <watch expression="rowLengths" language="JAVA" custom="" />
+        <watch expression="rowLengths[i-yStart]" language="JAVA" custom="" />
+        <watch expression="i-yStart" language="JAVA" custom="" />
       </configuration>
     </watches-manager>
   </component>
@@ -701,6 +701,99 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1424" max-vertical-offset="7140">
+          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#joinBufferedImage#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#createAmatrix#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#printMatrix#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#solveMatrix#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#solveHomogeneous#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#formMatrix#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#formMatrix#1;class#MainTemp#0" expanded="false" />
+            <element signature="method#multiplyAbyB#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#postMultyplyByVec#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#fillPoints#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#loadImg#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#calcSecondPoint#0;class#MainTemp#0" expanded="false" />
+            <element signature="docComment;method#calcRo1#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#calcRo1#0;class#MainTemp#0" expanded="false" />
+            <element signature="method#normalize#0;class#MainTemp#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2176">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1854#2228#0" expanded="true" />
+            <element signature="e#2227#2228#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/MainFrame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1717" max-vertical-offset="1870">
+          <caret line="289" column="32" selection-start-line="289" selection-start-column="32" selection-end-line="289" selection-end-column="32" />
+          <folding>
+            <element signature="e#614#703#0" expanded="false" />
+            <element signature="e#759#1876#0" expanded="false" />
+            <element signature="e#1875#1876#0" expanded="false" />
+            <element signature="e#2506#2677#0" expanded="false" />
+            <element signature="e#2676#2677#0" expanded="false" />
+            <element signature="e#3283#3464#0" expanded="false" />
+            <element signature="e#3463#3464#0" expanded="false" />
+            <element signature="e#3566#3747#0" expanded="false" />
+            <element signature="e#3746#3747#0" expanded="false" />
+            <element signature="e#3884#4065#0" expanded="false" />
+            <element signature="e#4064#4065#0" expanded="false" />
+            <element signature="e#4145#4326#0" expanded="false" />
+            <element signature="e#4325#4326#0" expanded="false" />
+            <element signature="e#4400#4581#0" expanded="false" />
+            <element signature="e#4580#4581#0" expanded="false" />
+            <element signature="e#11270#11357#0" expanded="false" />
+            <element signature="e#12701#12824#0" expanded="false" />
+            <element signature="e#12823#12824#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Point.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="2635">
+          <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+          <folding>
+            <element signature="e#657#658#0" expanded="false" />
+            <element signature="e#695#696#0" expanded="false" />
+            <element signature="e#829#830#0" expanded="false" />
+            <element signature="e#853#854#0" expanded="false" />
+            <element signature="e#987#988#0" expanded="false" />
+            <element signature="e#1011#1012#0" expanded="false" />
+            <element signature="e#1192#1193#0" expanded="false" />
+            <element signature="e#1222#1223#0" expanded="false" />
+            <element signature="e#2484#2485#0" expanded="false" />
+            <element signature="e#2537#2538#0" expanded="false" />
+            <element signature="e#2919#2920#0" expanded="false" />
+            <element signature="e#2972#2973#0" expanded="false" />
+            <element signature="e#3290#3291#0" expanded="false" />
+            <element signature="e#3359#3360#0" expanded="false" />
+            <element signature="e#3568#3569#0" expanded="false" />
+            <element signature="e#3642#3643#0" expanded="false" />
+            <element signature="e#3854#3855#0" expanded="false" />
+            <element signature="e#3929#3930#0" expanded="false" />
+            <element signature="e#4118#4119#0" expanded="false" />
+            <element signature="e#4175#4176#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://C:/Stuff/Opencv/opencv/build/java/opencv-2411.jar!/org/opencv/features2d/DescriptorExtractor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1912" max-vertical-offset="4760">
@@ -920,28 +1013,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_DelaunaySourceCodeJava60.zip/delaunay/Triangle.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1915" max-vertical-offset="2482">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_DelaunaySourceCodeJava60.zip/delaunay/Triangulation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3989" max-vertical-offset="4573">
-          <caret line="277" column="33" selection-start-line="277" selection-start-column="33" selection-end-line="277" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_DelaunaySourceCodeJava60.zip/delaunay/DelaunayAp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5230" max-vertical-offset="6766">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Downloads/Shareit/Document/IdeaProjects/SegmentInter/src/Triangulating/View.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.41975307" vertical-offset="0" max-vertical-offset="2261">
@@ -953,9 +1024,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1666">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -970,9 +1038,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.39209226" vertical-offset="238" max-vertical-offset="1972">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -980,11 +1045,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.6523888" vertical-offset="651" max-vertical-offset="1258">
           <caret line="20" column="2" selection-start-line="20" selection-start-column="2" selection-end-line="20" selection-end-column="2" />
-          <folding>
-            <element signature="e#0#6390#0" expanded="false" />
-            <element signature="e#5974#5975#0" expanded="false" />
-            <element signature="e#6038#6039#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -992,25 +1052,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.16803955" vertical-offset="0" max-vertical-offset="607">
           <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_Computational-geometry-master.zip/Computational-geometry-master/6) Point set Delaunay triangulation/src/ru/dubov/delaunay/MainFrame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.36408567" vertical-offset="68" max-vertical-offset="1836">
-          <caret line="22" column="70" selection-start-line="22" selection-start-column="70" selection-end-line="22" selection-end-column="70" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.44151565" vertical-offset="1381" max-vertical-offset="2006">
-          <caret line="97" column="24" selection-start-line="97" selection-start-column="24" selection-end-line="97" selection-end-column="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1018,9 +1059,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4301">
           <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding>
-            <element signature="e#1592#1602#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1028,11 +1066,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2533">
           <caret line="0" column="34" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#647#657#0" expanded="false" />
-            <element signature="e#704#711#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1040,7 +1073,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.22405271" vertical-offset="0" max-vertical-offset="3808">
           <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1048,7 +1080,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1394">
           <caret line="0" column="33" selection-start-line="0" selection-start-column="33" selection-end-line="0" selection-end-column="33" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1056,7 +1087,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8755">
           <caret line="0" column="34" selection-start-line="0" selection-start-column="8" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1064,7 +1094,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2057">
           <caret line="0" column="34" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1072,7 +1101,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.14003295" vertical-offset="0" max-vertical-offset="1428">
           <caret line="5" column="24" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1080,19 +1108,35 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3247">
           <caret line="0" column="34" selection-start-line="0" selection-start-column="34" selection-end-line="0" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#568#569#0" expanded="false" />
-            <element signature="e#634#635#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Point.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-10.551724" vertical-offset="0" max-vertical-offset="2635">
+        <state vertical-scroll-proportion="0.0" vertical-offset="306" max-vertical-offset="2635">
           <caret line="18" column="19" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
-          <folding />
+          <folding>
+            <element signature="e#657#658#0" expanded="false" />
+            <element signature="e#695#696#0" expanded="false" />
+            <element signature="e#829#830#0" expanded="false" />
+            <element signature="e#853#854#0" expanded="false" />
+            <element signature="e#987#988#0" expanded="false" />
+            <element signature="e#1011#1012#0" expanded="false" />
+            <element signature="e#1192#1193#0" expanded="false" />
+            <element signature="e#1222#1223#0" expanded="false" />
+            <element signature="e#2484#2485#0" expanded="false" />
+            <element signature="e#2537#2538#0" expanded="false" />
+            <element signature="e#2919#2920#0" expanded="false" />
+            <element signature="e#2972#2973#0" expanded="false" />
+            <element signature="e#3290#3291#0" expanded="false" />
+            <element signature="e#3359#3360#0" expanded="false" />
+            <element signature="e#3568#3569#0" expanded="false" />
+            <element signature="e#3642#3643#0" expanded="false" />
+            <element signature="e#3854#3855#0" expanded="false" />
+            <element signature="e#3929#3930#0" expanded="false" />
+            <element signature="e#4118#4119#0" expanded="false" />
+            <element signature="e#4175#4176#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1101,7 +1145,24 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1870">
           <caret line="289" column="32" selection-start-line="289" selection-start-column="32" selection-end-line="289" selection-end-column="32" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#614#703#0" expanded="false" />
+            <element signature="e#759#1876#0" expanded="false" />
+            <element signature="e#1875#1876#0" expanded="false" />
+            <element signature="e#2506#2677#0" expanded="false" />
+            <element signature="e#2676#2677#0" expanded="false" />
+            <element signature="e#3283#3464#0" expanded="false" />
+            <element signature="e#3463#3464#0" expanded="false" />
+            <element signature="e#3566#3747#0" expanded="false" />
+            <element signature="e#3746#3747#0" expanded="false" />
+            <element signature="e#3884#4065#0" expanded="false" />
+            <element signature="e#4064#4065#0" expanded="false" />
+            <element signature="e#4145#4326#0" expanded="false" />
+            <element signature="e#4325#4326#0" expanded="false" />
+            <element signature="e#4400#4581#0" expanded="false" />
+            <element signature="e#4580#4581#0" expanded="false" />
+            <element signature="e#11270#11357#0" expanded="false" />
+            <element signature="e#12701#12824#0" expanded="false" />
+            <element signature="e#12823#12824#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1118,10 +1179,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Delaunay.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="4.268839" vertical-offset="2647" max-vertical-offset="6613">
+          <caret line="281" column="0" selection-start-line="281" selection-start-column="0" selection-end-line="281" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/rec3d/depth/MainTemp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5777" max-vertical-offset="7021">
-          <caret line="554" column="0" selection-start-line="554" selection-start-column="0" selection-end-line="554" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1883" max-vertical-offset="7157">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#joinBufferedImage#0;class#MainTemp#0" expanded="false" />
@@ -1143,19 +1211,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Temp/Temp1_Computational-geometry-master.zip/Computational-geometry-master/6) Point set Delaunay triangulation/src/ru/dubov/delaunay/VRMLTerrainScript.java">
+    <entry file="file://$PROJECT_DIR$/src/rec3d/visualization/JPCTVisualizer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="696" max-vertical-offset="2074">
-          <caret line="62" column="71" selection-start-line="62" selection-start-column="71" selection-end-line="62" selection-end-column="71" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rec3d/depth/triangulation/Delaunay.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3315508" vertical-offset="4619" max-vertical-offset="6613">
-          <caret line="281" column="0" selection-start-line="281" selection-start-column="0" selection-end-line="281" selection-end-column="0" />
-          <folding />
+        <state vertical-scroll-proportion="0.2985972" vertical-offset="820" max-vertical-offset="3247">
+          <caret line="57" column="55" selection-start-line="57" selection-start-column="55" selection-end-line="57" selection-end-column="55" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1854#2228#0" expanded="true" />
+            <element signature="e#2227#2228#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

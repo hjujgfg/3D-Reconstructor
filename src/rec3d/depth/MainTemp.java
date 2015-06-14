@@ -24,6 +24,8 @@ public class MainTemp {
     public int dpwidth = 2000;
     public int dpheight = 1700;
     ArrayList<double[]> depthPoints;
+    ArrayList<int[]> scenePoints;
+    public static int [] rowLengths;
     public static void main(String[] args) {
         System.out.println("Hello, OpenCV");
 
@@ -31,22 +33,22 @@ public class MainTemp {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         MainTemp m = new MainTemp();
         m.run();
-        TriangulationLayer tr = new TriangulationLayer(m.depthPoints);
+        //TriangulationLayer tr = new TriangulationLayer(m.depthPoints);
 
     }
 
 
-    public ArrayList<double[]> run() {
+    public ArrayList<int[]> run() {
         System.out.println("\nRunning DetectFaceDemo");
         Point[][] points;
         double[][] matrA;
 
         try {
             ObjectInputStream fis = new ObjectInputStream(new FileInputStream(new File("Points.ser")));
-            depthPoints = (ArrayList<double[]>) fis.readObject();
+            scenePoints = (ArrayList<int[]>) fis.readObject();
 
             System.out.println("Points found!");
-            return depthPoints;
+            return scenePoints;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -95,7 +97,11 @@ public class MainTemp {
 
         ArrayList<int[]> correspondences = calcregionCorresp(700, 89, dpwidth, dpheight, img1, img2, 1, f);
         System.out.println("Corresps: " + correspondences.size());
-
+        int sum = 0;
+        for (int i = 0; i < rowLengths.length; i ++) {
+            sum += rowLengths[i];
+        }
+        System.out.println("Corresps2: " + sum);
         BufferedImage res = joinBufferedImage(img1, img2);
 
         Graphics2D grph = (Graphics2D)res.getGraphics();
@@ -226,13 +232,13 @@ public class MainTemp {
         System.out.println(maxDepth + " md " + minDepth);
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File("points.ser")));
-            oos.writeObject(depthPoints);
+            oos.writeObject(scenePoints);
             oos.flush();
             oos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return depthPoints;
+        return scenePoints;
 
     }
 
@@ -550,15 +556,17 @@ public class MainTemp {
         ArrayList<int[]> correspondences = new ArrayList<int[]>();
         int[] img1Colors = img1.getRGB(0,0, img1.getWidth(), img1.getHeight(), null, 0, img1.getWidth());
         int[] img2Colors = img2.getRGB(0,0, img2.getWidth(), img2.getHeight(), null, 0, img2.getWidth());
-
+        rowLengths = new int[height];
         int[][] img1ColorMatrix = formMatrix(img1Colors, img1.getHeight(), img1.getWidth());
         int[][] img2ColorMatrix = formMatrix(img2Colors, img2.getHeight(), img2.getWidth());
         for (int i = yStart; i < yStart + height; i ++) {
             int [] tmp = new int[4];
+            rowLengths[i - yStart] = 0;
             for (int j = xStart; j < xStart + width; j ++){
                 try {
                     int[] res = calcSecondPoint(new double[]{j, i, 1}, f, img1ColorMatrix, img2ColorMatrix);
                     correspondences.add(new int[]{j, i, res[0], res[1]});
+                    rowLengths[i - yStart] ++;
                 }catch (ArrayIndexOutOfBoundsException e ) {
                     continue;
                 }
