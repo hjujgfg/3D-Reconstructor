@@ -2,9 +2,8 @@ package rec3d.depth;
 
 import org.apache.commons.math3.linear.*;
 import org.opencv.core.*;
-import org.opencv.core.Point;
-import rec3d.depth.triangulation.TriangulationLayer;
-
+//import org.opencv.core.Point;
+import rec3d.math.Point;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -113,7 +112,6 @@ public class MainTemp {
         }
 
         try {
-
             boolean success = ImageIO.write(res, "png", new File("joined.png"));
             System.out.println("saved success? "+success);
         } catch (IOException e) {
