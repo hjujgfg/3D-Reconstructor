@@ -17,6 +17,7 @@ resources — копия/
 *.msm
 *.msp
 *.jar
+*.iml
 
 # Windows shortcuts
 *.lnk
