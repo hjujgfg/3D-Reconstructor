@@ -7,7 +7,7 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
-
+.idea/
 out/
 resources — копия/
 
@@ -16,6 +16,7 @@ resources — копия/
 *.msi
 *.msm
 *.msp
+*.jar
 
 # Windows shortcuts
 *.lnk
