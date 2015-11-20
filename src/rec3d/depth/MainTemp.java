@@ -335,6 +335,12 @@ public class MainTemp {
         return newImage;
     }
 
+    /**
+     * CAUTION this is not A matrix built from calibration and rotation matrices, but
+     * it is a matrix of 9 learning points! (15) in paper yo
+     * @param points
+     * @return
+     */
     static double[][] createAmatrix(Point[][] points) {
         double [][] A = new double[N_POINTS][];
         for (int i = 0; i < N_POINTS; i ++) {
@@ -427,6 +433,10 @@ public class MainTemp {
         return res.toArray();
     }
 
+    /**
+     * build correspondences between two images.
+     * @return
+     */
     static Point[][] fillPoints() {
         Point[][] p = new Point[9][];
         p[0] = new Point[2];
