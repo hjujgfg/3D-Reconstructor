@@ -1,7 +1,7 @@
 package edu.lapidus.rec3d.depth;
 
 import org.apache.commons.math3.linear.*;
-import org.opencv.core.*;
+//import org.opencv.core.*;
 //import org.opencv.core.Point;
 import edu.lapidus.rec3d.math.Point;
 import javax.imageio.ImageIO;
@@ -29,7 +29,7 @@ public class MainTemp {
         System.out.println("Hello, OpenCV");
 
         // Load the native library.
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         MainTemp m = new MainTemp();
         m.run();
         //TriangulationLayer tr = new TriangulationLayer(m.depthPoints);

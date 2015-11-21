@@ -10,6 +10,7 @@ $RECYCLE.BIN/
 .idea/
 out/
 resources — копия/
+target/
 
 # Windows Installer files
 *.cab
