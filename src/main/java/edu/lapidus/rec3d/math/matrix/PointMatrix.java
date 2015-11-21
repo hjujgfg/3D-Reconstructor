@@ -1,7 +1,7 @@
-package rec3d.math.matrix;
+package edu.lapidus.rec3d.math.matrix;
 
-import rec3d.math.Point;
-import rec3d.math.vector.Vector;
+import edu.lapidus.rec3d.math.Point;
+import edu.lapidus.rec3d.math.vector.Vector;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package rec3d.depth.calibration;
+package edu.lapidus.rec3d.depth.calibration;
 
 /**
  * Created by Егор on 16.11.2015.

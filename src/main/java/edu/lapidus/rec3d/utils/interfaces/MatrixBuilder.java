@@ -1,12 +1,8 @@
-package rec3d.utils.interfaces;
+package edu.lapidus.rec3d.utils.interfaces;
 
-import rec3d.math.Point;
-import rec3d.math.matrix.DoubleMatrix;
-import rec3d.math.matrix.Matrix;
-import rec3d.math.matrix.PointMatrix;
-import rec3d.math.vector.Vector;
-
-import java.util.Map;
+import edu.lapidus.rec3d.math.Point;
+import edu.lapidus.rec3d.math.matrix.Matrix;
+import edu.lapidus.rec3d.math.vector.Vector;
 
 /**
  * Created by Егор on 16.11.2015.
@@ -27,5 +23,5 @@ public interface MatrixBuilder {
      */
     public Matrix createAMatrix(Point[][] correspondences);
 
-    public Matrix buildFromVector(Vector doubleVector);
+    public Matrix buildFromVector(Vector doubleVector, int rows, int colls);
 }

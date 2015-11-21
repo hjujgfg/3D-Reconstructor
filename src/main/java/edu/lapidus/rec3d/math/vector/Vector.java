@@ -1,4 +1,4 @@
-package rec3d.math.vector;
+package edu.lapidus.rec3d.math.vector;
 
 /**
  * Created by Егор on 20.11.2015.
@@ -14,7 +14,7 @@ public class Vector {
         this.vec = vec;
     }
 
-    public Double byIndex(int index) {
+    public double byIndex(int index) {
         return vec[index];
     }
 

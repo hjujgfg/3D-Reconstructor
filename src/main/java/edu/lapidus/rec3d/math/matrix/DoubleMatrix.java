@@ -1,13 +1,10 @@
-package rec3d.math.matrix;
+package edu.lapidus.rec3d.math.matrix;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import rec3d.math.vector.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
+import edu.lapidus.rec3d.math.vector.Vector;
 
 /**
  * Created by Егор on 16.11.2015.

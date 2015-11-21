@@ -1,9 +1,9 @@
-package rec3d.depth;
+package edu.lapidus.rec3d.depth;
 
 import org.apache.commons.math3.linear.*;
 import org.opencv.core.*;
 //import org.opencv.core.Point;
-import rec3d.math.Point;
+import edu.lapidus.rec3d.math.Point;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -272,6 +272,7 @@ public class MainTemp {
         return homography.getData();
     }
 
+    //done
     public static double[][] createRotationMatrix(double angle, int axis) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
@@ -298,6 +299,7 @@ public class MainTemp {
         return res;
     }
 
+    //done
     public static double[][] createCalibrationMatrix(double ax, double ay, double px, double py) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
@@ -335,6 +337,7 @@ public class MainTemp {
         return newImage;
     }
 
+    //done
     /**
      * CAUTION this is not A matrix built from calibration and rotation matrices, but
      * it is a matrix of 9 learning points! (15) in paper yo
@@ -358,6 +361,7 @@ public class MainTemp {
         return A;
     }
 
+    //done
     static void printMatrix(double[][] matr) {
 
         System.out.println("matrix: " + matr.length + " x " + matr[0].length);
@@ -391,6 +395,7 @@ public class MainTemp {
         //return V.getColumn(0);
     }
 
+    //done
     static double[][] formMatrix(double[] vec) {
         double[][] matrix = new double[3][];
         matrix[0] = new double[3];
@@ -419,6 +424,7 @@ public class MainTemp {
         return res;
     }
 
+    //done
     static double[] multiplyAbyB(double[][] A, double[] B) {
         RealMatrix aa = new Array2DRowRealMatrix(A);
         RealVector bb = new ArrayRealVector(B);
@@ -426,6 +432,7 @@ public class MainTemp {
         return res.toArray();
     }
 
+    //done
     static double[] postMultyplyByVec(double[][] A, double[] v) {
         RealMatrix aa = new Array2DRowRealMatrix(A);
         RealVector vv = new ArrayRealVector(v);

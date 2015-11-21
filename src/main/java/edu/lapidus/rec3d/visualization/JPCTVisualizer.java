@@ -1,10 +1,7 @@
-package rec3d.visualization;
+package edu.lapidus.rec3d.visualization;
 
 import com.threed.jpct.*;
-import org.lwjgl.Sys;
-import rec3d.depth.MainTemp;
-import sun.applet.Main;
-import sun.java2d.pipe.SpanShapeRenderer;
+import edu.lapidus.rec3d.depth.MainTemp;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package rec3d.math;
+package edu.lapidus.rec3d.math;
 
 /**
  * Created by Егор on 16.11.2015.

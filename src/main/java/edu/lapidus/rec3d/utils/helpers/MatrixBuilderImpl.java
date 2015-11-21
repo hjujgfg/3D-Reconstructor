@@ -1,13 +1,10 @@
-package rec3d.utils.helpers;
+package edu.lapidus.rec3d.utils.helpers;
 
-import rec3d.math.Point;
-import rec3d.math.matrix.DoubleMatrix;
-import rec3d.math.matrix.Matrix;
-import rec3d.math.matrix.PointMatrix;
-import rec3d.math.vector.Vector;
-import rec3d.utils.interfaces.MatrixBuilder;
-
-import java.util.Map;
+import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
+import edu.lapidus.rec3d.math.Point;
+import edu.lapidus.rec3d.math.matrix.Matrix;
+import edu.lapidus.rec3d.math.vector.Vector;
+import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 
 /**
  * Created by Егор on 16.11.2015.
@@ -77,7 +74,16 @@ public class MatrixBuilderImpl implements MatrixBuilder{
     }
 
     @Override
-    public Matrix buildFromVector(Vector doubleVector) {
-        return null;
+    public Matrix buildFromVector(Vector doubleVector, int rows, int colls) {
+        double[][] res = new double[rows][];
+        int counter = 0;
+        for (int i = 0; i < rows; i++) {
+            res[i] = new double[colls];
+            for (int j = 0; j < colls; j++) {
+                res[i][j] = doubleVector.byIndex(counter);
+                counter ++;
+            }
+        }
+        return new DoubleMatrix(res);
     }
 }
