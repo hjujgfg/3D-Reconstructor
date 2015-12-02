@@ -10,7 +10,7 @@ import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
  * Created by Егор on 16.11.2015.
  */
 public class MatrixBuilderImpl implements MatrixBuilder{
-    @Override
+
     public Matrix createRotationMatrix(double angle, int axis) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
@@ -37,7 +37,6 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         return new DoubleMatrix(res.clone());
     }
 
-    @Override
     public Matrix createCalibrationMatrix(double ax, double ay, double px, double py) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
@@ -54,7 +53,6 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         return new DoubleMatrix(res);
     }
 
-    @Override
     public Matrix createAMatrix(Point[][] points) {
 
         double [][] A = new double[MatrixBuilder.LEARNING_POINT_NUMBER][];
@@ -73,7 +71,6 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         return new DoubleMatrix(A);
     }
 
-    @Override
     public Matrix buildFromVector(Vector doubleVector, int rows, int colls) {
         double[][] res = new double[rows][];
         int counter = 0;
