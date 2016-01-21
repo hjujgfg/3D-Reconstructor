@@ -12,6 +12,7 @@ out/
 resources — копия/
 target/
 
+/logs
 # Windows Installer files
 *.cab
 *.msi
@@ -20,6 +21,7 @@ target/
 *.jar
 *.iml
 *.zip
+*.ser
 
 # Windows shortcuts
 *.lnk

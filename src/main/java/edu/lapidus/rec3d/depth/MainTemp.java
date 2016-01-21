@@ -26,7 +26,8 @@ public class MainTemp {
     ArrayList<int[]> scenePoints;
     public static int [] rowLengths;
     public static void main(String[] args) {
-        System.out.println("Hello, OpenCV");
+
+        System.out.println("Main initiated!");
 
         // Load the native library.
         //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -38,7 +39,7 @@ public class MainTemp {
 
 
     public ArrayList<int[]> run() {
-        System.out.println("\nRunning DetectFaceDemo");
+        System.out.println("\nProgram started");
         Point[][] points;
         double[][] matrA;
 
@@ -60,7 +61,7 @@ public class MainTemp {
         //CascadeClassifier faceDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath());
         //if (!pointsExist) {
 
-                        //manual points!!!
+        //Correspondence points entered manually!!!
         points = fillPoints();
         //manual ends!!!
         matrA = createAmatrix(points);
@@ -71,7 +72,7 @@ public class MainTemp {
         }
 
 
-
+        //calculate fundamental vector, I think
         double[] matrx = solveHomogeneous(matrA);
 
         System.out.println("f-vector");
@@ -101,6 +102,7 @@ public class MainTemp {
             sum += rowLengths[i];
         }
         System.out.println("Corresps2: " + sum);
+        //Visualization of found correspondences
         BufferedImage res = joinBufferedImage(img1, img2);
 
         Graphics2D grph = (Graphics2D)res.getGraphics();
@@ -118,14 +120,17 @@ public class MainTemp {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         RealMatrix tst = new Array2DRowRealMatrix(f);
         RealMatrix transposed = tst.transpose();
         double [] epipole = solveHomogeneous(transposed.getData());
-
+        //it seems like i was not sure what i was doing here, that epipole is really a result of solving set of homogenious
+        //equations of fundamental matrix yo 
         System.out.println("possible epipole!");
         for (int i = 0; i < epipole.length; i ++) {
             System.out.print(" " + epipole[i]);
         }
+        //WTF is going on here? it seems like some attempt to calc epipole but it is not used anywhere.
         double scale = 1/ epipole[2];
         epipole[0] *= scale;
         epipole[1] *= scale;
@@ -145,17 +150,26 @@ public class MainTemp {
 
         double[][] k2 = createCalibrationMatrix(2798, 2748, 1600, 1184);*/
 
-        /*double[][] k1 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 639.5, 479.5);
+        /*
+        double[][] k1 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 639.5, 479.5);
 
-        double[][] k2 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 639.5, 479.5);*/
+        double[][] k2 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 639.5, 479.5);
+        */
 
+        /*
         double[][] k1 = createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 639.5, 479.5);
 
         double[][] k2 = createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 639.5, 479.5);
+        */
+        double[][] k1 = createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
 
-        /*double[][] k1 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 1600, 1184);
+        double[][] k2 = createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
 
-        double[][] k2 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 1600, 1184);*/
+        /*
+        double[][] k1 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 1600, 1184);
+
+        double[][] k2 = createCalibrationMatrix(954.4641287642511, 954.4641287642511, 1600, 1184);
+        */
 
         double[] test = postMultyplyByVec(k1, new double[] {20, 100, 200});
 
@@ -494,16 +508,16 @@ public class MainTemp {
     }
 
     static BufferedImage loadImg(String path) {
-        File f = new File(path);
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(f);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return img;
+            File f = new File(path);
+            BufferedImage img = null;
+            try {
+                img = ImageIO.read(f);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return img;
     }
 
     static int[] calcSecondPoint(double[] first, double[][] F, int[][] img1Color, int[][] colorsTwo) {

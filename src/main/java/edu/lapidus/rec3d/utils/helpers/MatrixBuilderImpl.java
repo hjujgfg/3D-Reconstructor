@@ -5,13 +5,15 @@ import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.Matrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Егор on 16.11.2015.
  */
 public class MatrixBuilderImpl implements MatrixBuilder{
+    final static Logger logger = Logger.getLogger(MatrixBuilder.class);
 
-    public Matrix createRotationMatrix(double angle, int axis) {
+    public DoubleMatrix createRotationMatrix(double angle, int axis) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
             res[i] = new double[3];
@@ -34,10 +36,10 @@ public class MatrixBuilderImpl implements MatrixBuilder{
                 res[2][2] = Math.cos(angle);
                 res[1][1] = 1;
         }
-        return new DoubleMatrix(res.clone());
+        return new DoubleMatrix(res);
     }
 
-    public Matrix createCalibrationMatrix(double ax, double ay, double px, double py) {
+    public DoubleMatrix createCalibrationMatrix(double ax, double ay, double px, double py) {
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
             res[i] = new double[3];
@@ -53,7 +55,12 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         return new DoubleMatrix(res);
     }
 
-    public Matrix createAMatrix(Point[][] points) {
+    /**
+     * Uses an array of manual points to build a set of homogeneous equations to construct a fundamental matrix
+     * @param points
+     * @return
+     */
+    public DoubleMatrix createAMatrix(Point[][] points) {
 
         double [][] A = new double[MatrixBuilder.LEARNING_POINT_NUMBER][];
         for (int i = 0; i < MatrixBuilder.LEARNING_POINT_NUMBER; i ++) {
@@ -68,7 +75,9 @@ public class MatrixBuilderImpl implements MatrixBuilder{
             A[i][7] = (int)(points[i][0].y * 1);
             A[i][8] = 1;
         }
-        return new DoubleMatrix(A);
+        DoubleMatrix res = new DoubleMatrix(A);
+        logger.info("Amatrix created: \n" + res.toString());
+        return res;
     }
 
     public Matrix buildFromVector(Vector doubleVector, int rows, int colls) {

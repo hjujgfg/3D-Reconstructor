@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.interfaces;
 
 import edu.lapidus.rec3d.math.Point;
+import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.matrix.Matrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 
@@ -11,9 +12,9 @@ public interface MatrixBuilder {
 
     final int LEARNING_POINT_NUMBER = 9;
 
-    public Matrix createRotationMatrix(double angle, int axis);
+    public DoubleMatrix createRotationMatrix(double angle, int axis);
 
-    public Matrix createCalibrationMatrix(double ax, double ay, double px, double py);
+    public DoubleMatrix createCalibrationMatrix(double ax, double ay, double px, double py);
 
     /**
      * Build A matrix which represents a set of homogeneous equations, which should be solved to
@@ -21,7 +22,9 @@ public interface MatrixBuilder {
      * @param correspondences - array of points correspondences[0] - Point at first image, [1] - at the second one
      * @return matrix of homogeneous equations
      */
-    public Matrix createAMatrix(Point[][] correspondences);
+    public DoubleMatrix createAMatrix(Point[][] correspondences);
 
     public Matrix buildFromVector(Vector doubleVector, int rows, int colls);
+
+
 }

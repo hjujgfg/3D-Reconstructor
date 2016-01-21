@@ -1,9 +1,6 @@
 package edu.lapidus.rec3d.math.matrix;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.*;
 import edu.lapidus.rec3d.math.vector.Vector;
 
 /**
@@ -29,21 +26,21 @@ public class DoubleMatrix implements Matrix {
     }
 
     public void print() {
-        System.out.println("Matrix:\n" + toString() + "----------------------------------\n");
+        System.out.println("\nMatrix:\n" + toString() + "----------------------------------\n");
     }
 
     public Vector getRow(int id) throws IllegalArgumentException {
         return new Vector(internal[id]);
     }
 
-    public double[] getColumn(int id) throws IllegalArgumentException {
+    public Vector getColumn(int id) throws IllegalArgumentException {
         double[] row = new double[internal.length];
         int i = 0;
         for (double[] d : internal) {
             row[i] = (d[id]);
             i++;
         }
-        return row;
+        return new Vector(row);
     }
 
     public Vector preMultiply(Vector vector) {
@@ -58,5 +55,28 @@ public class DoubleMatrix implements Matrix {
         RealVector vv = new ArrayRealVector(vector.getVec());
         RealVector res = aa.operate(vv);
         return new Vector(res.toArray());
+    }
+
+    public void transpose(){
+        RealMatrix m = new Array2DRowRealMatrix(internal);
+        internal = m.transpose().getData();
+    }
+
+    public double[][] getData() {
+        return internal;
+    }
+
+    /**
+     * Solves a homogeneous set of equasions represented as this matrix
+     * TODO add checks if the operation can be performed!
+     * TODO understand WHAT happens in SVD
+     * @return
+     */
+    public Vector solveHomogeneous() {
+        RealMatrix M = new Array2DRowRealMatrix(this.getData(), false);
+        SingularValueDecomposition SVD = new SingularValueDecomposition(M);
+        RealMatrix V = SVD.getV();
+        Vector v = new Vector(V.getColumn(V.getColumnDimension() - 1));
+        return v;
     }
 }
