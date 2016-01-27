@@ -120,12 +120,14 @@ public class MainTemp {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        /*
         RealMatrix tst = new Array2DRowRealMatrix(f);
         RealMatrix transposed = tst.transpose();
+
         double [] epipole = solveHomogeneous(transposed.getData());
         //it seems like i was not sure what i was doing here, that epipole is really a result of solving set of homogenious
-        //equations of fundamental matrix yo 
+        //equations of fundamental matrix yo
+
         System.out.println("possible epipole!");
         for (int i = 0; i < epipole.length; i ++) {
             System.out.print(" " + epipole[i]);
@@ -140,7 +142,7 @@ public class MainTemp {
         }
 
         System.out.println();
-
+        */
 
         double[][] r1 = createRotationMatrix(0, 2);
 

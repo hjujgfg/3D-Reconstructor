@@ -2,12 +2,14 @@ package edu.lapidus.rec3d.math.matrix;
 
 import org.apache.commons.math3.linear.*;
 import edu.lapidus.rec3d.math.vector.Vector;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Егор on 16.11.2015.
  */
 public class DoubleMatrix implements Matrix {
     double[][] internal;
+    private final static Logger logger = Logger.getLogger(DoubleMatrix.class);
 
     @Override
     public String toString() {
@@ -26,7 +28,7 @@ public class DoubleMatrix implements Matrix {
     }
 
     public void print() {
-        System.out.println("\nMatrix:\n" + toString() + "----------------------------------\n");
+        logger.info("\nMatrix:\n" + toString() + "----------------------------------\n");
     }
 
     public Vector getRow(int id) throws IllegalArgumentException {
@@ -73,10 +75,20 @@ public class DoubleMatrix implements Matrix {
      * @return
      */
     public Vector solveHomogeneous() {
+        logger.info("Solving homogeneous on matrix: " + toString());
         RealMatrix M = new Array2DRowRealMatrix(this.getData(), false);
         SingularValueDecomposition SVD = new SingularValueDecomposition(M);
         RealMatrix V = SVD.getV();
         Vector v = new Vector(V.getColumn(V.getColumnDimension() - 1));
+        logger.info("Solved with resulting vector: " + v.toString());
         return v;
+    }
+
+    public void inverse() {
+        logger.info("Inversing matrix: " + toString());
+        RealMatrix matrix = new Array2DRowRealMatrix(internal);
+        matrix = MatrixUtils.inverse(matrix);
+        internal = matrix.getData();
+        logger.info("Inversed matrix: " + toString());
     }
 }
