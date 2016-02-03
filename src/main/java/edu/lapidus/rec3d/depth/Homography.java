@@ -8,9 +8,9 @@ import org.apache.commons.math3.linear.RealMatrix;
 /**
  * Created by Егор on 15.01.2016.
  */
-public class Homography {
+public class Homography extends DoubleMatrix{
 
-    DoubleMatrix homography;
+    //DoubleMatrix homography;
 
     DoubleMatrix k1;
     DoubleMatrix k2;
@@ -75,7 +75,7 @@ public class Homography {
         RealMatrix tmp1 = K2.multiply(R2);
         RealMatrix tmp2 = tmp1.multiply(R1);
         res = tmp2.multiply(K1);
-        homography = new DoubleMatrix(res.getData());
+        internal = res.getData();
     }
 
 }

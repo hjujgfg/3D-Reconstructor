@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
  * Created by Егор on 16.11.2015.
  */
 public class DoubleMatrix implements Matrix {
-    double[][] internal;
+    protected double[][] internal;
     private final static Logger logger = Logger.getLogger(DoubleMatrix.class);
 
     @Override
@@ -22,6 +22,8 @@ public class DoubleMatrix implements Matrix {
         }
         return sb.toString();
     }
+
+    protected DoubleMatrix(){}
 
     public DoubleMatrix(double[][] matrix) {
         this.internal = matrix;
@@ -59,9 +61,9 @@ public class DoubleMatrix implements Matrix {
         return new Vector(res.toArray());
     }
 
-    public void transpose(){
+    public DoubleMatrix transpose(){
         RealMatrix m = new Array2DRowRealMatrix(internal);
-        internal = m.transpose().getData();
+        return new DoubleMatrix(m.transpose().getData());
     }
 
     public double[][] getData() {
@@ -84,11 +86,18 @@ public class DoubleMatrix implements Matrix {
         return v;
     }
 
-    public void inverse() {
+    public DoubleMatrix inverse() {
         logger.info("Inversing matrix: " + toString());
         RealMatrix matrix = new Array2DRowRealMatrix(internal);
         matrix = MatrixUtils.inverse(matrix);
-        internal = matrix.getData();
         logger.info("Inversed matrix: " + toString());
+        return new DoubleMatrix(matrix.getData());
+    }
+
+    public DoubleMatrix multiplyBy(DoubleMatrix mtrx) {
+        RealMatrix r1 = new Array2DRowRealMatrix(internal);
+        RealMatrix r2 = new Array2DRowRealMatrix(mtrx.getData());
+        RealMatrix res = r1.multiply(r2);
+        return new DoubleMatrix(res.getData());
     }
 }

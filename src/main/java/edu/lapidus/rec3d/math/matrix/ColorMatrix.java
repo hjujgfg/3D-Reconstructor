@@ -10,7 +10,16 @@ import java.awt.image.BufferedImage;
  */
 public class ColorMatrix implements Matrix {
     private int[][] inner;
-    int height, width;
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    private int height, width;
     private final static Logger logger = Logger.getLogger(ColorMatrix.class);
 
     public ColorMatrix(BufferedImage image) {
