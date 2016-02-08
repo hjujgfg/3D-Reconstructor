@@ -69,4 +69,14 @@ public class Vector {
         }
         return new Vector(res);
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        for (double d : vec) {
+            sb.append(String.format("%.2f ", d));
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
 }

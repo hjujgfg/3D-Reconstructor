@@ -1,13 +1,21 @@
 package edu.lapidus.rec3d.utils;
 
+import java.io.Serializable;
+
 /**
  * Created by Егор on 27.01.2016.
  */
-public class PairCorrespData {
+public class PairCorrespData implements Serializable {
 
     int x1, y1, x2, y2;
     double X, Y, Z;
-    double ro1, ro2;
+    double ro1 = 0, ro2 = 0;
+
+    public String toString() {
+        return x1 + " : " + y1 + "; "
+                + x2 + " : " + y2 + "; "
+                + X + " : " + Y + " : " + Z;
+    }
 
     public int getX1() {
         return x1;

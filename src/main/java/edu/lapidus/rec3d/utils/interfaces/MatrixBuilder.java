@@ -12,6 +12,8 @@ public interface MatrixBuilder {
 
     final int LEARNING_POINT_NUMBER = 9;
 
+    public final int X_AXIS = 1, Y_AXIS = 2, Z_AXIS = 3;
+
     public DoubleMatrix createRotationMatrix(double angle, int axis);
 
     public DoubleMatrix createCalibrationMatrix(double ax, double ay, double px, double py);

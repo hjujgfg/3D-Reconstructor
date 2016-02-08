@@ -4,15 +4,15 @@ import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Created by Егор on 21.11.2015.
  */
 public class ImageProcessor {
     final static Logger logger = Logger.getLogger(ImageProcessor.class);
+
+    final static String STORAGE_DIR = "/resources/res/";
 
     public BufferedImage loadImage(String path) {
         logger.info("Started loading " + path);

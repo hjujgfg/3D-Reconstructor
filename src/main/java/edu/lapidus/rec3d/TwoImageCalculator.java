@@ -6,7 +6,9 @@ import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.PairCorrespData;
+import edu.lapidus.rec3d.utils.SerializedDataType;
 import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
+import edu.lapidus.rec3d.utils.helpers.Serializer;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
 import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 
@@ -18,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -26,23 +29,93 @@ import java.util.*;
  */
 public class TwoImageCalculator {
     public static void main(String ... args) {
-        TwoImageCalculator init = new TwoImageCalculator();
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
+        DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(30, MatrixBuilder.Y_AXIS);
+        String img1 = "resources/flower1.png";
+        String img2 = "resources/flower2.png";
+        Vector c1 = new Vector(0.0, 0.0, 0.0);
+        Vector c2 = new Vector(57., 0.0, 7.);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, c1, c2, img1, img2);
         init.init();
         init.run();
     }
 
 
     final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
-    MatrixBuilder matrixBuilder;
+    static MatrixBuilder matrixBuilder;
     Correspondence correspondence;
-    ImageProcessor imageProcessor;
+    static ImageProcessor imageProcessor;
     Homography homography;
     DoubleMatrix k1, k2, r1, r2;
     Vector c1, c2;
+
+    static {
+        matrixBuilder = new MatrixBuilderImpl();
+        imageProcessor = new ImageProcessor();
+    }
+
+    public DoubleMatrix getK2() {
+        return k2;
+    }
+
+    public void setK2(DoubleMatrix k2) {
+        this.k2 = k2;
+    }
+
+    public DoubleMatrix getR1() {
+        return r1;
+    }
+
+    public void setR1(DoubleMatrix r1) {
+        this.r1 = r1;
+    }
+
+    public DoubleMatrix getR2() {
+        return r2;
+    }
+
+    public void setR2(DoubleMatrix r2) {
+        this.r2 = r2;
+    }
+
+    public DoubleMatrix getK1() {
+        return k1;
+    }
+
+    public void setK1(DoubleMatrix k1) {
+        this.k1 = k1;
+    }
+
+    public Homography getHomography() {
+        return homography;
+    }
+
+    public void setHomography(Homography homography) {
+        this.homography = homography;
+    }
+
+    public Vector getC1() {
+        return c1;
+    }
+
+    public void setC1(Vector c1) {
+        this.c1 = c1;
+    }
+
+    public Vector getC2() {
+        return c2;
+    }
+
+    public void setC2(Vector c2) {
+        this.c2 = c2;
+    }
+
     String img1Path;
     String img2Path;
     //TODO read it from properties
-    private final static int THREAD_NUMBER = 5;
+    private final static int THREAD_NUMBER = 20;
 
     Map<String, PairCorrespData> results;
 
@@ -52,7 +125,9 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path) {
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, Vector c1, Vector c2, String img1Path, String img2Path) {
+        this.c1 = c1;
+        this.c2 = c2;
         this.img1Path = img1Path;
         this.img2Path = img2Path;
         logger.info("Starting pair calculation");
@@ -66,9 +141,9 @@ public class TwoImageCalculator {
 
     public void init() {
         logger.info("ENTERED INIT!!!");
-        matrixBuilder = new MatrixBuilderImpl();
+        //matrixBuilder = new MatrixBuilderImpl();
         correspondence = new Correspondence();
-        imageProcessor = new ImageProcessor();
+        //imageProcessor = new ImageProcessor();
         results = new HashMap<String, PairCorrespData>();
     }
     public Map<String, PairCorrespData> run () {
@@ -83,11 +158,12 @@ public class TwoImageCalculator {
 
         int linesPerThread = images[0].getHeight() / THREAD_NUMBER;
         Set<Lock> semaphore = new HashSet<Lock>(THREAD_NUMBER);
-        for (int i = 0; i < images[0].getHeight(); i += THREAD_NUMBER) {
+        int step = (images[0].getHeight() - 400) / THREAD_NUMBER;
+        for (int i = 200; i < images[0].getHeight() - 200; i += step) {
             int yStart = i;
-            int yEnd = i + THREAD_NUMBER;
-            if (yEnd > images[0].getHeight()) {
-                yEnd = images[0].getHeight();
+            int yEnd = i + step;
+            if (yEnd > images[0].getHeight() - 200) {
+                yEnd = images[0].getHeight() - 200;
             }
             Thread t = new Thread(new DepthRegionCalculator(homography, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore));
             t.start();
@@ -100,6 +176,21 @@ public class TwoImageCalculator {
                 logger.error("Error waiting threads to finish", e);
             }
         }
+
+        try {
+            //FileOutputStream fos = new FileOutputStream();
+            FileWriter fw = new FileWriter(new File("result.txt"));
+            for (Map.Entry<String, PairCorrespData> entry : result.entrySet()) {
+                fw.write(entry.getKey() + "      " + entry.getValue().toString());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            logger.error("Error writing result \n", e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("Error writing result \n", e);
+        }
+
 
         return result;
 
@@ -178,7 +269,8 @@ public class TwoImageCalculator {
             semaphore.add(lock);
             //TODO elaborate this
             for (int i = yStart; i < yEnd; i ++) {
-                for (int j = 0; j < img1.getWidth(); j ++) {
+                //TODO it is not good to put things like -200, -100 etc. !!!! rework!!!
+                for (int j = 200; j < img1.getWidth() - 200; j ++) {
                     int[] firstPoint = {j, i, 1};
                     int[] secondPoint = calcSecondPoint(firstPoint);
                     Vector M = calcDepth(firstPoint, secondPoint);
@@ -216,6 +308,11 @@ public class TwoImageCalculator {
             double minDiff = Double.MAX_VALUE;
             for (int x2 = firstPoint[0] - 100; x2 < firstPoint[0] + 100; x2++) {
                 int y2 = (int)((( - coefficients.get(0) * x2 - coefficients.get(2)) / coefficients.get(1)));
+                if (y2 > img2.getHeight()) {
+                    y2 = img2.getHeight() - 1;
+                } else if (y2 < 0) {
+                    y2 = 0;
+                }
                 double tmp = evaluateSimilarity(firstPoint, new int[] {x2, y2});
                 if (tmp < minDiff) {
                     minDiff = tmp;
@@ -264,11 +361,32 @@ public class TwoImageCalculator {
                 res[1] = img.getRGB(point[0], point[1]);
             if (point[1] < 2)
                 res[4]*/
+            int xLeft, xRight, yUp, yDown;
+            if (point[0] - 1 < 0) {
+                xLeft = point[0];
+            } else {
+                xLeft = point[0] - 1;
+            }
+            if (point[0] + 1 >= img.getWidth()) {
+                xRight = point[0];
+            } else {
+                xRight = point[0] + 1;
+            }
+            if (point[1] - 1 < 0) {
+                yUp = point[1];
+            } else {
+                yUp = point[1] - 1;
+            }
+            if (point[1] + 1 >= img.getHeight()) {
+                yDown = point[1];
+            } else {
+                yDown = point[1] + 1;
+            }
             res[0] = img.getColor(point[0], point[1]);
-            res[1] = img.getColor(point[0] - 1, point[1] - 1);
-            res[2] = img.getColor(point[0] + 1, point[1] - 1);
-            res[3] = img.getColor(point[0] + 1, point[1] + 1);
-            res[4] = img.getColor(point[0] - 1, point[1] + 1);
+            res[1] = img.getColor(xLeft, yUp);
+            res[2] = img.getColor(xRight, yUp);
+            res[3] = img.getColor(xRight, yDown);
+            res[4] = img.getColor(xLeft, yDown);
             return res;
         }
 
@@ -292,7 +410,7 @@ public class TwoImageCalculator {
 
             Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
 
-            return null;
+            return M;
         }
 
     }

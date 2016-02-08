@@ -30,7 +30,7 @@ public class ColorMatrix implements Matrix {
         for (int i = 0; i < height; i ++) {
             inner[i] = new int[width];
             for (int j = 0; j < width; j ++) {
-                inner[i][j] = image.getRGB(width, height);
+                inner[i][j] = image.getRGB(j, i);
             }
         }
         logger.info("Ccreated Color Matrix with dimmensions: " + width + ":" + height);
@@ -68,7 +68,7 @@ public class ColorMatrix implements Matrix {
      * @param y - y coordinate, it should be inside height
      */
     public Color getColor(int x, int y) {
-        return new Color(inner[x][y]);
+        return new Color(inner[y][x]);
     }
 
 }

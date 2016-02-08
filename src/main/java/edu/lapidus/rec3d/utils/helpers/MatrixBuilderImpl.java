@@ -22,14 +22,16 @@ public class MatrixBuilderImpl implements MatrixBuilder{
             }
         }
         switch (axis) {
-            case 3:
+            //rotate around z
+            case MatrixBuilder.Z_AXIS:
                 res[0][0] = Math.cos(angle);
                 res[1][0] = Math.sin(angle);
                 res[0][1] = -Math.sin(angle);
                 res[1][1] = Math.cos(angle);
                 res[2][2] = 1;
                 break;
-            case 2:
+            //rotate around y
+            case MatrixBuilder.Y_AXIS:
                 res[0][0] = Math.cos(angle);
                 res[2][0] = -Math.sin(angle);
                 res[0][2] = Math.sin(angle);

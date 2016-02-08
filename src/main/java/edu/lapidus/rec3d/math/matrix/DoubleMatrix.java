@@ -4,19 +4,22 @@ import org.apache.commons.math3.linear.*;
 import edu.lapidus.rec3d.math.vector.Vector;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
+
 /**
  * Created by Егор on 16.11.2015.
  */
-public class DoubleMatrix implements Matrix {
+public class DoubleMatrix implements Matrix, Serializable {
     protected double[][] internal;
     private final static Logger logger = Logger.getLogger(DoubleMatrix.class);
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        sb.append("\n");
         for (double[] d : internal) {
             for (double dd : d) {
-                sb.append(dd + "");
+                sb.append(String.format("%.2f ", dd));
             }
             sb.append("\n");
         }
@@ -87,11 +90,12 @@ public class DoubleMatrix implements Matrix {
     }
 
     public DoubleMatrix inverse() {
-        logger.info("Inversing matrix: " + toString());
+        //logger.info("Inversing matrix: " + toString());
         RealMatrix matrix = new Array2DRowRealMatrix(internal);
         matrix = MatrixUtils.inverse(matrix);
-        logger.info("Inversed matrix: " + toString());
-        return new DoubleMatrix(matrix.getData());
+        DoubleMatrix res = new DoubleMatrix(matrix.getData());
+        //logger.info("Inversed matrix: " + res.toString());
+        return res;
     }
 
     public DoubleMatrix multiplyBy(DoubleMatrix mtrx) {

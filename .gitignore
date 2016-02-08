@@ -22,6 +22,7 @@ target/
 *.iml
 *.zip
 *.ser
+*.txt
 
 # Windows shortcuts
 *.lnk

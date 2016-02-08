@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.helpers;
 
 import edu.lapidus.rec3d.utils.SerializedDataType;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -8,16 +9,19 @@ import java.io.*;
  * Created by Егор on 02.12.2015.
  */
 public class Serializer {
+
+    private final static Logger logger = Logger.getLogger(Serializer.class);
     public static final String SER_DIRECTORY = "/Data/";
     public static String saveObject(Serializable obj, SerializedDataType type) {
         File f = buildFileName(obj, type);
         try {
             ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(f));
             os.writeObject(obj);
+            logger.info("Saved " + type.name());
         } catch (IOException e) {
             //TODO we need some logger thing everywhere
             //TODO we also need our own exceptions to rethrow
-            e.printStackTrace();
+            logger.error("Failed to save " + type.name(), e);
             return null;
         }
         return f.getPath();
