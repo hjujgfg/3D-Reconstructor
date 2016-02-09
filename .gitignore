@@ -23,6 +23,8 @@ target/
 *.zip
 *.ser
 *.txt
+/*.jpg
+/*.png
 
 # Windows shortcuts
 *.lnk

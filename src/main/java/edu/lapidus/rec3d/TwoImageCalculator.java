@@ -183,6 +183,8 @@ public class TwoImageCalculator {
             for (Map.Entry<String, PairCorrespData> entry : result.entrySet()) {
                 fw.write(entry.getKey() + "      " + entry.getValue().toString());
             }
+            fw.flush();
+            fw.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             logger.error("Error writing result \n", e);

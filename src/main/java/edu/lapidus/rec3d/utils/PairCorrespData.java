@@ -14,7 +14,7 @@ public class PairCorrespData implements Serializable {
     public String toString() {
         return x1 + " : " + y1 + "; "
                 + x2 + " : " + y2 + "; "
-                + X + " : " + Y + " : " + Z;
+                + X + " : " + Y + " : " + Z + "\n";
     }
 
     public int getX1() {
