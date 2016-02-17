@@ -19,7 +19,7 @@ public class DoubleMatrix implements Matrix, Serializable {
         sb.append("\n");
         for (double[] d : internal) {
             for (double dd : d) {
-                sb.append(String.format("%.2f ", dd));
+                sb.append(String.format("%.4f ", dd));
             }
             sb.append("\n");
         }
@@ -87,6 +87,12 @@ public class DoubleMatrix implements Matrix, Serializable {
         Vector v = new Vector(V.getColumn(V.getColumnDimension() - 1));
         logger.info("Solved with resulting vector: " + v.toString());
         return v;
+    }
+
+    public SingularValueDecomposition SVD() {
+        logger.info("Performing SVD over matrix: " + toString());
+        RealMatrix M = new Array2DRowRealMatrix(internal);
+        return new SingularValueDecomposition(M);
     }
 
     public DoubleMatrix inverse() {

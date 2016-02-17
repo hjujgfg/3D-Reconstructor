@@ -2,6 +2,11 @@ package edu.lapidus.rec3d.math;
 
 import org.apache.log4j.Logger;
 
+import javax.jnlp.IntegrationService;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.zip.Inflater;
+
 /**
  * Created by Егор on 21.01.2016.
  */
@@ -28,40 +33,40 @@ public class Correspondence {
     private Point[][] tempManualPoints() {
         Point[][] p = new Point[9][];
         p[0] = new Point[2];
-        p[0][0] = new Point(605, 841);
-        p[0][1] = new Point(673, 665);
+        p[0][0] = new Point(247, 1017);
+        p[0][1] = new Point(631, 913);
 
         p[1] = new Point[2];
-        p[1][0] = new Point(849, 837);
-        p[1][1] = new Point(1041, 677);
+        p[1][0] = new Point(617, 905);
+        p[1][1] = new Point(683, 715);
 
         p[2] = new Point[2];
-        p[2][0] = new Point(1633, 457);
-        p[2][1] = new Point(1681, 245);
+        p[2][0] = new Point(1583, 1279);
+        p[2][1] = new Point(1513, 1059);
 
         p[3] = new Point[2];
-        p[3][0] = new Point(1885, 497);
-        p[3][1] = new Point(2141, 337);
+        p[3][0] = new Point(1817, 963);
+        p[3][1] = new Point(2061, 827);
 
         p[4] = new Point[2];
-        p[4][0] = new Point(1741, 1149);
-        p[4][1] = new Point(1869, 985);
+        p[4][0] = new Point(419, 1987);
+        p[4][1] = new Point(767, 1821);
 
         p[5] = new Point[2];
-        p[5][0] = new Point(2025, 1625);
-        p[5][1] = new Point(2173, 1497);
+        p[5][0] = new Point(1829, 1925);
+        p[5][1] = new Point(2011, 1835);
 
         p[6] = new Point[2];
-        p[6][0] = new Point(1537, 2113);
-        p[6][1] = new Point(1705, 2009);
+        p[6][0] = new Point(2033, 1613);
+        p[6][1] = new Point(2177, 1495);
 
         p[7] = new Point[2];
-        p[7][0] = new Point(2153, 2145);
-        p[7][1] = new Point(2369, 2097);
+        p[7][0] = new Point(2589, 1818);
+        p[7][1] = new Point(2925, 1777);
 
         p[8] = new Point[2];
-        p[8][0] = new Point(409, 1969);
-        p[8][1] = new Point(773, 1813);
+        p[8][0] = new Point(1444, 2087);
+        p[8][1] = new Point(1637, 1975);
         /*
         vertDisp = 0;
         for (int i = 0; i < 9; i ++) {
@@ -73,5 +78,26 @@ public class Correspondence {
         System.out.println("vertical dispersy: " + vertDisp);
         */
         return p;
+    }
+
+    private Point[][] loadFromfile() {
+        ArrayList<Point[]> prePoints = new ArrayList<Point[]>();
+        File f = new File("Data/pointsData.txt");
+        String line;
+        try {
+            FileInputStream fis = new FileInputStream(f);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            while((line = br.readLine()) != null) {
+                String [] items = line.split(";");
+                Point first = new Point(Integer.parseInt(items[0]), Integer.parseInt(items[1]));
+                Point second = new Point(Integer.parseInt(items[2]), Integer.parseInt(items[3]));
+                prePoints.add(new Point[]{first, second});
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prePoints.toArray(new Point[prePoints.size()][]);
     }
 }

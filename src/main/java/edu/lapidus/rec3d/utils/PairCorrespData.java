@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.utils;
 
+import java.awt.*;
 import java.io.Serializable;
 
 /**
@@ -10,6 +11,8 @@ public class PairCorrespData implements Serializable {
     int x1, y1, x2, y2;
     double X, Y, Z;
     double ro1 = 0, ro2 = 0;
+
+    Color color;
 
     public String toString() {
         return x1 + " : " + y1 + "; "
@@ -89,5 +92,12 @@ public class PairCorrespData implements Serializable {
         this.ro2 = ro2;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 
 }
