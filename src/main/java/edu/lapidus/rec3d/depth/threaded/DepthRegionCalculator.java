@@ -17,6 +17,8 @@ import java.util.Set;
  */
 public class DepthRegionCalculator implements Runnable {
     private final static Logger logger = Logger.getLogger(DepthRegionCalculator.class);
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 100;
+    private final static Object LOCK_OBJ = new Object();
     Homography homography;
     private Vector epipole;
     ColorMatrix img1;
@@ -65,14 +67,15 @@ public class DepthRegionCalculator implements Runnable {
     public void run() {
         logger.info("Started thread for lines: " + yStart + " - " + yEnd);
         Lock lock = new Lock(yStart);
-        semaphore.add(lock);
+        synchronized (LOCK_OBJ) {
+            semaphore.add(lock);
+        }
         //TODO elaborate this
         for (int i = yStart; i < yEnd; i++) {
-            //TODO it is not good to put things like -200, -100 etc. !!!! rework!!!
-            for (int j = 200; j < img1.getWidth() - 200; j += skipNpoints) {
+            for (int j = 0; j < img1.getWidth(); j += skipNpoints) {
                 int[] firstPoint = {j, i, 1};
                 int[] secondPoint = calcSecondPoint(firstPoint);
-                Vector M = calcDepth(firstPoint, secondPoint);
+                Vector M = calcMetricDepth(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
                 res.setX1(j);
                 res.setY1(i);
@@ -81,14 +84,18 @@ public class DepthRegionCalculator implements Runnable {
                 res.setX(M.get(0));
                 res.setY(M.get(1));
                 res.setZ(M.get(2));
-                res.setColor(img1.getColor(j, i));
-                container.put(j + "_" + i, res);
+                res.setColor(img2.getColor(secondPoint[0], secondPoint[1]));
+                synchronized (this) {
+                    container.put(j + "_" + i, res);
+                }
             }
             if (i % 10 == 0) {
                 logger.info("Thread #" + lock.getId() + " Processed up to line " + i);
             }
         }
-        semaphore.remove(lock);
+        synchronized (LOCK_OBJ) {
+            semaphore.remove(lock);
+        }
         logger.info("#" + lock.getId() + " Finished thread for lines: " + yStart + " - " + yEnd + " Threads left: " + semaphore.size());
     }
 
@@ -110,12 +117,27 @@ public class DepthRegionCalculator implements Runnable {
         result[0] = Integer.MIN_VALUE;
         result[1] = Integer.MIN_VALUE;
         double minDiff = Double.MAX_VALUE;
-        for (int x2 = firstPoint[0] - 100; x2 < firstPoint[0] + 100; x2++) {
-            int y2 = (int) (((-coefficients.get(0) * x2 - coefficients.get(2)) / coefficients.get(1)));
+        //for (int x2 = firstPoint[0] - 100; x2 < firstPoint[0] + 100; x2++) {
+        int startY = firstPoint[1] - SECOND_POINT_LOOKUP_WIDTH / 2, endY = firstPoint[1] + SECOND_POINT_LOOKUP_WIDTH / 2;
+        if (startY < 0) {
+            startY = 0;
+            endY = SECOND_POINT_LOOKUP_WIDTH;
+        } else if (endY >= img1.getHeight()) {
+            endY = img1.getHeight() - 1;
+            startY = img1.getHeight() - SECOND_POINT_LOOKUP_WIDTH - 1;
+        }
+        for (int y2 = startY; y2 < endY; y2 ++) {
+            /*int y2 = (int) (((-coefficients.get(0) * x2 - coefficients.get(2)) / coefficients.get(1)));
             if (y2 >= img2.getHeight()) {
                 y2 = img2.getHeight() - 1;
             } else if (y2 < 0) {
                 y2 = 0;
+            }*/
+            int x2 = (int) ( - ( (coefficients.get(1) * y2 + coefficients.get(2)) / coefficients.get(0) ) );
+            if (x2 < 0) {
+                x2 = 0;
+            } else if (x2 >= img2.getHeight()) {
+                x2 = img2.getHeight()-1;
             }
             double tmp = 1000;
             try {
@@ -219,6 +241,19 @@ public class DepthRegionCalculator implements Runnable {
         Vector c = f.postMultiply(s);
         //See copybook :O
         double ro1 = (c.get(1) - c.get(2) * secondPoint[1]) / (z.get(2) * secondPoint[1] - z.get(1));
+
+        Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
+
+        return M;
+    }
+
+    private Vector calcMetricDepth(int [] firstPoint, int[] secondPoint) {
+        Vector A = homography.postMultiply(new Vector(firstPoint));
+        //TODO What should we do if we have 0 at secondPoints[1] - we will divide by zero
+        if (secondPoint[1] == 0) {
+            secondPoint[1] = 1;
+        }
+        double ro1 = ( (epipole.get(1) / secondPoint[1]) - epipole.get(2) ) / ( 1 - ( A.get(1) / secondPoint[1] ) );
 
         Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
 

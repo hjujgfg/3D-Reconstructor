@@ -14,7 +14,7 @@ public class Correspondence {
     private Point[][] inititalCorrespondences;
     final static Logger logger = Logger.getLogger(Correspondence.class);
     public Correspondence() {
-        inititalCorrespondences = tempManualPoints();
+        inititalCorrespondences = loadFromfile();
         logger.info("Correspondences created");
     }
 
@@ -82,15 +82,15 @@ public class Correspondence {
 
     private Point[][] loadFromfile() {
         ArrayList<Point[]> prePoints = new ArrayList<Point[]>();
-        File f = new File("Data/pointsData.txt");
+        File f = new File("Data/points.csv");
         String line;
         try {
             FileInputStream fis = new FileInputStream(f);
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
             while((line = br.readLine()) != null) {
                 String [] items = line.split(";");
-                Point first = new Point(Integer.parseInt(items[0]), Integer.parseInt(items[1]));
-                Point second = new Point(Integer.parseInt(items[2]), Integer.parseInt(items[3]));
+                Point first = new Point(Integer.parseInt(items[0].trim()), Integer.parseInt(items[1].trim()));
+                Point second = new Point(Integer.parseInt(items[2].trim()), Integer.parseInt(items[3].trim()));
                 prePoints.add(new Point[]{first, second});
             }
         } catch (FileNotFoundException e) {

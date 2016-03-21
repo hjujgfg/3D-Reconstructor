@@ -12,15 +12,17 @@ import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
 import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
+import edu.lapidus.rec3d.visualization.VRML.VRMLData;
+import edu.lapidus.rec3d.visualization.VRML.VRMLPointSetGenerator;
+import edu.lapidus.rec3d.visualization.VRML.VRMLTriangulator;
+import edu.lapidus.rec3d.visualization.XYZformatter;
+import org.apache.commons.math3.linear.*;
 import org.apache.log4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Егор on 21.11.2015.
@@ -28,12 +30,14 @@ import java.util.*;
  */
 public class TwoImageCalculator {
     public static void main(String ... args) {
-        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
+        //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
+        //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(30, MatrixBuilder.Y_AXIS);
-        String img1 = "resources/flower1.png";
-        String img2 = "resources/flower2.png";
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(15, MatrixBuilder.Y_AXIS);
+        String img1 = "resources/cup1.png";
+        String img2 = "resources/cup2.png";
         Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);
         TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, c1, c2, img1, img2);
@@ -92,23 +96,25 @@ public class TwoImageCalculator {
     public Map<String, PairCorrespData> run () {
         DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
         DoubleMatrix fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
+        fundamentalMatrix.scale(-1);
+        //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
         logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());
-        Vector epipole = calculateEpipole();
+        Vector epipole = calculateEpipoleFromFundamental(fundamentalMatrix);
 
-        Map<String, PairCorrespData> result = new HashMap<String, PairCorrespData>();
+        Map<String, PairCorrespData> result = new ConcurrentHashMap<String, PairCorrespData>();
         //TODO this is not good
         ColorMatrix[] images = loadImages();
 
         int linesPerThread = images[0].getHeight() / THREAD_NUMBER;
         Set<Lock> semaphore = new HashSet<Lock>(THREAD_NUMBER);
-        int step = (images[0].getHeight() - 400) / THREAD_NUMBER;
-        for (int i = 200; i < images[0].getHeight() - 200; i += step) {
+        int step = (images[0].getHeight() - 40) / THREAD_NUMBER;
+        for (int i = 0; i < images[0].getHeight(); i += step) {
             int yStart = i;
             int yEnd = i + step;
-            if (yEnd > images[0].getHeight() - 200) {
-                yEnd = images[0].getHeight() - 200;
+            if (yEnd > images[0].getHeight()) {
+                yEnd = images[0].getHeight();
             }
-            Thread t = new Thread(new DepthRegionCalculator(homography, c1, c2, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore).setSkipNpoints(5));
+            Thread t = new Thread(new DepthRegionCalculator(homography, c1, c2, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore).setSkipNpoints(1));
             t.start();
         }
         try {
@@ -144,6 +150,19 @@ public class TwoImageCalculator {
             logger.error("Error writing result \n", e);
         }
 
+        /*VRMLTriangulator triangulator = new VRMLTriangulator(result, images[0].getWidth(), images[1].getHeight());
+
+        VRMLData vrml = triangulator.triangulate();
+
+        vrml.saveWrl();*/
+
+        /*XYZformatter xyz = new XYZformatter(result);
+
+        xyz.saveXYZ();*/
+
+        VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
+
+        pointSet.buildPointSet();
 
         return result;
 
@@ -182,6 +201,14 @@ public class TwoImageCalculator {
         RealMatrix tmp1 = K2.multiply(R2);
         RealVector result = tmp1.operate(C1);
         return new Vector(result.toArray());
+    }
+
+    private Vector calculateEpipoleFromFundamental(DoubleMatrix fund) {
+        SingularValueDecomposition svd = fund.SVD();
+        RealMatrix v = svd.getV();
+        Vector e = new Vector(v.getColumn(2));
+        e = e.scalar(e.get(2));
+        return new Vector(v.getColumn(v.getColumnDimension() - 1));
     }
 
 

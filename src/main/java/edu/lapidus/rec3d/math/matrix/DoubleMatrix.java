@@ -110,4 +110,10 @@ public class DoubleMatrix implements Matrix, Serializable {
         RealMatrix res = r1.multiply(r2);
         return new DoubleMatrix(res.getData());
     }
+
+    public void scale(double scalar) {
+        RealMatrix r = new Array2DRowRealMatrix(internal);
+        r = r.scalarMultiply(scalar);
+        internal = r.getData();
+    }
 }

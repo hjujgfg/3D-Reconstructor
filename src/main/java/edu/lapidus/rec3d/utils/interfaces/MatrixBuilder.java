@@ -10,7 +10,7 @@ import edu.lapidus.rec3d.math.vector.Vector;
  */
 public interface MatrixBuilder {
 
-    final int LEARNING_POINT_NUMBER = 9;
+    final int LEARNING_POINT_NUMBER = 20;
 
     public final int X_AXIS = 1, Y_AXIS = 2, Z_AXIS = 3;
 
@@ -28,5 +28,6 @@ public interface MatrixBuilder {
 
     public Matrix buildFromVector(Vector doubleVector, int rows, int colls);
 
+    public DoubleMatrix buildFundamental(DoubleMatrix A);
 
 }

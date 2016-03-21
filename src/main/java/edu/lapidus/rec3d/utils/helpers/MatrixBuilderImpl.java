@@ -5,6 +5,8 @@ import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.Matrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.log4j.Logger;
 
 /**
@@ -66,7 +68,7 @@ public class MatrixBuilderImpl implements MatrixBuilder{
 
         double [][] A = new double[MatrixBuilder.LEARNING_POINT_NUMBER][];
         for (int i = 0; i < MatrixBuilder.LEARNING_POINT_NUMBER; i ++) {
-            A[i] = new double[MatrixBuilder.LEARNING_POINT_NUMBER];
+            A[i] = new double[9];
             A[i][0] = (int)(points[i][0].x * points[i][1].x);
             A[i][1] = (int)(points[i][0].y * points[i][1].x);
             A[i][2] = (int)(1 * points[i][1].x);
@@ -82,7 +84,7 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         return res;
     }
 
-    public Matrix buildFromVector(Vector doubleVector, int rows, int colls) {
+    public DoubleMatrix buildFromVector(Vector doubleVector, int rows, int colls) {
         double[][] res = new double[rows][];
         int counter = 0;
         for (int i = 0; i < rows; i++) {
@@ -93,5 +95,21 @@ public class MatrixBuilderImpl implements MatrixBuilder{
             }
         }
         return new DoubleMatrix(res);
+    }
+
+    public DoubleMatrix buildFundamental(DoubleMatrix A) {
+        SingularValueDecomposition Asvd = A.SVD();
+        RealMatrix v = Asvd.getV();
+        Vector f = new Vector(v.getColumn(2));
+        DoubleMatrix fund = buildFromVector(f, 3, 3);
+        //todo this is shit implement real fundamental matrix calculation
+        //this is atually the second part from matlab
+        SingularValueDecomposition svd = fund.SVD();
+        RealMatrix s = svd.getS();
+        s.setEntry(2, 2, 0.);
+        RealMatrix u = svd.getU();
+        RealMatrix vt = svd.getVT();
+        RealMatrix fundamental = s.multiply(u).multiply(vt);
+        return new DoubleMatrix(fundamental.getData());
     }
 }

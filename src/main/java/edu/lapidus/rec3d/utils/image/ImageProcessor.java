@@ -43,7 +43,7 @@ public class ImageProcessor {
             String [] coords = entry.getKey().split("_");
             int x = Integer.parseInt(coords[0]);
             int y = Integer.parseInt(coords[1]);
-            double z = entry.getValue().getZ();
+            double z = entry.getValue().getZ() * 1000000;
             int i = (int)z;
             if (i < -382)
                 i = -382;
@@ -51,7 +51,7 @@ public class ImageProcessor {
                 i = 382;
             }
 
-            map.setRGB(x, y, calcColor(i).getRGB());
+            map.setRGB(x, y, calcColorX(z).getRGB());
         }
         try {
             ImageIO.write(map, "png", f);
@@ -71,5 +71,45 @@ public class ImageProcessor {
             blue = depth - 128;
         }
         return new Color(red, green, blue);
+    }
+
+    private Color calcColor(double depth) {
+        int x = (int)depth;
+        //x += 700;
+        //x *= 100000;
+        if (x <= 0)
+            x = 0;
+        int r = x % 256;
+        int tmp = x / 256;
+        int g = tmp % 256;
+        tmp = tmp / 256;
+        int b = tmp % 256;
+        return new Color(r, g, b);
+    }
+
+    private Color calcColorX(double depth) {
+        int x = (int) depth;
+        x += 320;
+        if (x < 0) {
+            x = 0;
+        }
+        int r = x % 256;
+        x -= r;
+        x /= 10;
+        int g = x % 256;
+        x -= g;
+        x /= 10;
+        int b = x % 256;
+        return new Color(r,g,b);
+
+    }
+
+    public void saveImage(BufferedImage img, String fileName) {
+        try {
+            ImageIO.write(img, "png", new File(fileName));
+            logger.info("Saved image " + fileName);
+        } catch (IOException e) {
+            logger.error("Error saving image", e);
+        }
     }
 }
