@@ -74,7 +74,7 @@ public class Vector {
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
         for (double d : vec) {
-            sb.append(String.format("%.2f ", d));
+            sb.append(String.format("%.4f ", d));
         }
         sb.append("\n");
         return sb.toString();

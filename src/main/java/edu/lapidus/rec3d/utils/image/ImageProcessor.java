@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.utils.image;
 
+import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
 
@@ -8,7 +9,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.*;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by Егор on 21.11.2015.
@@ -111,5 +113,65 @@ public class ImageProcessor {
         } catch (IOException e) {
             logger.error("Error saving image", e);
         }
+    }
+
+    public void visualizeCorresps(Collection<PairCorrespData> points, String i1, String i2, int numOfPoints) {
+        logger.info("Saving correspondences");
+        BufferedImage combined = buildCombined(i1, i2);
+        Graphics g = combined.getGraphics();
+        ArrayList<PairCorrespData> inner = new ArrayList(points);
+        Random r = new Random();
+        for (int i = 0; i < numOfPoints; i ++) {
+            int index = r.nextInt(inner.size());
+            PairCorrespData p = inner.get(index);
+            int x1 = p.getX1();
+            int y1 = p.getY1();
+            int x2 = p.getX2() + combined.getWidth() / 2;
+            int y2 = p.getY2();
+            g.setColor(new Color(r.nextInt()));
+            g.drawLine(x1, y1, x2, y2);
+        }
+        saveImage(combined, "resources/res/corresps.png");
+    }
+
+    public void visualizeEpipolarLines(List<EpipolarLineHolder> lines, String i1, String i2, int numOfLines) {
+        BufferedImage combined = buildCombined(i1, i2);
+        Graphics g = combined.createGraphics();
+        Random r = new Random();
+        int w = combined.getWidth() / 2;
+        for (int i = 0; i < numOfLines; i ++) {
+            int ind = r.nextInt(lines.size());
+            EpipolarLineHolder e = lines.get(ind);
+            int[] f = e.getFirstPoint();
+            int[] s = e.getSecondPoint();
+            s[0] += w;
+            g.setColor(new Color(r.nextInt()));
+            g.drawOval(f[0], f[1], 3, 10);
+            g.drawOval(s[0], s[1], 3, 10);
+            double[] coefficients = e.getCoefficients();
+
+            for (int[] p : e.getLine()) {
+                g.drawOval(p[0] + w, p[1], 1, 1);
+            }
+
+            /*int x1 = w;
+            int y1 = (int)((-1 * ( coefficients[2] + coefficients[0] * x1 )) / coefficients[1]);
+
+            int x2 = combined.getWidth() - 1;
+            int y2 = (int)((-1 * ( coefficients[2] + coefficients[0] * x2 )) / coefficients[1]);
+
+            g.drawLine(x1, y1, x2, y2);*/
+        }
+        saveImage(combined, "resources/res/epipoles.png");
+    }
+
+    public BufferedImage buildCombined(String i1, String i2) {
+        BufferedImage img1 = loadImage(i1);
+        BufferedImage img2 = loadImage(i2);
+        BufferedImage combined = new BufferedImage(img1.getWidth() + img2.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics g = combined.createGraphics();
+        g.drawImage(img1, 0, 0, null);
+        g.drawImage(img2, img1.getWidth(), 0, null);
+        return combined;
     }
 }

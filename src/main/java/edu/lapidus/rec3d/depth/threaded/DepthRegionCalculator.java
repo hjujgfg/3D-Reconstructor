@@ -9,6 +9,10 @@ import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,12 +21,18 @@ import java.util.Set;
  */
 public class DepthRegionCalculator implements Runnable {
     private final static Logger logger = Logger.getLogger(DepthRegionCalculator.class);
-    private final static int SECOND_POINT_LOOKUP_WIDTH = 100;
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 50;
+    private final static int SECOND_POINT_SHIFT = 80;
     private final static Object LOCK_OBJ = new Object();
+
+    private final static int COLOR_REGION_RADIUS = 50;
+
     Homography homography;
     private Vector epipole;
     ColorMatrix img1;
     ColorMatrix img2;
+
+    ArrayList<EpipolarLineHolder> lines;
     //Here we put lines which this specific calculator should compute;
     //I mean there will be several threads, each calculating its own set of lines
     int yStart;
@@ -45,7 +55,8 @@ public class DepthRegionCalculator implements Runnable {
                                  int yStart, int yEnd,
                                  DoubleMatrix fundamental,
                                  Map<String, PairCorrespData> container,
-                                 Set<Lock> semaphore) {
+                                 Set<Lock> semaphore,
+                                 ArrayList<EpipolarLineHolder> lines) {
         this.homography = homography;
         this.c1 = c1;
         this.c2 = c2;
@@ -57,6 +68,7 @@ public class DepthRegionCalculator implements Runnable {
         this.fundamental = fundamental;
         this.container = container;
         this.semaphore = semaphore;
+        this.lines = lines;
         k1 = homography.getK1();
         k2 = homography.getK2();
         r1 = homography.getR1();
@@ -74,8 +86,8 @@ public class DepthRegionCalculator implements Runnable {
         for (int i = yStart; i < yEnd; i++) {
             for (int j = 0; j < img1.getWidth(); j += skipNpoints) {
                 int[] firstPoint = {j, i, 1};
-                int[] secondPoint = calcSecondPoint(firstPoint);
-                Vector M = calcMetricDepth(firstPoint, secondPoint);
+                int[] secondPoint = calcSecondPointAlongX(firstPoint);
+                Vector M = calcMetricDepthX(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
                 res.setX1(j);
                 res.setY1(i);
@@ -85,13 +97,13 @@ public class DepthRegionCalculator implements Runnable {
                 res.setY(M.get(1));
                 res.setZ(M.get(2));
                 res.setColor(img2.getColor(secondPoint[0], secondPoint[1]));
-                synchronized (this) {
+                synchronized (LOCK_OBJ) {
                     container.put(j + "_" + i, res);
                 }
             }
-            if (i % 10 == 0) {
+            /*if (i % 10 == 0) {
                 logger.info("Thread #" + lock.getId() + " Processed up to line " + i);
-            }
+            }*/
         }
         synchronized (LOCK_OBJ) {
             semaphore.remove(lock);
@@ -101,7 +113,7 @@ public class DepthRegionCalculator implements Runnable {
 
     /**
      * this method should calculate second point, given coordinates of the first one
-     * it uses m^T * F * m = 0 equation
+     * it uses m2^T * F * m1 = 0 equation
      *
      * @param firstPoint - coordinates of the point on the first image
      * @return coordinates of the point on the second image
@@ -154,9 +166,56 @@ public class DepthRegionCalculator implements Runnable {
         return result;
     }
 
+    private int[] calcSecondPointAlongX(int[] firstPoint) {
+        Vector first = new Vector(firstPoint);
+        Vector coefficients = fundamental.postMultiply(first);
+        //TODO it would be nice to use Gradient Descent here to find the most similar point from the second image!!!
+        //TODO also think how to bound this -100 - + 100 thing, in case our line is almost horizontal it may cause issues
+        int[] result = new int[3];
+        result[2] = 1;
+        result[0] = Integer.MIN_VALUE;
+        result[1] = Integer.MIN_VALUE;
+        double minDiff = Double.MAX_VALUE;
+        int startX = firstPoint[0] + SECOND_POINT_SHIFT - SECOND_POINT_LOOKUP_WIDTH / 2, endX = firstPoint[0] + SECOND_POINT_SHIFT + SECOND_POINT_LOOKUP_WIDTH / 2;
+        if (startX < 0) {
+            startX = 0;
+            endX = SECOND_POINT_LOOKUP_WIDTH;
+        } else if (endX >= img1.getWidth()) {
+            endX = img1.getWidth();
+            startX = img1.getWidth() - SECOND_POINT_LOOKUP_WIDTH - 1;
+        }
+        //TODO this is only for debugging, eats much resources
+        EpipolarLineHolder TMP = new EpipolarLineHolder(firstPoint, coefficients.getVec());
+        for (int x2 = startX; x2 < endX; x2 ++) {
+            int y2 = (int)((-1 * ( coefficients.get(2) + coefficients.get(0) * x2 )) / coefficients.get(1));
+
+            if (y2 < 0)
+                y2 = 0;
+            if (y2 >= img2.getHeight())
+                y2 = img2.getHeight() - 1;
+            TMP.addLinePoint(x2, y2);
+            double tmp = 1000;
+            try {
+                tmp = evaluateSimilarity(firstPoint, new int[]{x2, y2});
+            } catch (ArrayIndexOutOfBoundsException e) {
+                logger.error(String.format("Index out of bounds: %d : %d; %d : %d", firstPoint[0], firstPoint[1], x2, y2));
+            }
+            if (tmp < minDiff) {
+                minDiff = tmp;
+                result[0] = x2;
+                result[1] = y2;
+            }
+        }
+        TMP.setSecondPoint(result[0], result[1]);
+        synchronized (LOCK_OBJ) {
+            lines.add(TMP);
+        }
+        return result;
+    }
+
     private double evaluateSimilarity(int[] point1, int[] point2) {
-        Color[] firstSample = getColorRegion(img1, point1);
-        Color[] secondSample = getColorRegion(img2, point2);
+        Color[] firstSample = getColorRegionX(img1, point1);
+        Color[] secondSample = getColorRegionX(img2, point2);
         double meanDiff = 0;
         for (int i = 0; i < firstSample.length; i++) {
             meanDiff += comparePixels(firstSample[i], secondSample[i]);
@@ -223,6 +282,40 @@ public class DepthRegionCalculator implements Runnable {
         return res;
     }
 
+    private Color[] getColorRegionX(ColorMatrix img, int[] point) {
+        Color[] res = new Color[COLOR_REGION_RADIUS * 4];
+        for (int i = 1, j = 0; i <= COLOR_REGION_RADIUS; i ++, j += 4) {
+            //TODO GOVNOKOD INITIATED
+            //Here we take colors from image in cross pattern
+            Color c = null;
+            try {
+                c = img.getColor(point[0] - i, point[1]);
+            } catch (IndexOutOfBoundsException e) {
+                c = Color.magenta;
+            }
+            res[j] = c;
+            try {
+                c = img.getColor(point[0], point[1] - i);
+            } catch (IndexOutOfBoundsException e) {
+                c = Color.magenta;
+            }
+            res[j + 1] = c;
+            try {
+                c = img.getColor(point[0] + i, point[1]);
+            } catch (IndexOutOfBoundsException e) {
+                c = Color.magenta;
+            }
+            res[j + 2] = c;
+            try {
+                c = img.getColor(point[0], point[1] + i);
+            } catch (IndexOutOfBoundsException e) {
+                c = Color.magenta;
+            }
+            res[j + 3] = c;
+        }
+        return res;
+    }
+
     /**
      * Calcs M from two points
      *
@@ -258,6 +351,25 @@ public class DepthRegionCalculator implements Runnable {
         Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
 
         return M;
+    }
+
+    private Vector calcMetricDepthX(int[] firstPoint, int[] secondPoint) {
+        DoubleMatrix a = k2.multiplyBy(r2.transpose()).multiplyBy(r1);
+        a = a.inverse();
+        Vector b = a.postMultiply(new Vector(secondPoint));
+        Vector c = k1.inverse().postMultiply(new Vector(firstPoint));
+        Vector d = a.postMultiply(epipole);
+
+        double ro1 = ( d.get(0) * b.get(1) - d.get(1) * b.get(0) ) / ( c.get(1) * b.get(0) + c.get(0) * b.get(1) );
+
+        double ro2 = ( d.get(1) + ro1 * c.get(1) ) / b.get(1);
+
+        Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
+
+        Vector M1 = a.postMultiply(new Vector(secondPoint)).scalar(ro2).subtract(a.postMultiply(epipole));
+        //Vector M = a.postMultiply(new Vector(secondPoint)).scalar(ro2).subtract(epipole);
+        return M;
+
     }
 
     public DepthRegionCalculator setSkipNpoints(int skipNpoints) {

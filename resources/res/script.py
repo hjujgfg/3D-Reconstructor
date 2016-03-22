@@ -17,9 +17,9 @@ for line in file:
 	if min > z:
 		min = z
 	i += 1
-	if z > 10:
+	if z > 100:
 		maxcounter += 1
-	if z < -1:
+	if z < -100:
 		mincounter += 1
 print "Sum", sum
 print "Avg", sum / i

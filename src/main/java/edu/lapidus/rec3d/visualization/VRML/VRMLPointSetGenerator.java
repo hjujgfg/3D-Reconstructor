@@ -40,8 +40,10 @@ public class VRMLPointSetGenerator {
                     "                    color [\n");
             for (PairCorrespData p : points) {
                 if (p.getZ() > -10 && p.getZ() < 10) {
-                    fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
+                    //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 2000000) + ",\n");
+                    //fw.write(p.getX() + " " + p.getY() + " " + p.getZ() + ",\n");
+                    fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 10000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;
                     double g = c.getGreen() / 256.;

@@ -2,6 +2,7 @@ package edu.lapidus.rec3d;
 
 import edu.lapidus.rec3d.depth.Homography;
 import edu.lapidus.rec3d.depth.threaded.DepthRegionCalculator;
+import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.depth.threaded.Lock;
 import edu.lapidus.rec3d.math.Correspondence;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
@@ -55,6 +56,8 @@ public class TwoImageCalculator {
     DoubleMatrix k1, k2, r1, r2;
     Vector c1, c2;
 
+    ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
+
     static {
         matrixBuilder = new MatrixBuilderImpl();
         imageProcessor = new ImageProcessor();
@@ -63,7 +66,7 @@ public class TwoImageCalculator {
     String img1Path;
     String img2Path;
     //TODO read it from properties
-    private final static int THREAD_NUMBER = 20;
+    private final static int THREAD_NUMBER = 10;
 
     Map<String, PairCorrespData> results;
 
@@ -91,7 +94,7 @@ public class TwoImageCalculator {
         //matrixBuilder = new MatrixBuilderImpl();
         correspondence = new Correspondence();
         //imageProcessor = new ImageProcessor();
-        results = new HashMap<String, PairCorrespData>();
+        results = new TreeMap<String, PairCorrespData>();
     }
     public Map<String, PairCorrespData> run () {
         DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
@@ -114,7 +117,8 @@ public class TwoImageCalculator {
             if (yEnd > images[0].getHeight()) {
                 yEnd = images[0].getHeight();
             }
-            Thread t = new Thread(new DepthRegionCalculator(homography, c1, c2, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore).setSkipNpoints(1));
+            //TODO REMOVE lines parameter!!!!
+            Thread t = new Thread(new DepthRegionCalculator(homography, c1, c2, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore, lines).setSkipNpoints(1));
             t.start();
         }
         try {
@@ -135,8 +139,9 @@ public class TwoImageCalculator {
         try {
             //FileOutputStream fos = new FileOutputStream();
             logger.info("Writing results");
+            Map<String, PairCorrespData> sorted = new TreeMap<String, PairCorrespData>(result);
             FileWriter fw = new FileWriter(new File("resources/res/result.txt"));
-            for (Map.Entry<String, PairCorrespData> entry : result.entrySet()) {
+            for (Map.Entry<String, PairCorrespData> entry : sorted.entrySet()) {
                 fw.write(entry.getKey() + "      " + entry.getValue().toString());
             }
             fw.flush();
@@ -163,6 +168,10 @@ public class TwoImageCalculator {
         VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
 
         pointSet.buildPointSet();
+
+        imageProcessor.visualizeCorresps(result.values(), img1Path, img2Path, 20);
+
+        imageProcessor.visualizeEpipolarLines(lines, img1Path, img2Path, 10);
 
         return result;
 
@@ -207,8 +216,10 @@ public class TwoImageCalculator {
         SingularValueDecomposition svd = fund.SVD();
         RealMatrix v = svd.getV();
         Vector e = new Vector(v.getColumn(2));
-        e = e.scalar(e.get(2));
-        return new Vector(v.getColumn(v.getColumnDimension() - 1));
+        e = e.scalar(1/(e.get(2) * 1000));
+        logger.info("epipole : " + e);
+        //return new Vector(v.getColumn(v.getColumnDimension() - 1));
+        return e;
     }
 
 
