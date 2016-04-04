@@ -154,6 +154,9 @@ public class ImageProcessor {
                 g.drawOval(p[0] + w, p[1], 1, 1);
             }
 
+            int[] l = e.getLine().get(0);
+            g.drawOval(l[0] + w, l[1], 10, 3);
+
             /*int x1 = w;
             int y1 = (int)((-1 * ( coefficients[2] + coefficients[0] * x1 )) / coefficients[1]);
 

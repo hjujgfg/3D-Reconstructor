@@ -16,6 +16,7 @@ public class MatrixBuilderImpl implements MatrixBuilder{
     final static Logger logger = Logger.getLogger(MatrixBuilder.class);
 
     public DoubleMatrix createRotationMatrix(double angle, int axis) {
+        angle = Math.PI * angle / 180;
         double[][] res = new double[3][];
         for (int i = 0; i < 3; i ++) {
             res[i] = new double[3];
@@ -39,6 +40,14 @@ public class MatrixBuilderImpl implements MatrixBuilder{
                 res[0][2] = Math.sin(angle);
                 res[2][2] = Math.cos(angle);
                 res[1][1] = 1;
+                break;
+            case MatrixBuilder.X_AXIS:
+                res[0][0] = 1;
+                res[1][1] = Math.cos(angle);
+                res[1][2] = - Math.sin(angle);
+                res[2][1] = Math.sin(angle);
+                res[2][2] = Math.cos(angle);
+                break;
         }
         return new DoubleMatrix(res);
     }

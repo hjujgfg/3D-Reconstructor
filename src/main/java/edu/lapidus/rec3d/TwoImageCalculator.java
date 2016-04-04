@@ -36,12 +36,13 @@ public class TwoImageCalculator {
         DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(15, MatrixBuilder.Y_AXIS);
-        String img1 = "resources/cup1.png";
-        String img2 = "resources/cup2.png";
-        Vector c1 = new Vector(0.0, 0.0, 0.0);
-        Vector c2 = new Vector(57., 0.0, 7.);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, c1, c2, img1, img2);
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-30, MatrixBuilder.Y_AXIS);
+        //r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
+        String img1 = "resources/sheep1.png";
+        String img2 = "resources/sheep2.png";
+        /*Vector c1 = new Vector(0.0, 0.0, 0.0);
+        Vector c2 = new Vector(57., 0.0, 7.);*/
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2);
         init.init();
         Map<String, PairCorrespData> res = init.run();
         imageProcessor.createDepthMap(res);
@@ -54,7 +55,6 @@ public class TwoImageCalculator {
     static ImageProcessor imageProcessor;
     Homography homography;
     DoubleMatrix k1, k2, r1, r2;
-    Vector c1, c2;
 
     ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
 
@@ -66,7 +66,7 @@ public class TwoImageCalculator {
     String img1Path;
     String img2Path;
     //TODO read it from properties
-    private final static int THREAD_NUMBER = 10;
+    private final static int THREAD_NUMBER = 20;
 
     Map<String, PairCorrespData> results;
 
@@ -76,9 +76,7 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, Vector c1, Vector c2, String img1Path, String img2Path) {
-        this.c1 = c1;
-        this.c2 = c2;
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
         logger.info("Starting pair calculation");
@@ -110,7 +108,7 @@ public class TwoImageCalculator {
 
         int linesPerThread = images[0].getHeight() / THREAD_NUMBER;
         Set<Lock> semaphore = new HashSet<Lock>(THREAD_NUMBER);
-        int step = (images[0].getHeight() - 40) / THREAD_NUMBER;
+        int step = (images[0].getHeight()) / THREAD_NUMBER;
         for (int i = 0; i < images[0].getHeight(); i += step) {
             int yStart = i;
             int yEnd = i + step;
@@ -118,7 +116,7 @@ public class TwoImageCalculator {
                 yEnd = images[0].getHeight();
             }
             //TODO REMOVE lines parameter!!!!
-            Thread t = new Thread(new DepthRegionCalculator(homography, c1, c2, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore, lines).setSkipNpoints(1));
+            Thread t = new Thread(new DepthRegionCalculator(homography, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore, lines).setSkipNpoints(1));
             t.start();
         }
         try {
@@ -171,7 +169,7 @@ public class TwoImageCalculator {
 
         imageProcessor.visualizeCorresps(result.values(), img1Path, img2Path, 20);
 
-        imageProcessor.visualizeEpipolarLines(lines, img1Path, img2Path, 10);
+        imageProcessor.visualizeEpipolarLines(lines, img1Path, img2Path, 20);
 
         return result;
 
@@ -198,7 +196,8 @@ public class TwoImageCalculator {
         return res;
     }
     //TODO think how to implement this one, and how to get C1 and C2!
-    private Vector calculateEpipole() {
+    //This should be unnecessary
+/*    private Vector calculateEpipole() {
         RealMatrix K2 = new Array2DRowRealMatrix(k2.getData());
         RealMatrix R2 = new Array2DRowRealMatrix(r2.getData());
         RealVector C1 = new ArrayRealVector(c1.getVec());
@@ -210,7 +209,7 @@ public class TwoImageCalculator {
         RealMatrix tmp1 = K2.multiply(R2);
         RealVector result = tmp1.operate(C1);
         return new Vector(result.toArray());
-    }
+    }*/
 
     private Vector calculateEpipoleFromFundamental(DoubleMatrix fund) {
         SingularValueDecomposition svd = fund.SVD();
@@ -221,9 +220,6 @@ public class TwoImageCalculator {
         //return new Vector(v.getColumn(v.getColumnDimension() - 1));
         return e;
     }
-
-
-
 
     public DoubleMatrix getK2() {
         return k2;
@@ -264,21 +260,4 @@ public class TwoImageCalculator {
     public void setHomography(Homography homography) {
         this.homography = homography;
     }
-
-    public Vector getC1() {
-        return c1;
-    }
-
-    public void setC1(Vector c1) {
-        this.c1 = c1;
-    }
-
-    public Vector getC2() {
-        return c2;
-    }
-
-    public void setC2(Vector c2) {
-        this.c2 = c2;
-    }
-
 }

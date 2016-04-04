@@ -21,11 +21,13 @@ import java.util.Set;
  */
 public class DepthRegionCalculator implements Runnable {
     private final static Logger logger = Logger.getLogger(DepthRegionCalculator.class);
-    private final static int SECOND_POINT_LOOKUP_WIDTH = 50;
-    private final static int SECOND_POINT_SHIFT = 80;
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
+    private final static int SECOND_POINT_SHIFT = 40;
     private final static Object LOCK_OBJ = new Object();
 
-    private final static int COLOR_REGION_RADIUS = 50;
+    private final static int COLOR_REGION_RADIUS = 10;
+    private final static int HEIGHT_DIFF_LIM = 20;
+    private final static double HEIGHT_DIFF_WEIGHT = 10;
 
     Homography homography;
     private Vector epipole;
@@ -42,13 +44,11 @@ public class DepthRegionCalculator implements Runnable {
     private Set<Lock> semaphore;
 
     private DoubleMatrix k1, k2, r1, r2;
-    private Vector c1, c2;
+    //private Vector c1, c2;
     //Number of points to skip when iterating over the images, like we process every Nth point
     private int skipNpoints = 1;
 
     public DepthRegionCalculator(Homography homography,
-                                 Vector c1,
-                                 Vector c2,
                                  Vector epipole,
                                  ColorMatrix img1,
                                  ColorMatrix img2,
@@ -58,8 +58,6 @@ public class DepthRegionCalculator implements Runnable {
                                  Set<Lock> semaphore,
                                  ArrayList<EpipolarLineHolder> lines) {
         this.homography = homography;
-        this.c1 = c1;
-        this.c2 = c2;
         this.epipole = epipole;
         this.img1 = img1;
         this.img2 = img2;
@@ -87,7 +85,7 @@ public class DepthRegionCalculator implements Runnable {
             for (int j = 0; j < img1.getWidth(); j += skipNpoints) {
                 int[] firstPoint = {j, i, 1};
                 int[] secondPoint = calcSecondPointAlongX(firstPoint);
-                Vector M = calcMetricDepthX(firstPoint, secondPoint);
+                Vector M = calcMetricDepthXX(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
                 res.setX1(j);
                 res.setY1(i);
@@ -176,7 +174,14 @@ public class DepthRegionCalculator implements Runnable {
         result[0] = Integer.MIN_VALUE;
         result[1] = Integer.MIN_VALUE;
         double minDiff = Double.MAX_VALUE;
-        int startX = firstPoint[0] + SECOND_POINT_SHIFT - SECOND_POINT_LOOKUP_WIDTH / 2, endX = firstPoint[0] + SECOND_POINT_SHIFT + SECOND_POINT_LOOKUP_WIDTH / 2;
+        int widthClass = 0;
+        if (firstPoint[0] >= 180 && firstPoint[0] < 510 ) {
+            widthClass = 50;
+        } else {
+            widthClass = -20;
+        }
+        int startX = firstPoint[0] + SECOND_POINT_SHIFT - widthClass - (SECOND_POINT_LOOKUP_WIDTH / 2),
+                endX = firstPoint[0] + SECOND_POINT_SHIFT - widthClass + (SECOND_POINT_LOOKUP_WIDTH / 2);
         if (startX < 0) {
             startX = 0;
             endX = SECOND_POINT_LOOKUP_WIDTH;
@@ -186,8 +191,8 @@ public class DepthRegionCalculator implements Runnable {
         }
         //TODO this is only for debugging, eats much resources
         EpipolarLineHolder TMP = new EpipolarLineHolder(firstPoint, coefficients.getVec());
-        for (int x2 = startX; x2 < endX; x2 ++) {
-            int y2 = (int)((-1 * ( coefficients.get(2) + coefficients.get(0) * x2 )) / coefficients.get(1));
+        for (int x2 = startX; x2 < endX - 4; x2 += 4) {
+            int y2 = (int)( ( - coefficients.get(2) - coefficients.get(0) * x2 )  / coefficients.get(1) );
 
             if (y2 < 0)
                 y2 = 0;
@@ -220,7 +225,12 @@ public class DepthRegionCalculator implements Runnable {
         for (int i = 0; i < firstSample.length; i++) {
             meanDiff += comparePixels(firstSample[i], secondSample[i]);
         }
-        return meanDiff / firstSample.length;
+
+        int heightDiff = point1[1] - point2[1];
+        heightDiff = (heightDiff - HEIGHT_DIFF_LIM) * (heightDiff - HEIGHT_DIFF_LIM);
+        //logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff);
+        meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT;
+        return meanDiff / (2 * (firstSample.length + 1));
     }
 
     /**
@@ -238,6 +248,8 @@ public class DepthRegionCalculator implements Runnable {
 
         return redDiff * redDiff + greenDiff * greenDiff + blueDiff * blueDiff;
     }
+
+    //private double compareRegions(Color[] )
 
     /**
      * Get colors of nearby pixels
@@ -318,12 +330,12 @@ public class DepthRegionCalculator implements Runnable {
 
     /**
      * Calcs M from two points
-     *
+     * HOPEFULLY WE WON'T NEED THIS
      * @param firstPoint
      * @param secondPoint
      * @return M-vector
      */
-    private Vector calcDepth(int[] firstPoint, int[] secondPoint) {
+    /*private Vector calcDepth(int[] firstPoint, int[] secondPoint) {
         //A * m1
         Vector z = homography.postMultiply(new Vector(firstPoint));
         //k2*r2^t
@@ -338,7 +350,7 @@ public class DepthRegionCalculator implements Runnable {
         Vector M = k1.inverse().postMultiply(new Vector(firstPoint)).scalar(ro1);
 
         return M;
-    }
+    }*/
 
     private Vector calcMetricDepth(int [] firstPoint, int[] secondPoint) {
         Vector A = homography.postMultiply(new Vector(firstPoint));
@@ -370,6 +382,16 @@ public class DepthRegionCalculator implements Runnable {
         //Vector M = a.postMultiply(new Vector(secondPoint)).scalar(ro2).subtract(epipole);
         return M;
 
+    }
+
+    private Vector calcMetricDepthXX(int[] firstPoint, int [] secondPoint) {
+        Vector m1 = new Vector(firstPoint);
+        Vector m2 = new Vector(secondPoint);
+        Vector b = homography.postMultiply(m1);
+        double ro1 = ( epipole.get(1) * m2.get(0) - epipole.get(0) * m2.get(1) ) / ( b.get(0) * m2.get(1) - b.get(1) * m2.get(0));
+
+        Vector M = k1.inverse().postMultiply(m1).scalar(ro1);
+        return M;
     }
 
     public DepthRegionCalculator setSkipNpoints(int skipNpoints) {
