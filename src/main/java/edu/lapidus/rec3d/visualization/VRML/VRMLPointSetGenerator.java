@@ -25,24 +25,19 @@ public class VRMLPointSetGenerator {
     public void buildPointSet() {
         logger.info("Saving pointset wrl");
         try {
-            FileWriter fw = new FileWriter(new File("resources/res/pointSet.wrl"));
-            fw.write("Shape {\n" +
-                    "    appearance Appearance {\n" +
-                    "        material Material {\n" +
-                    "            emissiveColor 1.0 1.0 1.0\n" +
-                    "        }\n" +
-                    "    }\n" +
-                    "    geometry PointSet {\n" +
-                    "        coord Coordinate {\n" +
-                    "            point [\n");
+
+            StringBuilder sb1 = new StringBuilder();
+            appendHeader(sb1);
+            StringBuilder sb2 = new StringBuilder();
+            appendHeader(sb2);
             StringBuilder color = new StringBuilder();
             color.append("color Color {\n" +
                     "                    color [\n");
             for (PairCorrespData p : points) {
-                if (p.getZ() > -1 && p.getZ() < 1 && p.getX1() > 150 && p.getX1() < 650) {
+                if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 150 && p.getX1() < 650) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 20000) + ",\n");
-                    fw.write(p.getX() + " " + p.getY() + " " + p.getZ() + ",\n");
+                    sb2.append(p.getX1() + " " +  (-p.getY1()) + " " + (p.getZ() * 200000) + ",\n");
+                    sb1.append(p.getX() * 1000 + " " + (-p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;
@@ -51,13 +46,24 @@ public class VRMLPointSetGenerator {
                     color.append(r + " " + g + " " + b +",\n");
                 }
             }
-            fw.write("]\n" +
+            sb1.append("]\n" +
+                    "}\n");
+            sb2.append("]\n" +
                     "}\n");
             color.append("\t]\n" +
                     " \t}\n");
-            fw.write(color.toString());
-            fw.write("    }\n" +
+            sb1.append(color.toString());
+            sb2.append(color.toString());
+            sb1.append("    }\n" +
                     "}");
+            sb2.append("    }\n" +
+                    "}");
+            FileWriter fw = new FileWriter(new File("resources/res/pointSet3D.wrl"));
+            fw.write(sb1.toString());
+            fw.flush();
+            fw.close();
+            fw = new FileWriter(new File("resources/res/pointSetPlain.wrl"));
+            fw.write(sb2.toString());
             fw.flush();
             fw.close();
             logger.info("Done saving pointset");
@@ -65,5 +71,17 @@ public class VRMLPointSetGenerator {
             logger.error("Error saving pointset", e);
         }
 
+    }
+
+    private void appendHeader(StringBuilder sb) {
+        sb.append("Shape {\n" +
+                "    appearance Appearance {\n" +
+                "        material Material {\n" +
+                "            emissiveColor 1.0 1.0 1.0\n" +
+                "        }\n" +
+                "    }\n" +
+                "    geometry PointSet {\n" +
+                "        coord Coordinate {\n" +
+                "            point [\n");
     }
 }

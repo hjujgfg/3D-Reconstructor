@@ -33,8 +33,8 @@ public class TwoImageCalculator {
     public static void main(String ... args) {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
-        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(425, 425, 400, 300);
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 1000, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 1000, 400, 300);
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
         DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-30, MatrixBuilder.Y_AXIS);
         //r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
