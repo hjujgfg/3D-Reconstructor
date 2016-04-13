@@ -18,7 +18,7 @@ public class DoubleMatrixTest {
     MatrixBuilder matrixBuilder;
     @Test
     public void testSolveHomogeneous() {
-       DoubleMatrix tst = matrixBuilder.createAMatrix(new Correspondence().getInititalCorrespondences());
+       DoubleMatrix tst = matrixBuilder.createAMatrix(new Correspondence("Data/points.csv").getInititalCorrespondences());
         Vector v = tst.solveHomogeneous();
         logger.debug(v.toString());
     }

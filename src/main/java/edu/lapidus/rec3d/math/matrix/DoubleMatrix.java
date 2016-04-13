@@ -80,17 +80,17 @@ public class DoubleMatrix implements Matrix, Serializable {
      * @return
      */
     public Vector solveHomogeneous() {
-        logger.info("Solving homogeneous on matrix: " + toString());
+        //logger.info("Solving homogeneous on matrix: " + toString());
         RealMatrix M = new Array2DRowRealMatrix(this.getData(), false);
         SingularValueDecomposition SVD = new SingularValueDecomposition(M);
         RealMatrix V = SVD.getV();
         Vector v = new Vector(V.getColumn(V.getColumnDimension() - 1));
-        logger.info("Solved with resulting vector: " + v.toString());
+        //logger.info("Solved with resulting vector: " + v.toString());
         return v;
     }
 
     public SingularValueDecomposition SVD() {
-        logger.info("Performing SVD over matrix: " + toString());
+        //logger.info("Performing SVD over matrix: " + toString());
         RealMatrix M = new Array2DRowRealMatrix(internal);
         return new SingularValueDecomposition(M);
     }

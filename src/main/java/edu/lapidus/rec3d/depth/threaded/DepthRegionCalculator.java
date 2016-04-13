@@ -21,14 +21,29 @@ import java.util.Set;
  */
 public class DepthRegionCalculator implements Runnable {
     private final static Logger logger = Logger.getLogger(DepthRegionCalculator.class);
-    private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
-    private final static int SECOND_POINT_SHIFT = 40;
     private final static Object LOCK_OBJ = new Object();
 
-    private final static int COLOR_REGION_RADIUS = 10;
-    private final static int HEIGHT_DIFF_LIM = 20;
-    private final static double HEIGHT_DIFF_WEIGHT = 10;
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
+    private final static int SECOND_POINT_SHIFT = -40;
 
+    private final static int COLOR_REGION_RADIUS = 20;
+    //sheep0 - 1
+    /*private final static int HEIGHT_DIFF_LIM = 3;//5
+    private final static int WIDTH_DIFF_LIM = 30;
+    private final static double HEIGHT_DIFF_WEIGHT = 500;
+    private final static double WIDTH_DIFF_WEIGHT = 30;*/
+    /*private final static int SECOND_POINT_LOOKUP_WIDTH = 240;
+    private final static int SECOND_POINT_SHIFT = -40;
+
+    private final static int COLOR_REGION_RADIUS = 5;
+    private final static int HEIGHT_DIFF_LIM = 30;
+    private final static double HEIGHT_DIFF_WEIGHT = 3;
+    private final static double WIDTH_DIFF_WEIGHT = 50;*/
+    //crane
+    private final static int HEIGHT_DIFF_LIM = 3;//5
+    private final static int WIDTH_DIFF_LIM = 3;
+    private final static double HEIGHT_DIFF_WEIGHT = 500;
+    private final static double WIDTH_DIFF_WEIGHT = 3;
     Homography homography;
     private Vector epipole;
     ColorMatrix img1;
@@ -84,6 +99,8 @@ public class DepthRegionCalculator implements Runnable {
         for (int i = yStart; i < yEnd; i++) {
             for (int j = 0; j < img1.getWidth(); j += skipNpoints) {
                 int[] firstPoint = {j, i, 1};
+                if (img1.getColor(j, i).equals(Color.GREEN)) continue;
+
                 int[] secondPoint = calcSecondPointAlongX(firstPoint);
                 Vector M = calcMetricDepthXX(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
@@ -175,11 +192,11 @@ public class DepthRegionCalculator implements Runnable {
         result[1] = Integer.MIN_VALUE;
         double minDiff = Double.MAX_VALUE;
         int widthClass = 0;
-        if (firstPoint[0] >= 180 && firstPoint[0] < 510 ) {
+        /*if (firstPoint[0] >= 180 && firstPoint[0] < 510 ) {
             widthClass = 50;
         } else {
             widthClass = -20;
-        }
+        }*/
         int startX = firstPoint[0] + SECOND_POINT_SHIFT - widthClass - (SECOND_POINT_LOOKUP_WIDTH / 2),
                 endX = firstPoint[0] + SECOND_POINT_SHIFT - widthClass + (SECOND_POINT_LOOKUP_WIDTH / 2);
         if (startX < 0) {
@@ -228,8 +245,10 @@ public class DepthRegionCalculator implements Runnable {
 
         int heightDiff = point1[1] - point2[1];
         heightDiff = (heightDiff - HEIGHT_DIFF_LIM) * (heightDiff - HEIGHT_DIFF_LIM);
+        int widthDiff = point1[0] - point2[0] - WIDTH_DIFF_LIM;; //TODO was - 30
+        widthDiff *= widthDiff * WIDTH_DIFF_WEIGHT;
         //logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff);
-        meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT;
+        meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT + widthDiff;
         return meanDiff / (2 * (firstSample.length + 1));
     }
 

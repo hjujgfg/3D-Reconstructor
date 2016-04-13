@@ -33,19 +33,22 @@ public class TwoImageCalculator {
     public static void main(String ... args) {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
-        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 1000, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 1000, 400, 300);
+        //sheep01
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 692, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 692, 400, 300);
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-30, MatrixBuilder.Y_AXIS);
-        //r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
-        String img1 = "resources/sheep1.png";
-        String img2 = "resources/sheep2.png";
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-12, MatrixBuilder.Y_AXIS);
+        //r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-7, MatrixBuilder.X_AXIS));
+
+        String img1 = "resources/images/sheep1.png";
+        String img2 = "resources/images/sheep2.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2);
-        init.init();
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep1.csv");
         Map<String, PairCorrespData> res = init.run();
-        imageProcessor.createDepthMap(res);
+        VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res);
+        generator.buildPointSet();
+        //imageProcessor.createDepthMap(res);
     }
 
 
@@ -68,7 +71,6 @@ public class TwoImageCalculator {
     //TODO read it from properties
     private final static int THREAD_NUMBER = 20;
 
-    Map<String, PairCorrespData> results;
 
     ArrayList<Thread> depthComputers;
 
@@ -76,7 +78,7 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path) {
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String CorrespsFile) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
         logger.info("Starting pair calculation");
@@ -85,15 +87,16 @@ public class TwoImageCalculator {
         this.k2 = k2;
         this.r1 = r1;
         this.r2 = r2;
+        correspondence = new Correspondence(CorrespsFile);
     }
 
-    public void init() {
+    /*public void init() {
         logger.info("ENTERED INIT!!!");
         //matrixBuilder = new MatrixBuilderImpl();
-        correspondence = new Correspondence();
+
         //imageProcessor = new ImageProcessor();
-        results = new TreeMap<String, PairCorrespData>();
-    }
+
+    }*/
     public Map<String, PairCorrespData> run () {
         DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
         DoubleMatrix fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
@@ -105,7 +108,11 @@ public class TwoImageCalculator {
         Map<String, PairCorrespData> result = new ConcurrentHashMap<String, PairCorrespData>();
         //TODO this is not good
         ColorMatrix[] images = loadImages();
+        //TODO remove background
 
+        for (ColorMatrix c : images) {
+            c.removeBackground();
+        }
         int linesPerThread = images[0].getHeight() / THREAD_NUMBER;
         Set<Lock> semaphore = new HashSet<Lock>(THREAD_NUMBER);
         int step = (images[0].getHeight()) / THREAD_NUMBER;
@@ -163,9 +170,9 @@ public class TwoImageCalculator {
 
         xyz.saveXYZ();*/
 
-        VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
+        /*VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
 
-        pointSet.buildPointSet();
+        pointSet.buildPointSet();*/
 
         imageProcessor.visualizeCorresps(result.values(), img1Path, img2Path, 20);
 
@@ -215,7 +222,7 @@ public class TwoImageCalculator {
         SingularValueDecomposition svd = fund.SVD();
         RealMatrix v = svd.getV();
         Vector e = new Vector(v.getColumn(2));
-        e = e.scalar(1/(e.get(2) * 1000));
+        e = e.scalar(1/(e.get(2)*1000));
         logger.info("epipole : " + e);
         //return new Vector(v.getColumn(v.getColumnDimension() - 1));
         return e;

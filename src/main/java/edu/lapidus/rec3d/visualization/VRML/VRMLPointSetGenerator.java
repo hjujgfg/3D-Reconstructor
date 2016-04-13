@@ -21,6 +21,9 @@ public class VRMLPointSetGenerator {
     public VRMLPointSetGenerator(Map<String, PairCorrespData> points) {
         this.points = new HashSet<PairCorrespData>(points.values());
     }
+    public VRMLPointSetGenerator(Set<PairCorrespData> res) {
+        this.points = res;
+    }
 
     public void buildPointSet() {
         logger.info("Saving pointset wrl");
@@ -34,10 +37,11 @@ public class VRMLPointSetGenerator {
             color.append("color Color {\n" +
                     "                    color [\n");
             for (PairCorrespData p : points) {
-                if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 150 && p.getX1() < 650) {
+                //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
+                if (p.getZ() > -1 && p.getZ() < 1 && p.getX1() > 100 && p.getX1() < 700) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    sb2.append(p.getX1() + " " +  (-p.getY1()) + " " + (p.getZ() * 200000) + ",\n");
-                    sb1.append(p.getX() * 1000 + " " + (-p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
+                    sb2.append(p.getX1() + " " +  (p.getY1()) + " " + (p.getZ() * 600000) + ",\n");
+                    sb1.append(p.getX() * 1000 + " " + (p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;

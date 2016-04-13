@@ -100,4 +100,37 @@ public class PairCorrespData implements Serializable {
         this.color = color;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PairCorrespData that = (PairCorrespData) o;
+
+        if (x1 != that.x1) return false;
+        if (y1 != that.y1) return false;
+        if (x2 != that.x2) return false;
+        if (y2 != that.y2) return false;
+        if (x1 != that.x2 && y1 != that.y2) return false;
+        if (x2 != that.x1 && y2 != that.y1) return false;
+        if (Double.compare(that.X, X) != 0) return false;
+        if (Double.compare(that.Y, Y) != 0) return false;
+        return Double.compare(that.Z, Z) == 0;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(X);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(Y);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(Z);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + x1 + y1;
+        result = 31 * result + x2 + y2;
+        return result;
+    }
 }

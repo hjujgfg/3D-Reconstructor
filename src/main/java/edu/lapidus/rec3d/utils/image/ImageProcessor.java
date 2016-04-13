@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
+import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
 
@@ -9,6 +10,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
 
@@ -154,8 +157,8 @@ public class ImageProcessor {
                 g.drawOval(p[0] + w, p[1], 1, 1);
             }
 
-            int[] l = e.getLine().get(0);
-            g.drawOval(l[0] + w, l[1], 10, 3);
+            /*int[] l = e.getLine().get(0);
+            g.drawOval(l[0] + w, l[1], 10, 3);*/
 
             /*int x1 = w;
             int y1 = (int)((-1 * ( coefficients[2] + coefficients[0] * x1 )) / coefficients[1]);
@@ -176,5 +179,61 @@ public class ImageProcessor {
         g.drawImage(img1, 0, 0, null);
         g.drawImage(img2, img1.getWidth(), 0, null);
         return combined;
+    }
+
+    public BufferedImage subtract(BufferedImage a, BufferedImage bb, int threshold) {
+        if (a.getHeight() != bb.getHeight() || a.getWidth() != bb.getWidth()) {
+            throw new IllegalArgumentException("Dimmensions does not correspond");
+        }
+        BufferedImage res = new BufferedImage(a.getWidth(), a.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < a.getWidth(); x ++) {
+            for (int y = 0; y < a.getHeight(); y ++) {
+                Color c1 = new Color(a.getRGB(x, y));
+                Color c2 = new Color(bb.getRGB(x, y));
+                int r = c1.getRed() - c2.getRed();
+                int g = c1.getGreen() - c2.getGreen();
+                int b = c1.getBlue() - c2.getBlue();
+                if (r < threshold && b < threshold && g < threshold) {
+                    res.setRGB(x, y, Color.GREEN.getRGB());
+                } else {
+                    res.setRGB(x, y, c2.getRGB());
+                }
+            }
+        }
+        return res;
+    }
+    //TODO govnokod
+    private static int counter = 0;
+    public static void bulkResizeImages(String name, int newWidth, int newHeight) {
+        String dir = "resources/images/"+name +"/";
+        counter = 0;
+        try {
+            Files.walk(Paths.get(dir)).forEach(filePath -> {
+                try {
+                    BufferedImage originalImage = ImageIO.read(filePath.toFile());
+                    int type = originalImage.getType() == 0? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+                    BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
+                    ImageIO.write(img, "png", new File(dir + "res/" + name + counter + ".png"));
+                    counter ++;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static BufferedImage resizeImage(BufferedImage original, int type, int width, int height) {
+        BufferedImage resizedImage = new BufferedImage(width, height, type);
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(original, 0, 0, width, height, null);
+        g.dispose();
+
+        return resizedImage;
+    }
+
+    public static void main(String [] args) {
+        bulkResizeImages("sheep", 800, 600);
     }
 }

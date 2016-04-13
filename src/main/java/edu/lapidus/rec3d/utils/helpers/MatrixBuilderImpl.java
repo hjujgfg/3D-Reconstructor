@@ -75,8 +75,10 @@ public class MatrixBuilderImpl implements MatrixBuilder{
      */
     public DoubleMatrix createAMatrix(Point[][] points) {
 
-        double [][] A = new double[MatrixBuilder.LEARNING_POINT_NUMBER][];
-        for (int i = 0; i < MatrixBuilder.LEARNING_POINT_NUMBER; i ++) {
+        /*double [][] A = new double[MatrixBuilder.LEARNING_POINT_NUMBER][];
+        for (int i = 0; i < MatrixBuilder.LEARNING_POINT_NUMBER; i ++) {*/
+        double [][] A = new double[points.length][];
+        for (int i = 0; i < A.length; i ++) {
             A[i] = new double[9];
             A[i][0] = (int)(points[i][0].x * points[i][1].x);
             A[i][1] = (int)(points[i][0].y * points[i][1].x);
@@ -89,7 +91,7 @@ public class MatrixBuilderImpl implements MatrixBuilder{
             A[i][8] = 1;
         }
         DoubleMatrix res = new DoubleMatrix(A);
-        logger.info("Amatrix created: \n" + res.toString());
+        //logger.info("Amatrix created: \n" + res.toString());
         return res;
     }
 

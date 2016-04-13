@@ -13,8 +13,8 @@ import java.util.zip.Inflater;
 public class Correspondence {
     private Point[][] inititalCorrespondences;
     final static Logger logger = Logger.getLogger(Correspondence.class);
-    public Correspondence() {
-        inititalCorrespondences = loadFromfile();
+    public Correspondence(String name) {
+        inititalCorrespondences = loadFromfile(name);
         logger.info("Correspondences created");
     }
 
@@ -80,9 +80,11 @@ public class Correspondence {
         return p;
     }
 
-    private Point[][] loadFromfile() {
+    private Point[][] loadFromfile(String path) {
         ArrayList<Point[]> prePoints = new ArrayList<Point[]>();
-        File f = new File("Data/points.csv");
+        logger.info("Loading correspondences: " + path);
+        //File f = new File("resources/correspondences/" + name + ".csv");
+        File f = new File(path);
         String line;
         try {
             FileInputStream fis = new FileInputStream(f);

@@ -8,6 +8,8 @@ import javax.swing.*;
 public class CorrespsVisualizer {
     private MyPanel myPanel1;
     private JPanel panel1;
+    private JScrollPane jScrollPane;
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("MainFrame");
         MyPanel.state = 2;
@@ -15,6 +17,7 @@ public class CorrespsVisualizer {
         //m.myPanel = new MyPanel();
         //m.myPanel.setParent(frame);
         frame.setContentPane(m.myPanel1);
+        //frame.setContentPane(jS);
         m.myPanel1.setParent(frame);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();

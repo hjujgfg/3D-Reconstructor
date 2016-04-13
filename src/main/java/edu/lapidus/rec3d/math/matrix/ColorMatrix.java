@@ -70,5 +70,18 @@ public class ColorMatrix implements Matrix {
     public Color getColor(int x, int y) {
         return new Color(inner[y][x]);
     }
+    public void setColor(int x, int y, Color color) {
+        inner[y][x] = color.getRGB();
+    }
 
+    public void removeBackground() {
+        for (int x = 0; x < this.getWidth(); x++) {
+            for (int y = 0; y < this.getHeight(); y++) {
+                Color c = this.getColor(x, y);
+                if (c.getGreen() > c.getRed() && c.getGreen() > c.getBlue()) {
+                    this.setColor(x, y, Color.GREEN);
+                }
+            }
+        }
+    }
 }

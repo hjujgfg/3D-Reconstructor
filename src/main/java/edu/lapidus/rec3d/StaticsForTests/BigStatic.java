@@ -16,15 +16,30 @@ import java.util.ArrayList;
  */
 public class BigStatic {
     private final static Logger logger = Logger.getLogger(BigStatic.class);
-    private final static int SECOND_POINT_LOOKUP_WIDTH = 240;
+    //sheep
+    /*private final static int SECOND_POINT_LOOKUP_WIDTH = 240;
     private final static int SECOND_POINT_SHIFT = 20;
-    private final static Object LOCK_OBJ = new Object();
 
     private final static int COLOR_REGION_RADIUS = 10;
     private final static int HEIGHT_DIFF_LIM = 20;
     private final static double HEIGHT_DIFF_WEIGHT = 5;
-    private final static double WIDTH_DIFF_WEIGHT = 10;
+    private final static double WIDTH_DIFF_WEIGHT = 10;*/
+    //cup
+    /*private final static int SECOND_POINT_LOOKUP_WIDTH = 240;
+    private final static int SECOND_POINT_SHIFT = 80;
 
+    private final static int COLOR_REGION_RADIUS = 20;
+    private final static int HEIGHT_DIFF_LIM = 60;
+    private final static double HEIGHT_DIFF_WEIGHT = 5;
+    private final static double WIDTH_DIFF_WEIGHT = 5;*/
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
+    private final static int SECOND_POINT_SHIFT = -40;
+
+    private final static int COLOR_REGION_RADIUS = 20;
+    private final static int HEIGHT_DIFF_LIM = 3;//5
+    private final static int WIDTH_DIFF_LIM = 3;
+    private final static double HEIGHT_DIFF_WEIGHT = 500;
+    private final static double WIDTH_DIFF_WEIGHT = 3;
 
 
     public static Vector calculateEpipoleFromFundamental(DoubleMatrix fund) {
@@ -99,10 +114,11 @@ public class BigStatic {
 
         int heightDiff = point1[1] - point2[1];
         heightDiff = (heightDiff - HEIGHT_DIFF_LIM) * (heightDiff - HEIGHT_DIFF_LIM);
-        int widthDiff = point1[0] - point2[0] - 30;
+        int widthDiff = point1[0] - point2[0] - WIDTH_DIFF_LIM; // it was -30
         widthDiff *= widthDiff * WIDTH_DIFF_WEIGHT;
-        //logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff);
+        logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff * HEIGHT_DIFF_WEIGHT + " width: " + widthDiff);
         meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT + widthDiff;
+        logger.info("TOTAL DIFF: " + meanDiff);
         return meanDiff / (2 * (firstSample.length + 1));
     }
 
