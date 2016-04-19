@@ -34,19 +34,21 @@ public class TwoImageCalculator {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //sheep01
-        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 692, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 692, 400, 300);
+        /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);*/
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(519, 519, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(519, 519, 400, 300);
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-12, MatrixBuilder.Y_AXIS);
-        //r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-7, MatrixBuilder.X_AXIS));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS);
+        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep1.png";
-        String img2 = "resources/images/sheep2.png";
+        String img1 = "resources/images/sheep0.png";
+        String img2 = "resources/images/sheep1.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep1.csv");
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", 1);
         Map<String, PairCorrespData> res = init.run();
-        VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res);
+        VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
         //imageProcessor.createDepthMap(res);
     }
@@ -68,6 +70,7 @@ public class TwoImageCalculator {
 
     String img1Path;
     String img2Path;
+    double modelScaleFactor;
     //TODO read it from properties
     private final static int THREAD_NUMBER = 20;
 
@@ -78,9 +81,10 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String CorrespsFile) {
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String CorrespsFile, double modelScaleFactor) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
+        this.modelScaleFactor = modelScaleFactor;
         logger.info("Starting pair calculation");
         homography = new Homography(k1, k2, r1, r2);
         this.k1 = k1;
@@ -123,7 +127,7 @@ public class TwoImageCalculator {
                 yEnd = images[0].getHeight();
             }
             //TODO REMOVE lines parameter!!!!
-            Thread t = new Thread(new DepthRegionCalculator(homography, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore, lines).setSkipNpoints(1));
+            Thread t = new Thread(new DepthRegionCalculator(homography, epipole, images[0], images[1], yStart, yEnd, fundamentalMatrix, result, semaphore, modelScaleFactor, lines).setSkipNpoints(1));
             t.start();
         }
         try {
@@ -219,10 +223,10 @@ public class TwoImageCalculator {
     }*/
 
     private Vector calculateEpipoleFromFundamental(DoubleMatrix fund) {
-        SingularValueDecomposition svd = fund.SVD();
+        SingularValueDecomposition svd = fund.transpose().SVD();
         RealMatrix v = svd.getV();
         Vector e = new Vector(v.getColumn(2));
-        e = e.scalar(1/(e.get(2)*1000));
+        e = e.scalar( 1 / (e.get(2) * 1000));
         logger.info("epipole : " + e);
         //return new Vector(v.getColumn(v.getColumnDimension() - 1));
         return e;

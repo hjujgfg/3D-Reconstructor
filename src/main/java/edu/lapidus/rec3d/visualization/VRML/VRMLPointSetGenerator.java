@@ -15,14 +15,24 @@ import java.util.Set;
  * Created by Егор on 21.03.2016.
  */
 public class VRMLPointSetGenerator {
+
+    private final static String MULTIPLE_NAME = "pointSet3D_Mult";
+    private final static String SINGLE_NAME = "pointSet3D_Single";
     Set<PairCorrespData> points;
     private final static Logger logger = Logger.getLogger(VRMLPointSetGenerator.class);
+    public enum State { SINGLE, MULTIPLE}
 
-    public VRMLPointSetGenerator(Map<String, PairCorrespData> points) {
+
+
+    State state;
+
+    public VRMLPointSetGenerator(Map<String, PairCorrespData> points, State state) {
         this.points = new HashSet<PairCorrespData>(points.values());
+        this.state = state;
     }
-    public VRMLPointSetGenerator(Set<PairCorrespData> res) {
+    public VRMLPointSetGenerator(Set<PairCorrespData> res, State state) {
         this.points = res;
+        this.state = state;
     }
 
     public void buildPointSet() {
@@ -38,10 +48,10 @@ public class VRMLPointSetGenerator {
                     "                    color [\n");
             for (PairCorrespData p : points) {
                 //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
-                if (p.getZ() > -1 && p.getZ() < 1 && p.getX1() > 100 && p.getX1() < 700) {
+                if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    sb2.append(p.getX1() + " " +  (p.getY1()) + " " + (p.getZ() * 600000) + ",\n");
-                    sb1.append(p.getX() * 1000 + " " + (p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
+                    sb2.append(p.getX1() + " " +  ( - p.getY1()) + " " + (p.getZ() * 60000) + ",\n");
+                    sb1.append( p.getX() * 1000 + " " + ( - p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;
@@ -62,7 +72,14 @@ public class VRMLPointSetGenerator {
                     "}");
             sb2.append("    }\n" +
                     "}");
-            FileWriter fw = new FileWriter(new File("resources/res/pointSet3D.wrl"));
+            StringBuilder nameBuilder = new StringBuilder("resources/res/");
+            if (state == State.MULTIPLE) {
+                nameBuilder.append(MULTIPLE_NAME);
+            } else {
+                nameBuilder.append(SINGLE_NAME);
+            }
+            nameBuilder.append(".wrl");
+            FileWriter fw = new FileWriter(new File(nameBuilder.toString()));
             fw.write(sb1.toString());
             fw.flush();
             fw.close();
@@ -78,6 +95,7 @@ public class VRMLPointSetGenerator {
     }
 
     private void appendHeader(StringBuilder sb) {
+        sb.append("#VRML V2.0 utf8\n");
         sb.append("Shape {\n" +
                 "    appearance Appearance {\n" +
                 "        material Material {\n" +

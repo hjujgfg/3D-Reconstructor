@@ -24,7 +24,7 @@ public class DepthRegionCalculator implements Runnable {
     private final static Object LOCK_OBJ = new Object();
 
     private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
-    private final static int SECOND_POINT_SHIFT = -40;
+    private final static int SECOND_POINT_SHIFT = -20;
 
     private final static int COLOR_REGION_RADIUS = 20;
     //sheep0 - 1
@@ -40,7 +40,7 @@ public class DepthRegionCalculator implements Runnable {
     private final static double HEIGHT_DIFF_WEIGHT = 3;
     private final static double WIDTH_DIFF_WEIGHT = 50;*/
     //crane
-    private final static int HEIGHT_DIFF_LIM = 3;//5
+    private final static int HEIGHT_DIFF_LIM = 5;//5
     private final static int WIDTH_DIFF_LIM = 3;
     private final static double HEIGHT_DIFF_WEIGHT = 500;
     private final static double WIDTH_DIFF_WEIGHT = 3;
@@ -54,6 +54,7 @@ public class DepthRegionCalculator implements Runnable {
     //I mean there will be several threads, each calculating its own set of lines
     int yStart;
     int yEnd;
+    double modelScaleFactor;
     private DoubleMatrix fundamental;
     private Map<String, PairCorrespData> container;
     private Set<Lock> semaphore;
@@ -71,6 +72,7 @@ public class DepthRegionCalculator implements Runnable {
                                  DoubleMatrix fundamental,
                                  Map<String, PairCorrespData> container,
                                  Set<Lock> semaphore,
+                                 double modelScaleFactor,
                                  ArrayList<EpipolarLineHolder> lines) {
         this.homography = homography;
         this.epipole = epipole;
@@ -81,6 +83,7 @@ public class DepthRegionCalculator implements Runnable {
         this.fundamental = fundamental;
         this.container = container;
         this.semaphore = semaphore;
+        this.modelScaleFactor = modelScaleFactor;
         this.lines = lines;
         k1 = homography.getK1();
         k2 = homography.getK2();
@@ -102,15 +105,16 @@ public class DepthRegionCalculator implements Runnable {
                 if (img1.getColor(j, i).equals(Color.GREEN)) continue;
 
                 int[] secondPoint = calcSecondPointAlongX(firstPoint);
-                Vector M = calcMetricDepthXX(firstPoint, secondPoint);
+                if (img2.getColor(secondPoint[0], secondPoint[1]).equals(Color.GREEN)) continue;
+                Vector M = calcMetricDepthXXX(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
                 res.setX1(j);
                 res.setY1(i);
                 res.setX2(secondPoint[0]);
                 res.setY2(secondPoint[1]);
-                res.setX(M.get(0));
-                res.setY(M.get(1));
-                res.setZ(M.get(2));
+                res.setX(M.get(0) * modelScaleFactor);
+                res.setY(M.get(1) * modelScaleFactor);
+                res.setZ(M.get(2) * modelScaleFactor);
                 res.setColor(img2.getColor(secondPoint[0], secondPoint[1]));
                 synchronized (LOCK_OBJ) {
                     container.put(j + "_" + i, res);
@@ -408,6 +412,16 @@ public class DepthRegionCalculator implements Runnable {
         Vector m2 = new Vector(secondPoint);
         Vector b = homography.postMultiply(m1);
         double ro1 = ( epipole.get(1) * m2.get(0) - epipole.get(0) * m2.get(1) ) / ( b.get(0) * m2.get(1) - b.get(1) * m2.get(0));
+
+        Vector M = k1.inverse().postMultiply(m1).scalar(ro1);
+        return M;
+    }
+
+    private Vector calcMetricDepthXXX(int [] firstPoint, int[] secondPoint) {
+        Vector m1 = new Vector(firstPoint);
+        Vector m2 = new Vector(secondPoint);
+        Vector a = homography.postMultiply(m1);
+        double ro1 = ( epipole.get(1) - ( epipole.get(0) * m2.get(1) / m2.get(0) ) ) / ( (a.get(0) * m2.get(1) / m2.get(0)) - a.get(1) );
 
         Vector M = k1.inverse().postMultiply(m1).scalar(ro1);
         return M;

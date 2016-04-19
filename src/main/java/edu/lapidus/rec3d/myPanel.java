@@ -31,10 +31,11 @@ import java.util.Random;
 public class MyPanel extends JPanel {
     private final static Logger logger = Logger.getLogger(MyPanel.class);
     private JFrame parent;
+
     public MyPanel() {
         imgProcessor = new ImageProcessor();
-        img1 = imgProcessor.loadImage("resources/sheep1.png");
-        img2 = imgProcessor.loadImage("resources/sheep2.png");
+        img1 = imgProcessor.loadImage("resources/images/" + POINTS_NAME + COUNTER +".png");
+        img2 = imgProcessor.loadImage("resources/images/" + POINTS_NAME + (COUNTER + 1) + ".png");
         combined = new BufferedImage(img1.getWidth() + img2.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = combined.createGraphics();
         g.drawImage(img1, 0, 0, null);
@@ -47,7 +48,7 @@ public class MyPanel extends JPanel {
             i1 = new ColorMatrix(img1);
             i2 = new ColorMatrix(img2);
             MatrixBuilder matrixBuilder = new MatrixBuilderImpl();
-            Correspondence correspondence = new Correspondence();
+            Correspondence correspondence = new Correspondence(CORRESP_LOCATION);
             DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
             fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
             fundamentalMatrix.scale(-1);
@@ -61,6 +62,8 @@ public class MyPanel extends JPanel {
         parent = f;
     }
 
+    private final static int COUNTER = 2;
+
     int width, height;
     ImageProcessor imgProcessor;
     BufferedImage img1, img2;
@@ -68,6 +71,7 @@ public class MyPanel extends JPanel {
     Map<Point, Point> points = new HashMap<Point, Point>();
     Point start, end;
     Color penColor = new Color(5, 255, 0);
+    static final String POINTS_NAME = "sheep";
     //I know
     public static int state = 1;
     boolean isValid;
@@ -78,7 +82,7 @@ public class MyPanel extends JPanel {
     ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
     ColorMatrix i1, i2;
     DoubleMatrix fundamentalMatrix;
-
+    static final String CORRESP_LOCATION = "resources/correspondences/" + POINTS_NAME + COUNTER + ".csv";
 
     private class MyMouseListener implements MouseListener {
         MyPanel pn;
@@ -90,7 +94,7 @@ public class MyPanel extends JPanel {
         public void mouseClicked(MouseEvent e) {
 
             if (e.getX() < 10 && e.getY() < 10) {
-                savePointsToCsv();
+                savePointsToCsv(POINTS_NAME + COUNTER);
                 imgProcessor.saveImage(combined, "resources/COMBINED.png");
                 parent.dispose();
             }
@@ -131,7 +135,7 @@ public class MyPanel extends JPanel {
 
         public void mouseClicked(MouseEvent e) {
             if (e.getX() < 10 && e.getY() < 10) {
-                savePointsToCsv();
+                //savePointsToCsv(POINTS_NAME);
                 imgProcessor.saveImage(combined, "resources/COMBINED.png");
                 parent.dispose();
             }
@@ -182,6 +186,9 @@ public class MyPanel extends JPanel {
         g.drawImage(combined, 0, 0, null);
         if (isValid) {
             g.drawString(mouse, 10, 10);
+            if (points != null) {
+                g.drawString(points.size() + "", 10, 20);
+            }
         }
         isValid = true;
         g.setColor(penColor);
@@ -192,7 +199,8 @@ public class MyPanel extends JPanel {
                 g.setColor(new Color(r.nextInt(1000000)));*/
             }
             if (start != null) {
-                g.drawString("X", (int) start.x, (int) start.y);
+                g.drawLine((int) start.x - 5, (int) start.y - 5, (int) start.x + 5, (int) start.y + 5);
+                g.drawLine((int) start.x + 5, (int) start.y - 5, (int) start.x - 5, (int) start.y + 5);
             }
             logger.debug("Painted s,thng");
         } else {
@@ -225,8 +233,8 @@ public class MyPanel extends JPanel {
         return new Dimension(combined.getWidth(), combined.getHeight());
     }
 
-    private void savePointsToCsv() {
-        File csv = new File("resources/points.csv");
+    private void savePointsToCsv(String name) {
+        File csv = new File("resources/correspondences/" + name + ".csv");
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csv)));
             for (Map.Entry<Point, Point> entry : points.entrySet()) {

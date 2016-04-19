@@ -33,17 +33,17 @@ public class BigStatic {
     private final static double HEIGHT_DIFF_WEIGHT = 5;
     private final static double WIDTH_DIFF_WEIGHT = 5;*/
     private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
-    private final static int SECOND_POINT_SHIFT = -40;
+    private final static int SECOND_POINT_SHIFT = -10;
 
     private final static int COLOR_REGION_RADIUS = 20;
-    private final static int HEIGHT_DIFF_LIM = 3;//5
+    private final static int HEIGHT_DIFF_LIM = 10;//5
     private final static int WIDTH_DIFF_LIM = 3;
-    private final static double HEIGHT_DIFF_WEIGHT = 500;
+    private final static double HEIGHT_DIFF_WEIGHT = 300;
     private final static double WIDTH_DIFF_WEIGHT = 3;
 
 
     public static Vector calculateEpipoleFromFundamental(DoubleMatrix fund) {
-        SingularValueDecomposition svd = fund.SVD();
+        SingularValueDecomposition svd = fund.transpose().SVD();
         RealMatrix v = svd.getV();
         Vector e = new Vector(v.getColumn(2));
         e = e.scalar(1/(e.get(2) * 1000));
