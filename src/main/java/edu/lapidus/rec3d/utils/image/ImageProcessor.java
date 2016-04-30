@@ -233,7 +233,30 @@ public class ImageProcessor {
         return resizedImage;
     }
 
+    private void changeBackGround(String sourcePath) {
+        BufferedImage source = loadImage(sourcePath);
+        BufferedImage result = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int x = 0; x < source.getWidth(); x ++) {
+            for (int y = 0; y < source.getHeight(); y ++) {
+                Color s = new Color(source.getRGB(x, y));
+                int r = s.getRed();
+                int g = s.getGreen();
+                int b = s.getBlue();
+                Color res;
+                if (r == g && g == b) {
+                    res = new Color(255, 255, 255);
+                } else {
+                    res = s;
+                }
+                result.setRGB(x, y, res.getRGB());
+            }
+        }
+        saveImage(result, "no_background.png");
+    }
+
     public static void main(String [] args) {
-        bulkResizeImages("sheep", 800, 600);
+        //bulkResizeImages("sheep", 800, 600);
+        ImageProcessor p = new ImageProcessor();
+        p.changeBackGround("img.png");
     }
 }
