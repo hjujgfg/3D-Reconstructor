@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
+import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
@@ -252,6 +253,17 @@ public class ImageProcessor {
             }
         }
         saveImage(result, "no_background.png");
+    }
+
+    public void saveCorrClusters(String i1, String i2, List<Centroid> c1, List<Centroid> c2) {
+        BufferedImage combined = buildCombined(i1, i2);
+        Graphics g = combined.createGraphics();
+        for (int i = 0; i < c1.size(); i ++) {
+            Centroid a = c1.get(i);
+            Centroid b = c2.get(i);
+            g.drawLine(a.getX(), a.getY(), b.getX() + combined.getWidth() / 2, b.getY());
+        }
+        saveImage(combined, "resources/clustering/combined.png");
     }
 
     public static void main(String [] args) {

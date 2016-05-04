@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Centroid extends ColoredImagePoint {
 
-    List<ColoredImagePoint> cluster;
+    //List<ColoredImagePoint> cluster;
 
     public Centroid(int x, int y, Color color) {
         super(x, y, color);

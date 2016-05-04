@@ -12,6 +12,10 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,10 +30,12 @@ public class ImageDrawer extends JPanel{
     List<Centroid> centroids;
     List<List<ColoredImagePoint>> clusters;
     Kmeans kmeans;
+    private final static String img0Path = "resources/images/sheep0.png";
+    private final static String img1Path = "resources/images/sheep1.png";
     private static final Logger logger = Logger.getLogger(ImageDrawer.class);
     public ImageDrawer() {
         imageProcessor = new ImageProcessor();
-        bufferedImage = imageProcessor.loadImage("resources/images/sheep1.png");
+        bufferedImage = imageProcessor.loadImage(img0Path);
         image = new ColorMatrix(bufferedImage);
         centroids = new ArrayList<>();
         this.addMouseListener(new MyListener());
@@ -72,10 +78,24 @@ public class ImageDrawer extends JPanel{
                 kmeans.runAlgorithm();
                 centroids = kmeans.getCentroids();
                 clusters = kmeans.getClusters();
+                kmeans.saveToImage("firstCluster");
+                List<Centroid> l1 = new ArrayList<>(centroids.size());
+                for (Centroid c : centroids) {
+                    l1.add(new Centroid(c.getX(), c.getY(), c.getColor()));
+                }
+                logger.info("Starting second image");
+                BufferedImage img2 = imageProcessor.loadImage(img1Path);
+                ColorMatrix img2Matr = new ColorMatrix(img2);
+                Kmeans second = new Kmeans(centroids.size(), img2Matr, centroids);
+                second.runAlgorithm();
+                second.saveToImage("secondCluster");
+                saveCentroids(l1, second.getCentroids());
+                imageProcessor.saveCorrClusters(img0Path, img1Path, l1, second.getCentroids());
+            } else {
+                centroids.add(new Centroid(e.getX(), e.getY(), image.getColor(e.getX(), e.getY())));
+                logger.info("added centroid: " + e.getX() + e.getY());
             }
-            centroids.add(new Centroid(e.getX(), e.getY(), image.getColor(e.getX(), e.getY())));
             repaint();
-            logger.info("added centroid: " + e.getX() + e.getY());
         }
 
         @Override
@@ -96,6 +116,27 @@ public class ImageDrawer extends JPanel{
         @Override
         public void mouseExited(MouseEvent e) {
 
+        }
+    }
+
+    private static void saveCentroids(List<Centroid> l1, List<Centroid> l2) {
+        if (l1.size() != l2.size()) {
+            logger.info("Error saving centroids... ");
+            return;
+        }
+        File f = new File("Resources/clustering/centroids.txt");
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            for (int i = 0; i < l1.size(); i ++) {
+                ColoredImagePoint tmp  = l1.get(i);
+                bw.write(tmp.getX() + " " + tmp.getY() + " " + tmp.getColor().getRGB() + " ");
+                tmp = l2.get(i);
+                bw.write(tmp.getX() + " " + tmp.getY() + " " + tmp.getColor().getRGB() + "\n");
+            }
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
