@@ -16,17 +16,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Created by Егор on 30.04.2016.
  */
 public class ImageDrawer extends JPanel{
     private ImageProcessor imageProcessor;
-    private ColorMatrix image;
-    private BufferedImage bufferedImage;
+    private BufferedImage image;
+    private BufferedImage clusterized;
+    //private BufferedImage bufferedImage;
     List<Centroid> centroids;
     List<List<ColoredImagePoint>> clusters;
     Kmeans kmeans;
@@ -35,8 +38,10 @@ public class ImageDrawer extends JPanel{
     private static final Logger logger = Logger.getLogger(ImageDrawer.class);
     public ImageDrawer() {
         imageProcessor = new ImageProcessor();
-        bufferedImage = imageProcessor.loadImage(img0Path);
-        image = new ColorMatrix(bufferedImage);
+        image = imageProcessor.loadImage(img0Path);
+
+        /*image = new ColorMatrix(bufferedImage);
+        image.removeBackground();*/
         centroids = new ArrayList<>();
         this.addMouseListener(new MyListener());
     }
@@ -44,17 +49,10 @@ public class ImageDrawer extends JPanel{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(bufferedImage, 0, 0, null);
-
-        if (clusters != null) {
-            for (List<ColoredImagePoint> cluster : clusters) {
-                Random r = new Random();
-                Color color = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
-                g.setColor(color);
-                for (ColoredImagePoint c : cluster) {
-                    g.drawOval(c.getX(), c.getY(), 1, 1);
-                }
-            }
+        if (clusterized != null) {
+            g.drawImage(clusterized, 0, 0, null);
+        } else {
+            g.drawImage(image, 0, 0, null);
         }
         if (centroids != null) {
             for (ColoredImagePoint c : centroids) {
@@ -77,22 +75,21 @@ public class ImageDrawer extends JPanel{
                 kmeans = new Kmeans(centroids.size(), image, centroids);
                 kmeans.runAlgorithm();
                 centroids = kmeans.getCentroids();
-                clusters = kmeans.getClusters();
                 kmeans.saveToImage("firstCluster");
                 List<Centroid> l1 = new ArrayList<>(centroids.size());
-                for (Centroid c : centroids) {
-                    l1.add(new Centroid(c.getX(), c.getY(), c.getColor()));
-                }
+                l1.addAll(centroids.stream().map(c -> new Centroid(c.getX(), c.getY(), c.getColor())).collect(Collectors.toList()));
                 logger.info("Starting second image");
                 BufferedImage img2 = imageProcessor.loadImage(img1Path);
-                ColorMatrix img2Matr = new ColorMatrix(img2);
-                Kmeans second = new Kmeans(centroids.size(), img2Matr, centroids);
+                Kmeans second = new Kmeans(centroids.size(), img2, centroids);
                 second.runAlgorithm();
                 second.saveToImage("secondCluster");
                 saveCentroids(l1, second.getCentroids());
+                ClusterComparator comparator = new ClusterComparator(image, img2, kmeans.getFinalClusters(), second.getFinalClusters());
+                imageProcessor.saveCorrespsByKmeans(img0Path, img1Path, comparator.compareImages());
                 imageProcessor.saveCorrClusters(img0Path, img1Path, l1, second.getCentroids());
+                clusterized = kmeans.getClusterized();
             } else {
-                centroids.add(new Centroid(e.getX(), e.getY(), image.getColor(e.getX(), e.getY())));
+                centroids.add(new Centroid(e.getX(), e.getY(), image.getRGB(e.getX(), e.getY())));
                 logger.info("added centroid: " + e.getX() + e.getY());
             }
             repaint();

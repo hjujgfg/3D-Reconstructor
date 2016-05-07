@@ -2,6 +2,7 @@ package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
+import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
@@ -264,6 +265,22 @@ public class ImageProcessor {
             g.drawLine(a.getX(), a.getY(), b.getX() + combined.getWidth() / 2, b.getY());
         }
         saveImage(combined, "resources/clustering/combined.png");
+    }
+
+    public void saveCorrespsByKmeans(String i1, String i2, List<List<ColoredImagePoint>> corresps) {
+        BufferedImage combined = buildCombined(i1, i2);
+        Graphics g = combined.createGraphics();
+        Random r = new Random();
+        for (List<ColoredImagePoint> pp : corresps) {
+            ColoredImagePoint p1 = pp.get(0);
+            ColoredImagePoint p2 = pp.get(1);
+            Color c = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
+            g.setColor(c);
+            g.drawOval(p1.getX() - 2, p2.getY() - 2, 4, 4);
+            g.drawOval(p2.getX() + (combined.getWidth() / 2) - 2, p2.getY() - 2, 4, 4);
+            g.drawLine(p1.getX(), p1.getY(), p2.getX() + (combined.getWidth() / 2) , p2.getY());
+        }
+        saveImage(combined, "resources/clustering/combined2.png");
     }
 
     public static void main(String [] args) {
