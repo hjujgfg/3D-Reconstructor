@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.helpers;
 
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
+import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.Matrix;
@@ -10,7 +11,9 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.log4j.Logger;
 
+import java.awt.geom.Arc2D;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Егор on 16.11.2015.
@@ -115,6 +118,34 @@ public class MatrixBuilderImpl{
             i ++;
         }
         return new DoubleMatrix(A);
+    }
+
+    public DoubleMatrix createAMatrix(Map<ColoredImagePoint, ColoredImagePoint> points) {
+        double[][] A = new double[points.size()][];
+        int i = 0;
+        for (Map.Entry<ColoredImagePoint, ColoredImagePoint> p : points.entrySet()) {
+            ColoredImagePoint p1 = p.getKey();
+            ColoredImagePoint p2 = p.getValue();
+            A[i] = new double[9];
+            A[i][0] = p1.getX() * p2.getX();
+            A[i][1] = p1.getY() * p2.getX();
+            A[i][2] = p2.getX();
+            A[i][3] = p1.getX() * p2.getY();
+            A[i][4] = p1.getY() * p2.getY();
+            A[i][5] = p2.getY();
+            A[i][6] = p1.getX();
+            A[i][7] = p1.getY();
+            A[i][8] = 1;
+            i ++;
+        }
+        return new DoubleMatrix(A);
+    }
+
+    public DoubleMatrix createAMatrix(Map<ColoredImagePoint, ColoredImagePoint> map, List<CorrespondenceHolder> list) {
+        DoubleMatrix m1 = createAMatrix(map);
+        DoubleMatrix m2 = createAMatrix(list);
+        m1.rowsAppend(m2);
+        return m1;
     }
 
     public DoubleMatrix buildFromVector(Vector doubleVector, int rows, int colls) {

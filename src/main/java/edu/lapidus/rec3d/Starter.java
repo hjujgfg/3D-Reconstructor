@@ -54,9 +54,9 @@ public class Starter {
         for (int i = 0; i < numOfImages - 1; i++ ) {
             logger.info("Starting images: " + images[i] + "    " + images[i + 1] + "\n Correspondences: " + corresps[i] + "\n" );
             double scaleFactor = 1;
-            if (i == 0)
-                scaleFactor = 0.3;
-            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i+1], images[i], images[i + 1], corresps[i], scaleFactor);
+            /*if (i == 0)
+                scaleFactor = 0.3;*/
+            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i+1], images[i], images[i + 1], corresps[i], TwoImageCalculator.CONVOLVE_CORRESPS_SOURCE, scaleFactor);
             results.addAll(calculator.run().values());
         }
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(results, VRMLPointSetGenerator.State.MULTIPLE);
@@ -68,6 +68,7 @@ public class Starter {
     }
 
     private DoubleMatrix initK() {
+        //return matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         return matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
     }
 
@@ -77,8 +78,8 @@ public class Starter {
     //TODO it's a temporal method
     private void initRs(DoubleMatrix[] rs) {
         rs[0] = initR(0, MatrixBuilder.Y_AXIS);
-        rs[1] = initR(-20, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
-        rs[2] = initR(-20, MatrixBuilder.Y_AXIS).multiplyBy(initR(-7, MatrixBuilder.X_AXIS));
+        rs[1] = initR(-10, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        rs[2] = initR(-10, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
         rs[2] = rs[1].multiplyBy(rs[2]);
         /*rs[3] = initR(-60, MatrixBuilder.Y_AXIS);
         rs[4] = initR(-80, MatrixBuilder.Y_AXIS);

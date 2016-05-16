@@ -123,4 +123,11 @@ public class DoubleMatrix implements Matrix, Serializable {
         r = r.scalarMultiply(scalar);
         internal = r.getData();
     }
+
+    public void rowsAppend (DoubleMatrix a) {
+        double [][] res = new double[internal.length + a.internal.length][];
+        System.arraycopy(internal, 0, res, 0, internal.length);
+        System.arraycopy(a.internal, 0, res, internal.length, a.internal.length);
+        internal = res;
+     }
 }

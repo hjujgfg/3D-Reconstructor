@@ -212,11 +212,13 @@ public class ImageProcessor {
         try {
             Files.walk(Paths.get(dir)).forEach(filePath -> {
                 try {
-                    BufferedImage originalImage = ImageIO.read(filePath.toFile());
-                    int type = originalImage.getType() == 0? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-                    BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
-                    ImageIO.write(img, "png", new File(dir + "res/" + name + counter + ".png"));
-                    counter ++;
+                    if (filePath.toString().endsWith(".jpg")) {
+                        BufferedImage originalImage = ImageIO.read(filePath.toFile());
+                        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+                        BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
+                        ImageIO.write(img, "png", new File(dir + "res/" + name + counter + ".png"));
+                        counter++;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -305,7 +307,7 @@ public class ImageProcessor {
                 Color c = new Color(img.getRGB(x, y));
                 int cVal = c.getRGB();
                 if (c.getGreen() > c.getBlue() && c.getGreen() > c.getRed()) {
-                    res.setRGB(x, y, Color.LIGHT_GRAY.getRGB());
+                    res.setRGB(x, y, Color.GREEN.getRGB());
                 } else {
                     res.setRGB(x, y, cVal);
                 }
@@ -337,9 +339,30 @@ public class ImageProcessor {
         return res;
     }
 
+    public BufferedImage normalize(BufferedImage img, int top) {
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        BufferedImage noBack = removeGreen(img);
+        int topPixelY = 0;
+        boolean exit = false;
+        for (int y = 0; y < img.getHeight() && !exit; y ++) {
+            for (int x = 0; x < img.getWidth(); x ++) {
+                if (! new Color(noBack.getRGB(x, y)).equals(Color.GREEN)) {
+                    topPixelY = y;
+                    exit = true;
+                    break;
+                }
+            }
+        }
+        Graphics g = res.createGraphics();
+        g.setColor(Color.GREEN);
+        g.fillRect(0, 0, res.getWidth(), res.getHeight());
+        g.drawImage(img, 0, top - topPixelY, null);
+        return res;
+    }
+
     public static void main(String [] args) {
-        //bulkResizeImages("sheep", 800, 600);
-        ImageProcessor p = new ImageProcessor();
+        //bulkResizeImages("sheep_hand", 800, 600);
+        /*ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
             BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
             tst = p.removeGreen(tst);
@@ -347,7 +370,12 @@ public class ImageProcessor {
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(9)), "resources/convolve/xy9" + i + ".png");
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(15)), "resources/convolve/xy15" + i + ".png");
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "resources/convolve/xy21" + i + ".png");
-        }
+        }*/
+        /*ImageProcessor p = new ImageProcessor();
+        for (int i = 0; i < 5; i ++) {
+            BufferedImage res = p.loadImage("resources/images/sheep_hand/res/sheep_hand" + i + ".png");
+            p.saveImage(p.normalize(res, 100), "resources/images/sheep_hand/normalized/sheep" + i +".png");
+        }*/
     }
 
 

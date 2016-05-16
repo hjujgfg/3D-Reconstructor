@@ -30,6 +30,8 @@ public class ImageScanner {
 
     Map<ColoredImagePoint, Double> det1, det2;
 
+    Map<ColoredImagePoint, ColoredImagePoint> correspondences;
+
 
 
     public static void main(String[] args) {
@@ -68,8 +70,8 @@ public class ImageScanner {
         saveToImg(det2, "afterGauss2");*/
 
         det1 = evaluatePoints(images.subList(0, 3));
-        Map<ColoredImagePoint, ColoredImagePoint> corresps = compareImages(images, mapToSortedList(det1));
-        saveToCombined(corresps);
+        correspondences = compareImages(images, mapToSortedList(det1));
+        saveToCombined(correspondences);
         /*saveTopPoints(img1, det1, "topPoints1");
         saveTopPoints(img2, det2, "topPoints2");*/
     }
@@ -205,7 +207,7 @@ public class ImageScanner {
         Random r = new Random(points.size());
         for (int i = 0; i < pointCount ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
-            ColoredImagePoint curr = points.get(100 + r.nextInt(points.size()/2));
+            ColoredImagePoint curr = points.get(r.nextInt(points.size()/3));
             List<Window> current = getWindow(filtered.subList(0, 3), curr.getX(), curr.getY());
             if (current == null) continue;
             double minDist = Double.MAX_VALUE;
@@ -267,7 +269,8 @@ public class ImageScanner {
     private Map<ColoredImagePoint, Double> evaluatePoints(List<BufferedImage> filtered) {
         double dist;
         Map<ColoredImagePoint, Double> res = new HashMap<>();
-        for(int y = 0; y < filtered.get(0).getHeight() - 200; y ++) {
+        //TODO do we need this -200 ??? when we have normalization
+        for(int y = 0; y < filtered.get(0).getHeight()/* - 200*/; y ++) {
             for (int x = 0; x < filtered.get(0).getWidth(); x ++) {
                 dist = 1;
                 if (new Color(filtered.get(0).getRGB(x, y)).getRed() == 0) continue;
@@ -278,6 +281,10 @@ public class ImageScanner {
             }
         }
         return res;
+    }
+
+    public Map<ColoredImagePoint, ColoredImagePoint> getCorrespondences() {
+        return correspondences;
     }
 
     /*class Pair{

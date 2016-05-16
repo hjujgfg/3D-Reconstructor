@@ -7,6 +7,7 @@ import edu.lapidus.rec3d.depth.threaded.Lock;
 import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
+import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.Correspondence;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
@@ -14,12 +15,10 @@ import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
+import edu.lapidus.rec3d.utils.image.ImageScanner;
 import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 
-import edu.lapidus.rec3d.visualization.VRML.VRMLData;
 import edu.lapidus.rec3d.visualization.VRML.VRMLPointSetGenerator;
-import edu.lapidus.rec3d.visualization.VRML.VRMLTriangulator;
-import edu.lapidus.rec3d.visualization.XYZformatter;
 import org.apache.commons.math3.linear.*;
 import org.apache.log4j.Logger;
 
@@ -37,26 +36,30 @@ public class TwoImageCalculator {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //sheep01
-        /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);*/
-        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(519, 519, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(519, 519, 400, 300);
+        DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
+        /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);*/
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS);
-        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-10, MatrixBuilder.Y_AXIS);
+        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-3, MatrixBuilder.X_AXIS));
 
         String img1 = "resources/images/sheep2.png";
         String img2 = "resources/images/sheep3.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
-        //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, null, 1);
+        //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, null, TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
         //imageProcessor.createDepthMap(res);
     }
 
+    final static int FILE_CORRESPS_SOURCE = 1;
+    final static int KMEANS_CORREPS_SOURCE = 2;
+    final static int CONVOLVE_CORRESPS_SOURCE = 3;
+    final static int KMEANS_AND_CONVOLVE_SOURCE = 4;
 
     final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
     static MatrixBuilderImpl matrixBuilder;
@@ -77,10 +80,15 @@ public class TwoImageCalculator {
     private BufferedImage firstImage;
     private BufferedImage secondImage;
     private double modelScaleFactor;
-    private List<CorrespondenceHolder> correspondences;
+
+    private List<CorrespondenceHolder> kMeansCorrespondences;
+    private Map<ColoredImagePoint, ColoredImagePoint> convolveCorrespondences;
+    private String fileCorrespondencesPath;
+    private DoubleMatrix Amatrix;
+
     //TODO read it from properties
     private final static int THREAD_NUMBER = 20;
-    private final static int NUMBER_OF_CLUSTERS = 40;
+    private final static int NUMBER_OF_CLUSTERS = 50;
 
     ArrayList<Thread> depthComputers;
 
@@ -88,25 +96,13 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String CorrespsFile, double modelScaleFactor) {
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String correspsFile, int correspondenceType, double modelScaleFactor) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
         firstImage = imageProcessor.loadImage(img1Path);
         secondImage = imageProcessor.loadImage(img2Path);
-        if (CorrespsFile != null && !CorrespsFile.isEmpty())
-            correspondence = new Correspondence(CorrespsFile);
-        else {
-            Kmeans kmeans1 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img1Path), null);
-            kmeans1.runAlgorithm();
-            Kmeans kmeans2 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img2Path), kmeans1.getCentroids());
-            kmeans2.runAlgorithm();
-            ClusterComparator comparator = new ClusterComparator(firstImage, secondImage, kmeans1.getFinalClusters(), kmeans2.getFinalClusters(), kmeans1.getClusterMap());
-            correspondences = comparator.getRandomCorrespondences();
-            imageProcessor.saveCorrespsByKmeans(img1Path, img2Path, correspondences);
-            kmeans1.saveToImage("TwoImg1");
-            kmeans2.saveToImage("TwoImg2");
-            imageProcessor.saveCorrClusters(img1Path, img2Path, kmeans1.getCentroids(), kmeans2.getCentroids());
-        }
+        fileCorrespondencesPath = correspsFile;
+        buildAMatrix(correspondenceType);
         this.modelScaleFactor = modelScaleFactor;
         logger.info("Starting pair calculation");
         homography = new Homography(k1, k2, r1, r2);
@@ -114,8 +110,61 @@ public class TwoImageCalculator {
         this.k2 = k2;
         this.r1 = r1;
         this.r2 = r2;
+    }
 
+    private void buildAMatrix(int correspondenceSource) throws IllegalArgumentException {
+        switch (correspondenceSource) {
+            case FILE_CORRESPS_SOURCE:
+                logger.info("Starting loading correspondences from file: " + fileCorrespondencesPath);
+                buildFileCorrespondences();
+                Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
+                break;
+            case KMEANS_CORREPS_SOURCE:
+                logger.info("Started building correspondences by Kmeans");
+                buildKmeansCorrespondences();
+                Amatrix = matrixBuilder.createAMatrix(kMeansCorrespondences);
+                break;
+            case CONVOLVE_CORRESPS_SOURCE:
+                logger.info("Started building correspondences by convolve");
+                buildConvolveCorrespondences();
+                Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences);
+                break;
+            case KMEANS_AND_CONVOLVE_SOURCE:
+                logger.info("!!!Starting both kmeans and convolve!!!");
+                buildKmeansAndConvolveCorrespondences();
+                Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences, kMeansCorrespondences);
+                break;
+        }
+    }
 
+    private void buildKmeansCorrespondences() {
+        Kmeans kmeans1 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img1Path), null);
+        kmeans1.runAlgorithm();
+        Kmeans kmeans2 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img2Path), kmeans1.getCentroids());
+        kmeans2.runAlgorithm();
+        ClusterComparator comparator = new ClusterComparator(firstImage, secondImage, kmeans1.getFinalClusters(), kmeans2.getFinalClusters(), kmeans1.getClusterMap());
+        kMeansCorrespondences = comparator.getRandomCorrespondences();
+        imageProcessor.saveCorrespsByKmeans(img1Path, img2Path, kMeansCorrespondences);
+        kmeans1.saveToImage("TwoImg1");
+        kmeans2.saveToImage("TwoImg2");
+        imageProcessor.saveCorrClusters(img1Path, img2Path, kmeans1.getCentroids(), kmeans2.getCentroids());
+    }
+
+    private void buildConvolveCorrespondences() {
+        ImageScanner scanner = new ImageScanner(img1Path, img2Path);
+        scanner.run();
+        convolveCorrespondences = scanner.getCorrespondences();
+    }
+
+    private void buildFileCorrespondences() {
+        if (fileCorrespondencesPath == null || fileCorrespondencesPath.isEmpty())
+            throw new IllegalArgumentException("Correspondence path is empty or null, but was specified as source");
+        correspondence = new Correspondence(fileCorrespondencesPath);
+    }
+
+    private void buildKmeansAndConvolveCorrespondences() {
+        buildConvolveCorrespondences();
+        buildKmeansCorrespondences();
     }
 
     /*public void init() {
@@ -126,13 +175,7 @@ public class TwoImageCalculator {
 
     }*/
     public Map<String, PairCorrespData> run () {
-        DoubleMatrix Amatrix;
-        if (correspondence != null) {
-            Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
-        } else {
-            Amatrix = matrixBuilder.createAMatrix(correspondences);
-        }
-        DoubleMatrix fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
+        DoubleMatrix fundamentalMatrix = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
         fundamentalMatrix.scale(-1);
         //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
         logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());
