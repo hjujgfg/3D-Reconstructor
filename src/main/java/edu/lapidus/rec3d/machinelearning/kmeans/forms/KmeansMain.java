@@ -1,4 +1,4 @@
-package edu.lapidus.rec3d.machinelearning.kmeans;
+package edu.lapidus.rec3d.machinelearning.kmeans.forms;
 
 import javax.swing.*;
 

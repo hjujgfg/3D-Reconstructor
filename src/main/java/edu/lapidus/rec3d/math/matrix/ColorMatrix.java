@@ -78,7 +78,8 @@ public class ColorMatrix implements Matrix {
         for (int x = 0; x < this.getWidth(); x++) {
             for (int y = 0; y < this.getHeight(); y++) {
                 Color c = this.getColor(x, y);
-                if (c.getGreen() > c.getRed() && c.getGreen() > c.getBlue()) {
+                //TODO remove this shit
+                if ( ( c.getGreen() > c.getRed() && c.getGreen() > c.getBlue() ) || y > 440) {
                     this.setColor(x, y, Color.GREEN);
                 }
             }

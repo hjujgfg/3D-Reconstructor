@@ -47,7 +47,7 @@ public class MyPanel extends JPanel {
             addMouseListener(new MyEpipMouseListener());
             i1 = new ColorMatrix(img1);
             i2 = new ColorMatrix(img2);
-            MatrixBuilder matrixBuilder = new MatrixBuilderImpl();
+            MatrixBuilderImpl matrixBuilder = new MatrixBuilderImpl();
             Correspondence correspondence = new Correspondence(CORRESP_LOCATION);
             DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
             fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);

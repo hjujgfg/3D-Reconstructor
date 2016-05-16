@@ -40,6 +40,11 @@ public class ColoredImagePoint {
         this.color = color;
     }
 
+    public ColoredImagePoint(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public ColoredImagePoint(int x, int y, int color) {
         this.x = x;
         this.y = y;
@@ -78,7 +83,20 @@ public class ColoredImagePoint {
     public int hashCode() {
         int result = x;
         result = 31 * result + y;
-        result = 31 * result + color.hashCode();
+        if (color != null)
+            result = 31 * result + color.hashCode();
         return result;
+    }
+
+    public String toString(){
+        return x + " " + y + " ";
+    }
+
+    public String key() {
+        return x + "_" + y;
+    }
+
+    public Point toSimplePoint() {
+        return new Point(x, y);
     }
 }

@@ -79,4 +79,12 @@ public class Vector {
         sb.append("\n");
         return sb.toString();
     }
+
+    public double multiply(Vector v2) {
+        double res = 0;
+        for (int i = 0; i < vec.length; i ++) {
+            res += vec[i] * v2.get(i);
+        }
+        return res;
+    }
 }

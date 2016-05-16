@@ -1,10 +1,12 @@
 package edu.lapidus.rec3d.math.matrix;
 
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import org.apache.commons.math3.linear.*;
 import edu.lapidus.rec3d.math.vector.Vector;
 import org.apache.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Егор on 16.11.2015.
@@ -30,6 +32,11 @@ public class DoubleMatrix implements Matrix, Serializable {
 
     public DoubleMatrix(double[][] matrix) {
         this.internal = matrix;
+    }
+
+    public DoubleMatrix(List<CorrespondenceHolder> init) {
+        internal = new double[init.size()][];
+
     }
 
     public void print() {

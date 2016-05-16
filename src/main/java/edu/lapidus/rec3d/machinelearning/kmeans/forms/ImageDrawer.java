@@ -1,10 +1,11 @@
-package edu.lapidus.rec3d.machinelearning.kmeans;
+package edu.lapidus.rec3d.machinelearning.kmeans.forms;
 
+import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
+import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
+import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
-import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
-import org.apache.commons.math3.analysis.function.Log;
-import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -16,10 +17,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -72,6 +71,8 @@ public class ImageDrawer extends JPanel{
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getY() < 10 && e.getX() < 10) {
+                /*image = imageProcessor.removeGreen(image);
+                image = imageProcessor.toGrayScale(image);*/
                 kmeans = new Kmeans(centroids.size(), image, centroids);
                 kmeans.runAlgorithm();
                 centroids = kmeans.getCentroids();
@@ -80,12 +81,16 @@ public class ImageDrawer extends JPanel{
                 l1.addAll(centroids.stream().map(c -> new Centroid(c.getX(), c.getY(), c.getColor())).collect(Collectors.toList()));
                 logger.info("Starting second image");
                 BufferedImage img2 = imageProcessor.loadImage(img1Path);
+                /*img2 = imageProcessor.removeGreen(img2);
+                img2 = imageProcessor.toGrayScale(img2);*/
                 Kmeans second = new Kmeans(centroids.size(), img2, centroids);
                 second.runAlgorithm();
                 second.saveToImage("secondCluster");
                 saveCentroids(l1, second.getCentroids());
-                ClusterComparator comparator = new ClusterComparator(image, img2, kmeans.getFinalClusters(), second.getFinalClusters());
-                imageProcessor.saveCorrespsByKmeans(img0Path, img1Path, comparator.compareImages());
+                ClusterComparator comparator = new ClusterComparator(image, img2, kmeans.getFinalClusters(), second.getFinalClusters(), kmeans.getClusterMap());
+                List<CorrespondenceHolder> corresps = comparator.getRandomCorrespondences();
+                saveCorresps(corresps);
+                imageProcessor.saveCorrespsByKmeans(img0Path, img1Path, corresps);
                 imageProcessor.saveCorrClusters(img0Path, img1Path, l1, second.getCentroids());
                 clusterized = kmeans.getClusterized();
             } else {
@@ -113,6 +118,19 @@ public class ImageDrawer extends JPanel{
         @Override
         public void mouseExited(MouseEvent e) {
 
+        }
+    }
+
+    private static void saveCorresps(List<CorrespondenceHolder> corresps) {
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("resources/clustering/corresps.txt"));
+            for (CorrespondenceHolder c : corresps) {
+                bw.write(c.get(0).toString() + ":" + c.get(1).toString() + "; " + c.getDistance() + "\n") ;
+            }
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

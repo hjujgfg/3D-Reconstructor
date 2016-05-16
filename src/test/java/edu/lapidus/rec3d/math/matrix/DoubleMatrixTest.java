@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 public class DoubleMatrixTest {
     private final static Logger logger = Logger.getLogger(DoubleMatrixTest.class);
-    MatrixBuilder matrixBuilder;
+    MatrixBuilderImpl matrixBuilder;
     @Test
     public void testSolveHomogeneous() {
        DoubleMatrix tst = matrixBuilder.createAMatrix(new Correspondence("Data/points.csv").getInititalCorrespondences());

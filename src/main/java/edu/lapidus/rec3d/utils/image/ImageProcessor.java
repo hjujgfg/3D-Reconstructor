@@ -2,6 +2,7 @@ package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.PairCorrespData;
@@ -9,8 +10,7 @@ import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
+import java.awt.image.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -267,25 +267,88 @@ public class ImageProcessor {
         saveImage(combined, "resources/clustering/combined.png");
     }
 
-    public void saveCorrespsByKmeans(String i1, String i2, List<List<ColoredImagePoint>> corresps) {
+    public void saveCorrespsByKmeans(String i1, String i2, List<CorrespondenceHolder> corresps) {
         BufferedImage combined = buildCombined(i1, i2);
         Graphics g = combined.createGraphics();
         Random r = new Random();
-        for (List<ColoredImagePoint> pp : corresps) {
+        for (CorrespondenceHolder pp : corresps) {
+            if (pp.getDistance() > 11) continue;
             ColoredImagePoint p1 = pp.get(0);
             ColoredImagePoint p2 = pp.get(1);
             Color c = new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256));
             g.setColor(c);
-            g.drawOval(p1.getX() - 2, p2.getY() - 2, 4, 4);
+            g.drawOval(p1.getX() - 2, p1.getY() - 2, 4, 4);
             g.drawOval(p2.getX() + (combined.getWidth() / 2) - 2, p2.getY() - 2, 4, 4);
             g.drawLine(p1.getX(), p1.getY(), p2.getX() + (combined.getWidth() / 2) , p2.getY());
         }
         saveImage(combined, "resources/clustering/combined2.png");
     }
 
+    public BufferedImage toGrayScale(BufferedImage source) {
+        BufferedImage res = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        Graphics g = res.createGraphics();
+        g.drawImage(source, 0, 0, null);
+        return res;
+    }
+
+    public BufferedImage applyKernel(BufferedImage img, Kernel k) {
+        logger.info("Applying Kernel");
+        ConvolveOp op = new ConvolveOp(k);
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        return op.filter(img, res);
+    }
+
+    public BufferedImage removeGreen(BufferedImage img) {
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        for (int y = 0; y < img.getHeight(); y ++) {
+            for (int x = 0; x < img.getWidth(); x ++) {
+                Color c = new Color(img.getRGB(x, y));
+                int cVal = c.getRGB();
+                if (c.getGreen() > c.getBlue() && c.getGreen() > c.getRed()) {
+                    res.setRGB(x, y, Color.LIGHT_GRAY.getRGB());
+                } else {
+                    res.setRGB(x, y, cVal);
+                }
+             }
+        }
+        return res;
+    }
+
+    public int[] grayToIntArray(BufferedImage img) {
+        int[] res = new int[img.getHeight() * img.getWidth()];
+        int i = 0;
+        for (int y = 0; y < img.getHeight();  y ++) {
+            for (int x = 0; x < img.getWidth(); x ++) {
+                res [i ++] = new Color(img.getRGB(x,y)).getRed();
+            }
+        }
+        return res;
+    }
+
+    public BufferedImage intArrToImg(int[] arr, int width, int height) {
+        BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        int counter = 0;
+        for (int y = 0; y < height; y ++) {
+            for (int x= 0; x < width; x ++) {
+                res.setRGB(x, y, arr[counter]);//new Color(arr[counter], arr[counter], arr[counter]).getRGB());
+                counter ++;
+            }
+        }
+        return res;
+    }
+
     public static void main(String [] args) {
         //bulkResizeImages("sheep", 800, 600);
         ImageProcessor p = new ImageProcessor();
-        p.changeBackGround("img.png");
+        for (int i = 0; i < 3; i ++) {
+            BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
+            tst = p.removeGreen(tst);
+            tst = p.toGrayScale(tst);
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(9)), "resources/convolve/xy9" + i + ".png");
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(15)), "resources/convolve/xy15" + i + ".png");
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "resources/convolve/xy21" + i + ".png");
+        }
     }
+
+
 }

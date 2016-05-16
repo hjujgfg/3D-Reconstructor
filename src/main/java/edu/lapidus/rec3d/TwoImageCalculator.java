@@ -4,6 +4,9 @@ import edu.lapidus.rec3d.depth.Homography;
 import edu.lapidus.rec3d.depth.threaded.DepthRegionCalculator;
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.depth.threaded.Lock;
+import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
+import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
 import edu.lapidus.rec3d.math.Correspondence;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
@@ -42,11 +45,12 @@ public class TwoImageCalculator {
         DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS);
         r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep0.png";
-        String img2 = "resources/images/sheep1.png";
+        String img1 = "resources/images/sheep2.png";
+        String img2 = "resources/images/sheep3.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", 1);
+        //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, null, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
@@ -55,7 +59,7 @@ public class TwoImageCalculator {
 
 
     final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
-    static MatrixBuilder matrixBuilder;
+    static MatrixBuilderImpl matrixBuilder;
     Correspondence correspondence;
     static ImageProcessor imageProcessor;
     Homography homography;
@@ -68,12 +72,15 @@ public class TwoImageCalculator {
         imageProcessor = new ImageProcessor();
     }
 
-    String img1Path;
-    String img2Path;
-    double modelScaleFactor;
+    private String img1Path;
+    private String img2Path;
+    private BufferedImage firstImage;
+    private BufferedImage secondImage;
+    private double modelScaleFactor;
+    private List<CorrespondenceHolder> correspondences;
     //TODO read it from properties
     private final static int THREAD_NUMBER = 20;
-
+    private final static int NUMBER_OF_CLUSTERS = 40;
 
     ArrayList<Thread> depthComputers;
 
@@ -84,6 +91,22 @@ public class TwoImageCalculator {
     public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String CorrespsFile, double modelScaleFactor) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
+        firstImage = imageProcessor.loadImage(img1Path);
+        secondImage = imageProcessor.loadImage(img2Path);
+        if (CorrespsFile != null && !CorrespsFile.isEmpty())
+            correspondence = new Correspondence(CorrespsFile);
+        else {
+            Kmeans kmeans1 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img1Path), null);
+            kmeans1.runAlgorithm();
+            Kmeans kmeans2 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img2Path), kmeans1.getCentroids());
+            kmeans2.runAlgorithm();
+            ClusterComparator comparator = new ClusterComparator(firstImage, secondImage, kmeans1.getFinalClusters(), kmeans2.getFinalClusters(), kmeans1.getClusterMap());
+            correspondences = comparator.getRandomCorrespondences();
+            imageProcessor.saveCorrespsByKmeans(img1Path, img2Path, correspondences);
+            kmeans1.saveToImage("TwoImg1");
+            kmeans2.saveToImage("TwoImg2");
+            imageProcessor.saveCorrClusters(img1Path, img2Path, kmeans1.getCentroids(), kmeans2.getCentroids());
+        }
         this.modelScaleFactor = modelScaleFactor;
         logger.info("Starting pair calculation");
         homography = new Homography(k1, k2, r1, r2);
@@ -91,7 +114,8 @@ public class TwoImageCalculator {
         this.k2 = k2;
         this.r1 = r1;
         this.r2 = r2;
-        correspondence = new Correspondence(CorrespsFile);
+
+
     }
 
     /*public void init() {
@@ -102,7 +126,12 @@ public class TwoImageCalculator {
 
     }*/
     public Map<String, PairCorrespData> run () {
-        DoubleMatrix Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
+        DoubleMatrix Amatrix;
+        if (correspondence != null) {
+            Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
+        } else {
+            Amatrix = matrixBuilder.createAMatrix(correspondences);
+        }
         DoubleMatrix fundamentalMatrix = (DoubleMatrix) matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
         fundamentalMatrix.scale(-1);
         //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
@@ -200,8 +229,6 @@ public class TwoImageCalculator {
      */
     private ColorMatrix[] loadImages() {
         ColorMatrix[] res = new ColorMatrix[2];
-        BufferedImage firstImage = imageProcessor.loadImage(img1Path);
-        BufferedImage secondImage = imageProcessor.loadImage(img2Path);
         res[0] = new ColorMatrix(firstImage);
         res[1] = new ColorMatrix(secondImage);
         return res;

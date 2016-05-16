@@ -27,7 +27,7 @@ public class Starter {
 
     private final static String IMAGE_LOCATION = "resources/images/";
     private final static String CORRESPS_LOCATION = "resources/correspondences/";
-    private final static MatrixBuilder matrixBuilder = new MatrixBuilderImpl();
+    private final static MatrixBuilderImpl matrixBuilder = new MatrixBuilderImpl();
     DoubleMatrix[] k;
     DoubleMatrix[] r;
     String[] images;

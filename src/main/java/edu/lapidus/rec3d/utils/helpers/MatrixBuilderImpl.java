@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.utils.helpers;
 
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.Matrix;
@@ -9,10 +10,12 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.log4j.Logger;
 
+import java.util.List;
+
 /**
  * Created by Егор on 16.11.2015.
  */
-public class MatrixBuilderImpl implements MatrixBuilder{
+public class MatrixBuilderImpl{
     final static Logger logger = Logger.getLogger(MatrixBuilder.class);
 
     public DoubleMatrix createRotationMatrix(double angle, int axis) {
@@ -93,6 +96,25 @@ public class MatrixBuilderImpl implements MatrixBuilder{
         DoubleMatrix res = new DoubleMatrix(A);
         //logger.info("Amatrix created: \n" + res.toString());
         return res;
+    }
+
+    public DoubleMatrix createAMatrix(List<CorrespondenceHolder> points) {
+        double [][] A = new double[points.size()][];
+        int i = 0;
+        for (CorrespondenceHolder c : points) {
+            A[i] = new double[9];
+            A[i][0] = c.getA().getX() * c.getB().getX();
+            A[i][1] = c.getA().getY() * c.getB().getX();
+            A[i][2] = c.getB().getX();
+            A[i][3] = c.getA().getX() * c.getB().getY();
+            A[i][4] = c.getA().getY() * c.getB().getY();
+            A[i][5] = c.getB().getY();
+            A[i][6] = c.getA().getX();
+            A[i][7] = c.getA().getY();
+            A[i][8] = 1;
+            i ++;
+        }
+        return new DoubleMatrix(A);
     }
 
     public DoubleMatrix buildFromVector(Vector doubleVector, int rows, int colls) {

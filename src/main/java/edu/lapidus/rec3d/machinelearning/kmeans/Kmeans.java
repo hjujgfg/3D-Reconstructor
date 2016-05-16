@@ -37,10 +37,22 @@ public class Kmeans {
     int [] clusterPointCounts;
     ColoredImagePoint temporalPoint;
 
-    private List<List<ColoredImagePoint>> finalClusters;
+    private static final List<Color> colors;
+    static {
+        colors = new ArrayList<>(500);
+        Random rand = new Random();
+        for (int i = 0; i < 500; i ++) {
+            int r = rand.nextInt(256);
+            int g = rand.nextInt(256);
+            int b = rand.nextInt(256);
+            colors.add(new Color(r,g,b));
+        }
+    }
+
+    private List<Cluster> finalClusters;
     private final static double THRESHOLD = 3;
-    private final static double ITERATION_NUMBER = 200;
-    private final static int CLUSTERS_NUMBER = 50;
+    private final static double ITERATION_NUMBER = 20;
+    private final int CLUSTERS_NUMBER;
     private final static Logger logger = Logger.getLogger(Kmeans.class);
 
     public Kmeans(int numberOfClusters, BufferedImage img, List<Centroid> initCentroids) {
@@ -48,6 +60,7 @@ public class Kmeans {
         for (int i = 0; i < numberOfClusters; i ++) {
             clusters.add(new ArrayList<>());
         }*/
+        CLUSTERS_NUMBER = numberOfClusters;
         image = new ColorMatrix(img);
         image.removeBackground();
         if (initCentroids != null && initCentroids.size() > 0) {
@@ -68,8 +81,8 @@ public class Kmeans {
         centroids = new ArrayList<>(CLUSTERS_NUMBER);
         for (int i = 0; i < CLUSTERS_NUMBER; i ++) {
             Random r = new Random();
-            int x = r.nextInt(image.getWidth());
-            int y = r.nextInt(image.getHeight());
+            int x = 200 + r.nextInt( image.getWidth() - 200);
+            int y = 20 + r.nextInt(image.getHeight() - 200);
             Color c = image.getColor(x, y);
             centroids.add(new Centroid(x, y, c));
         }
@@ -86,17 +99,17 @@ public class Kmeans {
             iterationCounter ++;
         }
         buildList();
-        logger.info("finished algorithm");
+        logger.info("finished algorithm with " + centroids.size() + " clusters");
     }
 
-    private boolean compareCentroids(List<Centroid> c1, List<Centroid> c2) {
+    /*private boolean compareCentroids(List<Centroid> c1, List<Centroid> c2) {
         for (Centroid c : c1) {
             for (Centroid d : c2) {
                 if (getDistance(c, d) > THRESHOLD) return false;
             }
         }
         return true;
-    }
+    }*/
 
 
     private void runClusterization() {
@@ -110,7 +123,8 @@ public class Kmeans {
                 temporalPoint.setX(x);
                 temporalPoint.setY(y);
                 temporalPoint.setColor(image.getColor(x, y));
-                if (temporalPoint.getColor().equals(Color.GREEN)) {
+                if (temporalPoint.getColor().equals(Color.GREEN)) { //this is for colored images!!! TODO
+                //if (temporalPoint.getColor().equals(Color.BLACK)) {//  this is for grayscale images
                     clusterMap.put(x + "_" + y, -1);
                     continue;
                 }
@@ -118,7 +132,8 @@ public class Kmeans {
                 int minIndex = 0;
                 int counter = 0;
                 for (Centroid centroid : centroids) {
-                    if (centroid.getColor().equals(Color.GREEN)) continue;
+                    if (centroid.getColor().equals(Color.GREEN)) continue; //Colored images
+                    //if (centroid.getColor().equals(Color.BLACK)) continue; //Gray images
                     double currDist = getDistance(centroid, temporalPoint);
                     if (currDist < minDist) {
                         minDist = currDist;
@@ -211,28 +226,39 @@ public class Kmeans {
 
     private double getDistance(ColoredImagePoint p1, ColoredImagePoint p2) {
         double pxDist = p1.getDistanceTo(p2);
-        double colorMultiplier = (image.getWidth() + image.getHeight()) / 2. / 128.;
+        double colorMultiplier = (double)(image.getWidth() + image.getHeight()) / 2. / 256.;
         //logger.info("color multiplier: " + colorMultiplier);
         //logger.info("pxDist: " + pxDist + " colorDist: " + colorMultiplier * p1.getColorDistance(p2));
-        double colorDist = p1.getColorDistance(p2) * colorMultiplier ;
+        double colorDist = p1.getColorDistance(p2);
+        colorDist *= colorDist;
         //double colorDist = 0;
-        return pxDist + colorDist;
+        return Math.sqrt(pxDist * pxDist + colorDist * colorMultiplier);
+        //return pxDist + colorDist;
+    }
+
+    private double getDistanceGrayScale(ColoredImagePoint p1, ColoredImagePoint p2) {
+        double pxDist = p1.getDistanceTo(p2);
+        double colorMult = (double)(image.getWidth() + image.getHeight()) / 2. / 512.;
+        double colorDist = p1.getColor().getRed() - p2.getColor().getRed();
+        colorDist *= colorDist;
+        return Math.sqrt(pxDist * pxDist + colorDist * colorMult);
     }
 
     public BufferedImage getClusterized() {
-        int rStep = 250 / centroids.size();
+        /*int rStep = 250 / centroids.size();
         int gStep = 250 / (centroids.size() * 2);
-        int bStep = 250 / (centroids.size() * 3);
+        int bStep = 250 / (centroids.size() * 3);*/
         if (clusterMap == null || centroids == null) return null;
         int r = 0, gr = 0, b = 0;
         BufferedImage img = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int counter = 0;
         for (int x = 0; x < image.getWidth(); x ++) {
             for (int y = 0; y < image.getHeight(); y ++) {
                 int cluster = clusterMap.get(x + "_" + y);
                 Color color;
                 if (cluster == -1) color = Color.GREEN;
                 else {
-                    color = new Color(rStep * cluster, gStep * cluster, bStep * cluster);
+                    color = colors.get(cluster);
                 }
                 img.setRGB(x, y, color.getRGB());
             }
@@ -243,7 +269,7 @@ public class Kmeans {
     private void buildList() {
         finalClusters = new ArrayList<>(CLUSTERS_NUMBER);
         for (int i = 0; i < CLUSTERS_NUMBER; i ++) {
-            finalClusters.add(new ArrayList<>());
+            finalClusters.add(new Cluster());
         }
         for (int x = 0; x < image.getWidth(); x ++) {
             for (int y = 0; y < image.getHeight(); y ++) {
@@ -278,8 +304,11 @@ public class Kmeans {
     }
 
 
-    public List<List<ColoredImagePoint>> getFinalClusters() {
+    public List<Cluster> getFinalClusters() {
         return finalClusters;
     }
 
+    public Map<String, Integer> getClusterMap() {
+        return clusterMap;
+    }
 }

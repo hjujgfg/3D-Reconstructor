@@ -12,9 +12,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by Егор on 17.02.2016.
@@ -26,7 +25,7 @@ public class DepthRegionCalculator implements Runnable {
     private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
     private final static int SECOND_POINT_SHIFT = -20;
 
-    private final static int COLOR_REGION_RADIUS = 20;
+    private final static int COLOR_REGION_RADIUS = 10;
     //sheep0 - 1
     /*private final static int HEIGHT_DIFF_LIM = 3;//5
     private final static int WIDTH_DIFF_LIM = 30;
@@ -222,7 +221,7 @@ public class DepthRegionCalculator implements Runnable {
             TMP.addLinePoint(x2, y2);
             double tmp = 1000;
             try {
-                tmp = evaluateSimilarity(firstPoint, new int[]{x2, y2});
+                tmp = evaluateSimilarityX(firstPoint, new int[]{x2, y2});
             } catch (ArrayIndexOutOfBoundsException e) {
                 logger.error(String.format("Index out of bounds: %d : %d; %d : %d", firstPoint[0], firstPoint[1], x2, y2));
             }
@@ -239,6 +238,19 @@ public class DepthRegionCalculator implements Runnable {
         return result;
     }
 
+    private double evaluateSimilarityX(int[] point1, int[] point2) {
+        List<Color> firstSample = getColorRegionXX(img1, point1);
+        List<Color> secondSample = getColorRegionXX(img2, point2);
+        double meanDiff = 0;
+        int xDiff = xDiff = (point1[0] - point2[0]) * (point1[0] - point2[0]);
+        int yDiff = yDiff = (point1[1] - point2[1]) * (point1[1] - point2[1]);
+        for (int i = 0; i < firstSample.size(); i ++) {
+            meanDiff += comparePixels(firstSample.get(i), secondSample.get(i));
+        }
+        return Math.sqrt(meanDiff + xDiff + yDiff);
+
+    }
+
     private double evaluateSimilarity(int[] point1, int[] point2) {
         Color[] firstSample = getColorRegionX(img1, point1);
         Color[] secondSample = getColorRegionX(img2, point2);
@@ -253,7 +265,7 @@ public class DepthRegionCalculator implements Runnable {
         widthDiff *= widthDiff * WIDTH_DIFF_WEIGHT;
         //logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff);
         meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT + widthDiff;
-        return meanDiff / (2 * (firstSample.length + 1));
+        return Math.sqrt(meanDiff) / (2 * (firstSample.length + 1));
     }
 
     /**
@@ -347,6 +359,32 @@ public class DepthRegionCalculator implements Runnable {
                 c = Color.magenta;
             }
             res[j + 3] = c;
+        }
+        return res;
+    }
+
+    private List<Color> getColorRegionXX(ColorMatrix m, int[] p) {
+        List<Color> res = new ArrayList<>();
+        int px = p[0];
+        int py = p[1];
+        int startX = px - COLOR_REGION_RADIUS;
+        int startY = py - COLOR_REGION_RADIUS;
+        if (startX < 0) startX = 0;
+        if (startY < 0) startY = 0;
+        int endX = startX + 2 * COLOR_REGION_RADIUS;
+        int endY = startY + 2 * COLOR_REGION_RADIUS;
+        if (endX >= m.getWidth()) {
+            endX = m.getWidth() - 1;
+            startX = m.getWidth() - 1 - 2 * COLOR_REGION_RADIUS;
+        }
+        if (endY >= m.getHeight()) {
+            endY = m.getHeight() - 1;
+            startY = m.getHeight() - 1 - 2 * COLOR_REGION_RADIUS;
+        }
+        for (int x = startX; x < endX; x += 2){
+            for (int y = startY; y < endY; y += 2) {
+                res.add(m.getColor(x, y));
+            }
         }
         return res;
     }
