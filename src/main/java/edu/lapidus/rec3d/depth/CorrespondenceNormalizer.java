@@ -4,6 +4,7 @@ import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.Vector;
+import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
@@ -85,7 +86,7 @@ public class CorrespondenceNormalizer {
         RealMatrix d = fSvd.getS();
         d.setEntry(2, 2, 0);
         RealMatrix u = fSvd.getU();
-        RealMatrix v = fSvd.getV();
+        RealMatrix v = fSvd.getVT();
         F = u.multiply(d).multiply(v);
         fundamental = T2.transpose().multiplyBy(new DoubleMatrix(F.getData())).multiplyBy(T1);
         logger.info("Calculated fundamental: \n" + fundamental);
@@ -188,5 +189,9 @@ public class CorrespondenceNormalizer {
         }
         CorrespondenceNormalizer tst = new CorrespondenceNormalizer(map);
         DoubleMatrix f = tst.normalizeAndCalculateF();
+        MatrixBuilderImpl mb = new MatrixBuilderImpl();
+        DoubleMatrix A = mb.createAMatrix(map);
+        SingularValueDecomposition svd = A.SVD();
+
     }
 }

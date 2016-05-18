@@ -43,10 +43,10 @@ public class TwoImageCalculator {
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);*/
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
         DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS);
-        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-3, MatrixBuilder.X_AXIS));
+        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-7, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep2.png";
-        String img2 = "resources/images/sheep4.png";
+        String img1 = "resources/images/sheep0.png";
+        String img2 = "resources/images/sheep2.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
@@ -137,7 +137,7 @@ public class TwoImageCalculator {
                 logger.info("!!!Starting both kmeans and convolve!!!");
                 buildKmeansAndConvolveCorrespondences();
                 Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences, kMeansCorrespondences);
-                //normalizer = new CorrespondenceNormalizer(kMeansCorrespondences, convolveCorrespondences);
+                normalizer = new CorrespondenceNormalizer(kMeansCorrespondences, convolveCorrespondences);
                 break;
         }
     }
@@ -181,10 +181,10 @@ public class TwoImageCalculator {
     }*/
     public Map<String, PairCorrespData> run () {
 
-        DoubleMatrix fundamentalMatrix = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
-        fundamentalMatrix.scale(-1);
+        /*DoubleMatrix fundamentalMatrix = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
+        fundamentalMatrix.scale(-1);*/
 
-        //DoubleMatrix fundamentalMatrix = normalizer.normalizeAndCalculateF();
+        DoubleMatrix fundamentalMatrix = normalizer.normalizeAndCalculateF();
 
         //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
         logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());

@@ -48,7 +48,8 @@ public class VRMLPointSetGenerator {
                     "                    color [\n");
             for (PairCorrespData p : points) {
                 //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
-                if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
+                //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
+                if (true) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
                     sb2.append(p.getX1() + " " +  ( - p.getY1()) + " " + (p.getZ() * 60000) + ",\n");
                     sb1.append( p.getX() * 1000 + " " + ( - p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
