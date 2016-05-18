@@ -87,4 +87,8 @@ public class Vector {
         }
         return res;
     }
+
+    public void setDoubleAt(int index, double value) {
+        vec[index] = value;
+    }
 }

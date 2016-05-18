@@ -27,8 +27,18 @@ public class DoubleMatrix implements Matrix, Serializable {
         }
         return sb.toString();
     }
+    //TODO check why Homography does not compile without this constructor
+    protected DoubleMatrix() {}
 
-    protected DoubleMatrix(){}
+    public DoubleMatrix(int rows, int columns){
+        internal = new double[rows][];
+        for (int i = 0; i < rows; i ++) {
+            internal[i] = new double[columns];
+            for (int j = 0; j < columns; j ++) {
+                internal[i][j] = 0;
+            }
+        }
+    }
 
     public DoubleMatrix(double[][] matrix) {
         this.internal = matrix;
@@ -130,4 +140,8 @@ public class DoubleMatrix implements Matrix, Serializable {
         System.arraycopy(a.internal, 0, res, internal.length, a.internal.length);
         internal = res;
      }
+
+    public void setAtPosition(int row, int column, double value) {
+        internal[row][column] = value;
+    }
 }

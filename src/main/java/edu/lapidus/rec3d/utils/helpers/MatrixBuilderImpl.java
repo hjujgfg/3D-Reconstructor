@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.helpers;
 
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
+import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.Point;
@@ -12,6 +13,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.log4j.Logger;
 
 import java.awt.geom.Arc2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -147,6 +149,55 @@ public class MatrixBuilderImpl{
         m1.rowsAppend(m2);
         return m1;
     }
+
+    /*protected void scaleToRoot(List<ColoredImagePoint> list) {
+        boolean stop = false;
+        double factor = 1;
+        double realMultiplier = 1;
+        double twoRoot = 1.41421;
+        double currentDistance = scaleList(list, factor);
+        factor = 2;
+        boolean changeFactor = true;
+        while (true) {
+            if (Math.abs(currentDistance - twoRoot) < 0.1) break;
+            if (currentDistance < 2 && changeFactor)
+                factor *= 2;
+            realMultiplier = 1;
+            if (currentDistance > twoRoot) {
+                realMultiplier -= 1 / factor;
+            } else {
+                changeFactor = false;
+                factor /= 2;
+                realMultiplier += 1 / factor;
+            }
+            currentDistance = scaleList(list, realMultiplier);
+        }
+    }
+
+
+    private final static ColoredImagePoint ORIGIN_POINT = new ColoredImagePoint(0, 0);
+    private double scaleList(List<ColoredImagePoint> list, double factor) {
+        int x, y;
+        *//*int totalX = 0, totalY = 0;*//*
+        double distance = 0;
+        double currentDistance ;
+        for (ColoredImagePoint p : list) {
+
+            x = (int) (p.getX() * factor);
+            y = (int) (p.getY() * factor);
+            p.setX(x);
+            p.setY(y);
+            currentDistance = ORIGIN_POINT.getDistanceTo(p);
+            distance += currentDistance * currentDistance;
+            *//*totalX += x;
+            totalY += y;*//*
+        }
+        *//*mean.setX(totalX / list.size());
+        mean.setY(totalY / list.size());*//*
+        return Math.sqrt(distance / list.size());
+    }*/
+
+
 
     public DoubleMatrix buildFromVector(Vector doubleVector, int rows, int colls) {
         double[][] res = new double[rows][];
