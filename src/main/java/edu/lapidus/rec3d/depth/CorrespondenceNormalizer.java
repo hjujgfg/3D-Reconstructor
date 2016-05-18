@@ -9,9 +9,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Егор on 17.05.2016.
@@ -73,7 +71,7 @@ public class CorrespondenceNormalizer {
         logger.info("calculating fundamental");
         DoubleMatrix A = createAMatrix(normalized1, normalized2);
         SingularValueDecomposition svd = A.SVD();
-        double[] f = svd.getV().getColumn(2);
+        double[] f = svd.getV().getColumn(svd.getV().getColumnDimension() - 1);
         double[][] ff = new double[3][];
         int counter = 0;
         for (int i = 0; i < 3; i ++) {
@@ -179,4 +177,16 @@ public class CorrespondenceNormalizer {
         return fundamental;
     }
 
+
+    public static void main(String[] args) {
+        Map<ColoredImagePoint, ColoredImagePoint> map = new HashMap<>(20);
+        Random r = new Random();
+        for (int i = 0; i < 20; i ++) {
+            int x = r.nextInt(800);
+            int y = r.nextInt(600);
+            map.put(new ColoredImagePoint(x, y), new ColoredImagePoint(x + r.nextInt(10), y + r.nextInt(10)));
+        }
+        CorrespondenceNormalizer tst = new CorrespondenceNormalizer(map);
+        DoubleMatrix f = tst.normalizeAndCalculateF();
+    }
 }
