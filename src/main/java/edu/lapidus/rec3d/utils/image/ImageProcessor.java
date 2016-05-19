@@ -361,7 +361,7 @@ public class ImageProcessor {
     }
 
     public static void main(String [] args) {
-        //bulkResizeImages("sheep_hand", 800, 600);
+        bulkResizeImages("sheep_holder", 800, 600);
         /*ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
             BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
@@ -371,11 +371,11 @@ public class ImageProcessor {
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(15)), "resources/convolve/xy15" + i + ".png");
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "resources/convolve/xy21" + i + ".png");
         }*/
-        /*ImageProcessor p = new ImageProcessor();
+        ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 5; i ++) {
-            BufferedImage res = p.loadImage("resources/images/sheep_hand/res/sheep_hand" + i + ".png");
-            p.saveImage(p.normalize(res, 100), "resources/images/sheep_hand/normalized/sheep" + i +".png");
-        }*/
+            BufferedImage res = p.loadImage("resources/images/sheep_holder/res/sheep_holder" + i + ".png");
+            p.saveImage(p.normalize(res, 100), "resources/images/sheep_holder/normalized/sheep" + i +".png");
+        }
     }
 
 

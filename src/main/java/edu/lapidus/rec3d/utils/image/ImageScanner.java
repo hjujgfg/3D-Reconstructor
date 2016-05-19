@@ -24,14 +24,16 @@ public class ImageScanner {
     private final static String IMG1 = "resources/images/sheep0.png";
     private final static String IMG2 = "resources/images/sheep1.png";
     private final static int FILTER_SIZE = 15;
-    private final static int WINDOW_SIDE = 20;
+    private final static int WINDOW_SIDE = 10;
+    private final static int CORRESPONDENCE_COUNT = 20;
+
     BufferedImage img1, img2;
     String img1Path, img2Path;
 
     Map<ColoredImagePoint, Double> det1, det2;
 
     Map<ColoredImagePoint, ColoredImagePoint> correspondences;
-
+    List<BufferedImage> processed;
 
 
     public static void main(String[] args) {
@@ -58,9 +60,9 @@ public class ImageScanner {
         images.addAll(applyGaussianFilters(img1, FILTER_SIZE));
         images.addAll(applyGaussianFilters(img2, FILTER_SIZE));
         int i = 0;
-        for (BufferedImage b : images) {
+        /*for (BufferedImage b : images) {
             processor.saveImage(b, "resources/convolve/scanner" + i++ +".png");
-        }
+        }*/
         /*det1 = evaluatePoints(images.subList(0, 3));
         det2 = evaluatePoints(images.subList(3, 6));*/
 
@@ -201,13 +203,12 @@ public class ImageScanner {
     }
 
     private Map<ColoredImagePoint, ColoredImagePoint> compareImages(List<BufferedImage> filtered, List<ColoredImagePoint> points) {
-        int pointCount = 20;
-        int topPointCount = pointCount > points.size() ? points.size() : pointCount;
+        int topPointCount = CORRESPONDENCE_COUNT > points.size() ? points.size() : CORRESPONDENCE_COUNT;
         Map<ColoredImagePoint, ColoredImagePoint> result = new HashMap<>();
         Random r = new Random(points.size());
-        for (int i = 0; i < pointCount ; i += 1) {
+        for (int i = 0; i < CORRESPONDENCE_COUNT ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
-            ColoredImagePoint curr = points.get(r.nextInt(points.size()/3));
+            ColoredImagePoint curr = points.get(r.nextInt(points.size()/10));
             List<Window> current = getWindow(filtered.subList(0, 3), curr.getX(), curr.getY());
             if (current == null) continue;
             double minDist = Double.MAX_VALUE;
@@ -216,7 +217,7 @@ public class ImageScanner {
                 if (y < 0 || y > filtered.get(0).getHeight() - WINDOW_SIDE) {
                     continue;
                 }
-                for (int x = curr.getX() - 30; x < curr.getX() + 30; x ++) {
+                for (int x = curr.getX() - 50; x < curr.getX() + 50; x ++) {
                     if (x < 0 || x > filtered.get(0).getWidth() - WINDOW_SIDE) {
                         continue;
                     }
@@ -281,6 +282,18 @@ public class ImageScanner {
             }
         }
         return res;
+    }
+
+    public void initCorrespondenceChecker() {
+        processed = new ArrayList<>(6);
+        processed.addAll(applyGaussianFilters(img1, FILTER_SIZE));
+        processed.addAll(applyGaussianFilters(img2, FILTER_SIZE));
+    }
+
+    public double comparePoints(int x1, int y1, int x2, int y2) {
+        List<Window> w1 = getWindow(processed.subList(0, 3), x1, y1);
+        List<Window> w2 = getWindow(processed.subList(3, 6), x2, y2);
+        return compareWindowLists(w1, w2);
     }
 
     public Map<ColoredImagePoint, ColoredImagePoint> getCorrespondences() {

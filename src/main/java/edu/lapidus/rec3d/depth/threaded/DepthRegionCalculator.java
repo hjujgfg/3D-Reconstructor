@@ -6,6 +6,7 @@ import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.PairCorrespData;
+import edu.lapidus.rec3d.utils.image.ImageScanner;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -22,10 +23,10 @@ public class DepthRegionCalculator implements Runnable {
     private final static Logger logger = Logger.getLogger(DepthRegionCalculator.class);
     private final static Object LOCK_OBJ = new Object();
 
-    private final static int SECOND_POINT_LOOKUP_WIDTH = 120;
-    private final static int SECOND_POINT_SHIFT = -20;
+    private final static int SECOND_POINT_LOOKUP_WIDTH = 60;
+    private final static int SECOND_POINT_SHIFT = 0;
 
-    private final static int COLOR_REGION_RADIUS = 10;
+    private final static int COLOR_REGION_RADIUS = 20;
     //sheep0 - 1
     /*private final static int HEIGHT_DIFF_LIM = 3;//5
     private final static int WIDTH_DIFF_LIM = 30;
@@ -47,7 +48,7 @@ public class DepthRegionCalculator implements Runnable {
     private Vector epipole;
     ColorMatrix img1;
     ColorMatrix img2;
-
+    ImageScanner scanner;
     ArrayList<EpipolarLineHolder> lines;
     //Here we put lines which this specific calculator should compute;
     //I mean there will be several threads, each calculating its own set of lines
@@ -72,7 +73,8 @@ public class DepthRegionCalculator implements Runnable {
                                  Map<String, PairCorrespData> container,
                                  Set<Lock> semaphore,
                                  double modelScaleFactor,
-                                 ArrayList<EpipolarLineHolder> lines) {
+                                 ArrayList<EpipolarLineHolder> lines,
+                                 ImageScanner scanner) {
         this.homography = homography;
         this.epipole = epipole;
         this.img1 = img1;
@@ -88,7 +90,7 @@ public class DepthRegionCalculator implements Runnable {
         k2 = homography.getK2();
         r1 = homography.getR1();
         r2 = homography.getR2();
-
+        this.scanner = scanner;
     }
 
     public void run() {
@@ -104,6 +106,7 @@ public class DepthRegionCalculator implements Runnable {
                 if (img1.getColor(j, i).equals(Color.GREEN)) continue;
 
                 int[] secondPoint = calcSecondPointAlongX(firstPoint);
+                if (secondPoint[0] == Integer.MIN_VALUE || secondPoint[1] == Integer.MIN_VALUE) continue;
                 if (img2.getColor(secondPoint[0], secondPoint[1]).equals(Color.GREEN)) continue;
                 Vector M = calcMetricDepthXXX(firstPoint, secondPoint);
                 PairCorrespData res = new PairCorrespData();
@@ -213,15 +216,16 @@ public class DepthRegionCalculator implements Runnable {
         EpipolarLineHolder TMP = new EpipolarLineHolder(firstPoint, coefficients.getVec());
         for (int x2 = startX; x2 < endX - 4; x2 += 4) {
             int y2 = (int)( ( - coefficients.get(2) - coefficients.get(0) * x2 )  / coefficients.get(1) );
-
+            if (Math.abs(y2 - firstPoint[1]) > 20) continue;
             if (y2 < 0)
                 y2 = 0;
             if (y2 >= img2.getHeight())
                 y2 = img2.getHeight() - 1;
             TMP.addLinePoint(x2, y2);
-            double tmp = 1000;
+            double tmp = 1000000;
             try {
                 tmp = evaluateSimilarityX(firstPoint, new int[]{x2, y2});
+                //tmp = scanner.comparePoints(firstPoint[0], firstPoint[1], x2, y2);
             } catch (ArrayIndexOutOfBoundsException e) {
                 logger.error(String.format("Index out of bounds: %d : %d; %d : %d", firstPoint[0], firstPoint[1], x2, y2));
             }
@@ -242,8 +246,8 @@ public class DepthRegionCalculator implements Runnable {
         List<Color> firstSample = getColorRegionXX(img1, point1);
         List<Color> secondSample = getColorRegionXX(img2, point2);
         double meanDiff = 0;
-        int xDiff = xDiff = (point1[0] - point2[0]) * (point1[0] - point2[0]);
-        int yDiff = yDiff = (point1[1] - point2[1]) * (point1[1] - point2[1]);
+        int xDiff = (point1[0] - point2[0]) * (point1[0] - point2[0]);
+        int yDiff = (point1[1] - point2[1]) * (point1[1] - point2[1]);
         for (int i = 0; i < firstSample.size(); i ++) {
             meanDiff += comparePixels(firstSample.get(i), secondSample.get(i));
         }

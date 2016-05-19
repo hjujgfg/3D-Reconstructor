@@ -148,7 +148,7 @@ public class CorrespondenceNormalizer {
             A[i][4] = p2.getY() * p1.getY();
             A[i][5] = p2.getY();
             A[i][6] = p1.getX();
-            A[i][7] = p2.getY();
+            A[i][7] = p1.getY();
             A[i][8] = 1;
         }
         return new DoubleMatrix(A);

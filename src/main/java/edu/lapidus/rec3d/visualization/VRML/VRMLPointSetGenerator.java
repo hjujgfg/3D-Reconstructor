@@ -4,6 +4,7 @@ import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,17 +50,21 @@ public class VRMLPointSetGenerator {
             for (PairCorrespData p : points) {
                 //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
                 //if (p.getZ() > -0.1 && p.getZ() < 0.1 && p.getX1() > 100 && p.getX1() < 700) {
-                if (true) {
+                if (Double.isNaN(p.getY()) || Double.isNaN(p.getX()) || Double.isNaN(p.getZ())) {
+                    continue;
+                }
+
+                //if (p.getY() != Double.NaN && p.getX() != Double.NaN && p.getZ() != Double.NaN) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    sb2.append(p.getX1() + " " +  ( - p.getY1()) + " " + (p.getZ() * 60000) + ",\n");
-                    sb1.append( p.getX() * 1000 + " " + ( - p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
+                    sb2.append(p.getX1() + " " +  ( -p.getY1()) + " " + (p.getZ() * 100) + ",\n");
+                    sb1.append( p.getX() * 1000 + " " + ( -p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;
                     double g = c.getGreen() / 256.;
                     double b = c.getBlue() / 256.;
                     color.append(r + " " + g + " " + b +",\n");
-                }
+                //}
             }
             sb1.append("]\n" +
                     "}\n");
