@@ -42,8 +42,8 @@ public class TwoImageCalculator {
         /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);*/
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-7, MatrixBuilder.Y_AXIS);
-        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-3, MatrixBuilder.X_AXIS));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS);
+        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-0.9, MatrixBuilder.X_AXIS));
 
         String img1 = "resources/images/sheep0.png";
         String img2 = "resources/images/sheep1.png";
@@ -69,6 +69,7 @@ public class TwoImageCalculator {
     Homography homography;
     CorrespondenceNormalizer normalizer;
     DoubleMatrix k1, k2, r1, r2;
+    Vector epipole;
 
     ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
 
@@ -124,7 +125,7 @@ public class TwoImageCalculator {
             case KMEANS_CORREPS_SOURCE:
                 logger.info("Started building correspondences by Kmeans");
                 buildKmeansCorrespondences();
-                //Amatrix = matrixBuilder.createAMatrix(kMeansCorrespondences);
+                Amatrix = matrixBuilder.createAMatrix(kMeansCorrespondences);
                 normalizer = new CorrespondenceNormalizer(kMeansCorrespondences);
                 break;
             case CONVOLVE_CORRESPS_SOURCE:
@@ -181,19 +182,28 @@ public class TwoImageCalculator {
     }*/
     public Map<String, PairCorrespData> run () {
 
-        DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
-        fundamentalMatrix2.scale(-1);
+        DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
+        logger.info("Found fundamental without normalization: " + fundamentalMatrix2);
+        //DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
+
+        //fundamentalMatrix2.scale(-1);
 
         DoubleMatrix fundamentalMatrix = normalizer.normalizeAndCalculateF();
 
         //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
         logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());
-        Vector epipole = calculateEpipoleFromFundamental(fundamentalMatrix, fundamentalMatrix2);
+        boolean success = calculateEpipoleFromFundamental(fundamentalMatrix);
+        //success = false;
+        if (!success){
+            logger.info("attempting another epipole");
+            calculateEpipoleFromFundamental(fundamentalMatrix2);
+            //TODO we calculate EPIPOLE from one matrix, BUT later use another FUNDAMENTAL - fixed not tested
+            fundamentalMatrix = fundamentalMatrix2;
+        }
 
         Map<String, PairCorrespData> result = new ConcurrentHashMap<String, PairCorrespData>();
-        //TODO this is not good
+
         ColorMatrix[] images = loadImages();
-        //TODO remove background
 
         for (ColorMatrix c : images) {
             c.removeBackground();
@@ -313,7 +323,7 @@ public class TwoImageCalculator {
         return new Vector(result.toArray());
     }*/
 
-    private Vector calculateEpipoleFromFundamental(DoubleMatrix fund, DoubleMatrix fundBack) {
+    private boolean calculateEpipoleFromFundamental(DoubleMatrix fund) {
         //SingularValueDecomposition svd = fund.transpose().SVD();
         SingularValueDecomposition svd = fund.SVD();
         RealMatrix v = svd.getV();
@@ -328,15 +338,9 @@ public class TwoImageCalculator {
                 break;
             }
         }
-        if (!correctEpipole) {
-            svd = fundBack.SVD();
-            v = svd.getV();
-            e = new Vector(v.getColumn(2));
-            e = e.scalar(1 / e.get(2));
-            logger.info("!!!Backup epipole!!!" + e.toString());
-        }
+        epipole = e;
         //return new Vector(v.getColumn(v.getColumnDimension() - 1));
-        return e;
+        return correctEpipole;
     }
 
     public DoubleMatrix getK2() {

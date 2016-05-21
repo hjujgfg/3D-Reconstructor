@@ -24,8 +24,8 @@ public class ImageScanner {
     private final static String IMG1 = "resources/images/sheep0.png";
     private final static String IMG2 = "resources/images/sheep1.png";
     private final static int FILTER_SIZE = 15;
-    private final static int WINDOW_SIDE = 10;
-    private final static int CORRESPONDENCE_COUNT = 20;
+    private final static int WINDOW_SIDE = 20;
+    private final static int CORRESPONDENCE_COUNT = 10;
 
     BufferedImage img1, img2;
     String img1Path, img2Path;

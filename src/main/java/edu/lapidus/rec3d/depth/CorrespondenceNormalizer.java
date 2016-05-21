@@ -69,7 +69,7 @@ public class CorrespondenceNormalizer {
     }
 
     private void calculateFundamental() {
-        logger.info("calculating fundamental");
+        logger.info("calculating normalized fundamental");
         DoubleMatrix A = createAMatrix(normalized1, normalized2);
         SingularValueDecomposition svd = A.SVD();
         double[] f = svd.getV().getColumn(svd.getV().getColumnDimension() - 1);
@@ -89,7 +89,7 @@ public class CorrespondenceNormalizer {
         RealMatrix v = fSvd.getVT();
         F = u.multiply(d).multiply(v);
         fundamental = T2.transpose().multiplyBy(new DoubleMatrix(F.getData())).multiplyBy(T1);
-        logger.info("Calculated fundamental: \n" + fundamental);
+        logger.info("Calculated normalized fundamental: \n" + fundamental);
     }
 
     public void normalize(List<ColoredImagePoint> first, List<ColoredImagePoint> second) {

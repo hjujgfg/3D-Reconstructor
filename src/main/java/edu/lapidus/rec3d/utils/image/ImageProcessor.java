@@ -361,7 +361,7 @@ public class ImageProcessor {
     }
 
     public static void main(String [] args) {
-        bulkResizeImages("sheep_holder", 800, 600);
+        //bulkResizeImages("sheep_holder", 800, 600);
         /*ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
             BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
@@ -373,8 +373,8 @@ public class ImageProcessor {
         }*/
         ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 5; i ++) {
-            BufferedImage res = p.loadImage("resources/images/sheep_holder/res/sheep_holder" + i + ".png");
-            p.saveImage(p.normalize(res, 100), "resources/images/sheep_holder/normalized/sheep" + i +".png");
+            BufferedImage res = p.loadImage("resources/images/sheep/res/sheep" + i + ".png");
+            p.saveImage(p.normalize(res, 100), "resources/images/sheep/normalized/sheep" + i +".png");
         }
     }
 

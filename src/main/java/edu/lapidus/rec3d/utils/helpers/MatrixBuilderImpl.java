@@ -224,7 +224,7 @@ public class MatrixBuilderImpl{
         s.setEntry(2, 2, 0.);
         RealMatrix u = svd.getU();
         RealMatrix vt = svd.getVT();
-        RealMatrix fundamental = s.multiply(u).multiply(vt);
+        RealMatrix fundamental = u.multiply(s).multiply(vt);
         return new DoubleMatrix(fundamental.getData());
     }
 }

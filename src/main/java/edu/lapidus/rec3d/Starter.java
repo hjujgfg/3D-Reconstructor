@@ -78,8 +78,8 @@ public class Starter {
     //TODO it's a temporal method
     private void initRs(DoubleMatrix[] rs) {
         rs[0] = initR(0, MatrixBuilder.Y_AXIS);
-        rs[1] = initR(-10, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
-        rs[2] = initR(-10, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        rs[1] = initR(-7, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        rs[2] = initR(-7, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
         rs[2] = rs[1].multiplyBy(rs[2]);
         /*rs[3] = initR(-60, MatrixBuilder.Y_AXIS);
         rs[4] = initR(-80, MatrixBuilder.Y_AXIS);
