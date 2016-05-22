@@ -2,6 +2,7 @@ package edu.lapidus.rec3d.depth;
 
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
+import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
@@ -16,8 +17,8 @@ import java.util.*;
  * Created by Егор on 17.05.2016.
  */
 public class CorrespondenceNormalizer {
-    private List<ColoredImagePoint> left, right;
-    private List<ColoredImagePoint> normalized1, normalized2;
+    private List<Point> left, right;
+    private List<Point> normalized1, normalized2;
     private DoubleMatrix T1;
     private DoubleMatrix T2;
     private DoubleMatrix fundamental;
@@ -42,23 +43,23 @@ public class CorrespondenceNormalizer {
     public CorrespondenceNormalizer(List<CorrespondenceHolder> holder, Map<ColoredImagePoint, ColoredImagePoint> map) {
         initLists(holder.size() + map.size());
         correspsToTwoLists(holder, left, right);
-        List<ColoredImagePoint> t1 = new ArrayList<>(), t2 = new ArrayList<>();
+        List<Point> t1 = new ArrayList<>(), t2 = new ArrayList<>();
         correspsToTwoLists(map, t1, t2);
         left.addAll(t1);
         right.addAll(t2);
     }
 
-    private void correspsToTwoLists (Map<ColoredImagePoint, ColoredImagePoint> map, List<ColoredImagePoint> first, List<ColoredImagePoint> second) {
+    private void correspsToTwoLists (Map<ColoredImagePoint, ColoredImagePoint> map, List<Point> first, List<Point> second) {
         for (Map.Entry<ColoredImagePoint, ColoredImagePoint> entry : map.entrySet()) {
-            first.add(entry.getKey());
-            second.add(entry.getValue());
+            first.add(new Point(entry.getKey()));
+            second.add(new Point(entry.getValue()));
         }
     }
 
-    private void correspsToTwoLists (List<CorrespondenceHolder> list, List<ColoredImagePoint> first, List<ColoredImagePoint> second) {
+    private void correspsToTwoLists (List<CorrespondenceHolder> list, List<Point> first, List<Point> second) {
         for (CorrespondenceHolder h : list) {
-            first.add(h.getA());
-            second.add(h.getB());
+            first.add(new Point(h.getA()));
+            second.add(new Point(h.getB()));
         }
     }
 
@@ -92,16 +93,16 @@ public class CorrespondenceNormalizer {
         logger.info("Calculated normalized fundamental: \n" + fundamental);
     }
 
-    public void normalize(List<ColoredImagePoint> first, List<ColoredImagePoint> second) {
+    public void normalize(List<Point> first, List<Point> second) {
         logger.info("Normalizing correspondences");
         if (first.size() != second.size()) throw new IllegalArgumentException("Lists are not the same size");
 
-        int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+        double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
         for (int i = 0; i < first.size(); i ++) {
-            x1 += first.get(i).getX();
-            y1 += first.get(i).getY();
-            x2 += second.get(i).getX();
-            y2 += second.get(i).getY();
+            x1 += first.get(i).x;
+            y1 += first.get(i).y;
+            x2 += second.get(i).x;
+            y2 += second.get(i).y;
         }
         x1 /= first.size();
         y1 /= first.size();
@@ -115,55 +116,55 @@ public class CorrespondenceNormalizer {
         T1 = buildTMatrix(s1, x1, y1);
         T2 = buildTMatrix(s2, x2, y2);
 
-        List<ColoredImagePoint> p1 = new ArrayList<>(left.size());
-        List<ColoredImagePoint> p2 = new ArrayList<>(right.size());
+        List<Point> p1 = new ArrayList<>(left.size());
+        List<Point> p2 = new ArrayList<>(right.size());
         double[] pointContainer = new double[3];
         pointContainer[2] = 1;
         Vector temp = new Vector(pointContainer);
         for (int i = 0; i < first.size(); i ++) {
-            temp.setDoubleAt(0, left.get(i).getX());
-            temp.setDoubleAt(1, left.get(i).getY());
+            temp.setDoubleAt(0, left.get(i).x);
+            temp.setDoubleAt(1, left.get(i).y);
             Vector res = T1.postMultiply(temp);
-            p1.add(new ColoredImagePoint((int)res.get(0), (int)res.get(1)));
+            p1.add(new Point(res.get(0), res.get(1)));
 
-            temp.setDoubleAt(0, right.get(i).getX());
-            temp.setDoubleAt(1, right.get(i).getY());
+            temp.setDoubleAt(0, right.get(i).x);
+            temp.setDoubleAt(1, right.get(i).y);
             res = T2.postMultiply(temp);
-            p2.add(new ColoredImagePoint((int)res.get(0), (int)res.get(1)));
+            p2.add(new Point(res.get(0), res.get(1)));
         }
         normalized1 = p1;
         normalized2 = p2;
     }
 
-    private DoubleMatrix createAMatrix(List<ColoredImagePoint> l1, List<ColoredImagePoint> l2) {
+    private DoubleMatrix createAMatrix(List<Point> l1, List<Point> l2) {
         double[][] A = new double[l1.size()][];
         for (int i = 0; i < l1.size(); i ++) {
             A[i] = new double[9];
-            ColoredImagePoint p1 = l1.get(i);
-            ColoredImagePoint p2 = l2.get(i);
-            A[i][0] = p2.getX() * p1.getX();
-            A[i][1] = p2.getX() * p1.getY();
-            A[i][2] = p2.getX();
-            A[i][3] = p2.getY() * p1.getX();
-            A[i][4] = p2.getY() * p1.getY();
-            A[i][5] = p2.getY();
-            A[i][6] = p1.getX();
-            A[i][7] = p1.getY();
+            Point p1 = l1.get(i);
+            Point p2 = l2.get(i);
+            A[i][0] = p2.x * p1.x;
+            A[i][1] = p2.x * p1.y;
+            A[i][2] = p2.x;
+            A[i][3] = p2.y * p1.x;
+            A[i][4] = p2.y * p1.y;
+            A[i][5] = p2.y;
+            A[i][6] = p1.x;
+            A[i][7] = p1.y;
             A[i][8] = 1;
         }
         return new DoubleMatrix(A);
     }
 
-    private double calcS(List<ColoredImagePoint> list, int xAvg, int yAvg) {
+    private double calcS(List<Point> list, double xAvg, double yAvg) {
         double sum = 0;
-        ColoredImagePoint mean = new ColoredImagePoint(xAvg, yAvg);
-        for (ColoredImagePoint p : list) {
+        Point mean = new Point(xAvg, yAvg);
+        for (Point p : list) {
             sum += p.getDistanceTo(mean);
         }
         return Math.sqrt(2) * list.size() / sum;
     }
 
-    private DoubleMatrix buildTMatrix (double s, int xMean, int yMean) {
+    private DoubleMatrix buildTMatrix (double s, double xMean, double yMean) {
         DoubleMatrix res = new DoubleMatrix(3, 3);
         res.setAtPosition(0, 0, 1);
         res.setAtPosition(1, 1, 1);

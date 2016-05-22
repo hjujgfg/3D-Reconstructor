@@ -11,6 +11,11 @@ public class Point {
         this.y = y;
     }
 
+    public Point (ColoredImagePoint p) {
+        this.x = p.getX();
+        this.y = p.getY();
+    }
+
     public String toString() {
         return x + ":" + y;
     }
@@ -35,5 +40,11 @@ public class Point {
         temp = Double.doubleToLongBits(y);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    public double getDistanceTo(Point p) {
+        double xDist = x - p.x;
+        double yDist = y - p.y;
+        return Math.sqrt(xDist * xDist + yDist * yDist);
     }
 }

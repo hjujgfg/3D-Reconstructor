@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.machinelearning.kmeans;
 
 import edu.lapidus.rec3d.math.ColoredImagePoint;
+import edu.lapidus.rec3d.math.Point;
 
 import java.util.ArrayList;
 

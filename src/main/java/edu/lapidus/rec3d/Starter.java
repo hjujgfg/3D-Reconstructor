@@ -34,15 +34,15 @@ public class Starter {
     String[] corresps;
     int numOfImages;
 
-    public Starter(int numberOfImges, String name) {
-        numOfImages = numberOfImges;
-        k = new DoubleMatrix[numberOfImges];
-        r = new DoubleMatrix[numberOfImges];
-        images = new String[numberOfImges];
-        corresps = new String[numberOfImges - 1];
-        for (int i = 0; i < numberOfImges; i ++) {
+    public Starter(int numberOfImages, String name) {
+        numOfImages = numberOfImages;
+        k = new DoubleMatrix[numberOfImages];
+        r = new DoubleMatrix[numberOfImages];
+        images = new String[numberOfImages];
+        corresps = new String[numberOfImages - 1];
+        for (int i = 0; i < numberOfImages; i ++) {
             images[i] = IMAGE_LOCATION + name + i + ".png";
-            if (i < numberOfImges - 1)
+            if (i < numberOfImages - 1)
                 corresps[i] = CORRESPS_LOCATION + name + i + ".csv";
             k[i] = initK();
         }
@@ -54,9 +54,9 @@ public class Starter {
         for (int i = 0; i < numOfImages - 1; i++ ) {
             logger.info("Starting images: " + images[i] + "    " + images[i + 1] + "\n Correspondences: " + corresps[i] + "\n" );
             double scaleFactor = 1;
-            /*if (i == 0)
-                scaleFactor = 0.3;*/
-            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i+1], images[i], images[i + 1], corresps[i], TwoImageCalculator.CONVOLVE_CORRESPS_SOURCE, scaleFactor);
+            if (i == 0)
+                scaleFactor = 0.3;
+            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i+1], images[i], images[i + 1], corresps[i], TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, scaleFactor);
             results.addAll(calculator.run().values());
         }
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(results, VRMLPointSetGenerator.State.MULTIPLE);
@@ -78,9 +78,10 @@ public class Starter {
     //TODO it's a temporal method
     private void initRs(DoubleMatrix[] rs) {
         rs[0] = initR(0, MatrixBuilder.Y_AXIS);
-        rs[1] = initR(-7, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
-        rs[2] = initR(-7, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
-        rs[2] = rs[1].multiplyBy(rs[2]);
+        rs[1] = initR(-10, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        rs[2] = initR(-20, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        //rs[3] = initR(-30, MatrixBuilder.Y_AXIS).multiplyBy(initR(-3, MatrixBuilder.X_AXIS));
+        //rs[2] = rs[1].multiplyBy(rs[2]);
         /*rs[3] = initR(-60, MatrixBuilder.Y_AXIS);
         rs[4] = initR(-80, MatrixBuilder.Y_AXIS);
         rs[5] = initR(-100, MatrixBuilder.Y_AXIS);*/

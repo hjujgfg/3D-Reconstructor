@@ -208,7 +208,7 @@ public class ImageScanner {
         Random r = new Random(points.size());
         for (int i = 0; i < CORRESPONDENCE_COUNT ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
-            ColoredImagePoint curr = points.get(r.nextInt(points.size()/10));
+            ColoredImagePoint curr = points.get(100 + r.nextInt(points.size()/10));
             List<Window> current = getWindow(filtered.subList(0, 3), curr.getX(), curr.getY());
             if (current == null) continue;
             double minDist = Double.MAX_VALUE;

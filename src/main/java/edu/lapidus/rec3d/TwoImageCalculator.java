@@ -39,14 +39,14 @@ public class TwoImageCalculator {
         //sheep01
         DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
-        /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);
-        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1000, 700, 400, 300);*/
+        /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);
+        DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);*/
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS);
-        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-0.9, MatrixBuilder.X_AXIS));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-10, MatrixBuilder.Y_AXIS);
+        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep0.png";
-        String img2 = "resources/images/sheep1.png";
+        String img1 = "resources/images/sheep1.png";
+        String img2 = "resources/images/sheep2.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
@@ -326,7 +326,7 @@ public class TwoImageCalculator {
     private boolean calculateEpipoleFromFundamental(DoubleMatrix fund) {
         //SingularValueDecomposition svd = fund.transpose().SVD();
         SingularValueDecomposition svd = fund.SVD();
-        RealMatrix v = svd.getV();
+        RealMatrix v = svd.getU();
         Vector e = new Vector(v.getColumn(2));
         e = e.scalar( 1 / (e.get(2)  ));
         logger.info("epipole : " + e);
