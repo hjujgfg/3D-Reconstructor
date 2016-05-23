@@ -23,10 +23,13 @@ import edu.lapidus.rec3d.visualization.VRML.VRMLPointSetGenerator;
 import org.apache.commons.math3.linear.*;
 import org.apache.log4j.Logger;
 
+import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.Math.PI;
 
 /**
  * Created by Егор on 21.11.2015.
@@ -41,12 +44,15 @@ public class TwoImageCalculator {
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);*/
-        DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS);
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(-10, MatrixBuilder.Y_AXIS);
-        r2 = r2.multiplyBy(matrixBuilder.createRotationMatrix(-2, MatrixBuilder.X_AXIS));
+        DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Z_AXIS)
+                .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS)
+                .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS)));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Z_AXIS)
+                .multiplyBy(matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS))
+                .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
 
         String img1 = "resources/images/sheep1.png";
-        String img2 = "resources/images/sheep2.png";
+        String img2 = "resources/images/sheep3.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
@@ -67,6 +73,7 @@ public class TwoImageCalculator {
     Correspondence correspondence;
     static ImageProcessor imageProcessor;
     Homography homography;
+    DoubleMatrix fundamentalMatrix;
     CorrespondenceNormalizer normalizer;
     DoubleMatrix k1, k2, r1, r2;
     Vector epipole;
@@ -102,17 +109,46 @@ public class TwoImageCalculator {
     public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String correspsFile, int correspondenceType, double modelScaleFactor) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
-        firstImage = imageProcessor.loadImage(img1Path);
-        secondImage = imageProcessor.loadImage(img2Path);
-        fileCorrespondencesPath = correspsFile;
-        buildAMatrix(correspondenceType);
-        this.modelScaleFactor = modelScaleFactor;
-        logger.info("Starting pair calculation");
-        homography = new Homography(k1, k2, r1, r2);
         this.k1 = k1;
         this.k2 = k2;
         this.r1 = r1;
         this.r2 = r2;
+        firstImage = imageProcessor.loadImage(img1Path);
+        secondImage = imageProcessor.loadImage(img2Path);
+        fileCorrespondencesPath = correspsFile;
+        buildAMatrix(correspondenceType);
+        buildFundamental();
+        if (r2 == null) {
+            this.r2 = extractRotationMatrix(buildEssentialMatrix());
+        }
+        logger.info("R1: " + this.r1);
+        getRotationAngles(this.r1);
+        logger.info("R2: " + this.r2);
+        getRotationAngles(this.r2);
+        this.modelScaleFactor = modelScaleFactor;
+        logger.info("Starting pair calculation");
+        homography = new Homography(this.k1, this.k2, this.r1, this.r2);
+    }
+
+    private void buildFundamental() {
+        DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
+        logger.info("Found fundamental without normalization: " + fundamentalMatrix2);
+        //DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
+
+        //fundamentalMatrix2.scale(-1);
+
+        fundamentalMatrix = normalizer.normalizeAndCalculateF();
+
+        //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
+        logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());
+        boolean success = calculateEpipoleFromFundamental(fundamentalMatrix);
+        //success = false;
+        if (!success){
+            logger.info("attempting another epipole");
+            calculateEpipoleFromFundamental(fundamentalMatrix2);
+            //TODO we calculate EPIPOLE from one matrix, BUT later use another FUNDAMENTAL - fixed not tested
+            fundamentalMatrix = fundamentalMatrix2;
+        }
     }
 
     private void buildAMatrix(int correspondenceSource) throws IllegalArgumentException {
@@ -173,6 +209,46 @@ public class TwoImageCalculator {
         buildKmeansCorrespondences();
     }
 
+    private DoubleMatrix buildEssentialMatrix() {
+        DoubleMatrix E = k2.transpose().multiplyBy(fundamentalMatrix).multiplyBy(k1);
+        logger.info("Built essential matrix: " + E);
+        return E;
+    }
+
+    private DoubleMatrix extractRotationMatrix(DoubleMatrix essential) {
+        double[][] w = new double[3][];
+        for (int i = 0; i < 3; i ++) {
+            w[i] = new double[3];
+            for (int j = 0; j < 3; j ++) {
+                w[i][j] = 0;
+            }
+        }
+        w[0][1] = -1;
+        w[1][0] = 1;
+        w[2][2] = 1;
+        DoubleMatrix W = new DoubleMatrix(w).transpose();
+        SingularValueDecomposition esvd = essential.SVD();
+        logger.info(new DoubleMatrix(esvd.getS().getData()));
+        DoubleMatrix u = new DoubleMatrix(esvd.getU().getData());
+        DoubleMatrix vt = new DoubleMatrix(esvd.getVT().getData());
+        DoubleMatrix rotationM = u.multiplyBy(W).multiplyBy(vt);
+        logger.info("Calculated rotation matrix: " + rotationM);
+        //http://nghiaho.com/?page_id=846
+        return rotationM;
+    }
+
+    public double[] getRotationAngles(DoubleMatrix rotationM) {
+        double x = Math.atan2(rotationM.get(2,1), rotationM.get(2,2));
+        double y = Math.atan2(-rotationM.get(2,0), Math.sqrt(rotationM.get(2,1) * rotationM.get(2,1) + rotationM.get(2,2) * rotationM.get(2,2)));
+        double z = Math.atan2(rotationM.get(1,0), rotationM.get(0,0));
+        x = (x >= 0 ? x : (2*PI + x)) * 360 / (2*PI);
+        y = (y >= 0 ? y : (2*PI + y)) * 360 / (2*PI);
+        z = (z >= 0 ? z : (2*PI + z)) * 360 / (2*PI);
+        logger.info("R angles: x = " + x + " y = " + y + " z = " + z);
+        double[] res = new double[] {x, y, z};
+        return res;
+    }
+
     /*public void init() {
         logger.info("ENTERED INIT!!!");
         //matrixBuilder = new MatrixBuilderImpl();
@@ -182,26 +258,7 @@ public class TwoImageCalculator {
     }*/
     public Map<String, PairCorrespData> run () {
 
-        DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
-        logger.info("Found fundamental without normalization: " + fundamentalMatrix2);
-        //DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFromVector(Amatrix.solveHomogeneous(), 3, 3);
-
-        //fundamentalMatrix2.scale(-1);
-
-        DoubleMatrix fundamentalMatrix = normalizer.normalizeAndCalculateF();
-
-        //DoubleMatrix fundamentalMatrix = matrixBuilder.buildFundamental(Amatrix);
-        logger.info("Calculated fundamental matrix: " + fundamentalMatrix.toString());
-        boolean success = calculateEpipoleFromFundamental(fundamentalMatrix);
-        //success = false;
-        if (!success){
-            logger.info("attempting another epipole");
-            calculateEpipoleFromFundamental(fundamentalMatrix2);
-            //TODO we calculate EPIPOLE from one matrix, BUT later use another FUNDAMENTAL - fixed not tested
-            fundamentalMatrix = fundamentalMatrix2;
-        }
-
-        Map<String, PairCorrespData> result = new ConcurrentHashMap<String, PairCorrespData>();
+        Map<String, PairCorrespData> result = new ConcurrentHashMap<>();
 
         ColorMatrix[] images = loadImages();
 
