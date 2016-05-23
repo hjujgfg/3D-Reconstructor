@@ -144,4 +144,8 @@ public class DoubleMatrix implements Matrix, Serializable {
     public void setAtPosition(int row, int column, double value) {
         internal[row][column] = value;
     }
+
+    public double get(int row, int column) {
+        return internal[row][column];
+    }
 }
