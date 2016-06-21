@@ -34,8 +34,8 @@ public class MyPanel extends JPanel {
 
     public MyPanel() {
         imgProcessor = new ImageProcessor();
-        img1 = imgProcessor.loadImage("resources/images/" + POINTS_NAME + COUNTER +".png");
-        img2 = imgProcessor.loadImage("resources/images/" + POINTS_NAME + (COUNTER + 1) + ".png");
+        img1 = imgProcessor.loadImage("output/images/" + POINTS_NAME + COUNTER +".png");
+        img2 = imgProcessor.loadImage("output/images/" + POINTS_NAME + (COUNTER + 1) + ".png");
         combined = new BufferedImage(img1.getWidth() + img2.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = combined.createGraphics();
         g.drawImage(img1, 0, 0, null);
@@ -82,7 +82,7 @@ public class MyPanel extends JPanel {
     ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
     ColorMatrix i1, i2;
     DoubleMatrix fundamentalMatrix;
-    static final String CORRESP_LOCATION = "resources/correspondences/" + POINTS_NAME + COUNTER + ".csv";
+    static final String CORRESP_LOCATION = "output/correspondences/" + POINTS_NAME + COUNTER + ".csv";
 
     private class MyMouseListener implements MouseListener {
         MyPanel pn;
@@ -95,7 +95,7 @@ public class MyPanel extends JPanel {
 
             if (e.getX() < 10 && e.getY() < 10) {
                 savePointsToCsv(POINTS_NAME + COUNTER);
-                imgProcessor.saveImage(combined, "resources/COMBINED.png");
+                imgProcessor.saveImage(combined, "output/COMBINED.png");
                 parent.dispose();
             }
 
@@ -136,7 +136,7 @@ public class MyPanel extends JPanel {
         public void mouseClicked(MouseEvent e) {
             if (e.getX() < 10 && e.getY() < 10) {
                 //savePointsToCsv(POINTS_NAME);
-                imgProcessor.saveImage(combined, "resources/COMBINED.png");
+                imgProcessor.saveImage(combined, "output/COMBINED.png");
                 parent.dispose();
             }
             int [] first = new int[] {e.getX(), e.getY(), 1};
@@ -234,7 +234,7 @@ public class MyPanel extends JPanel {
     }
 
     private void savePointsToCsv(String name) {
-        File csv = new File("resources/correspondences/" + name + ".csv");
+        File csv = new File("output/correspondences/" + name + ".csv");
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(csv)));
             for (Map.Entry<Point, Point> entry : points.entrySet()) {

@@ -173,7 +173,7 @@ public class KernelFactory {
                 counter ++;
             }
         }
-        p.saveImage(img, "resources/convolve/box" + anInt++ + ".png");
+        p.saveImage(img, "output/convolve/box" + anInt++ + ".png");
     }
     static int anInt = 0;
 }

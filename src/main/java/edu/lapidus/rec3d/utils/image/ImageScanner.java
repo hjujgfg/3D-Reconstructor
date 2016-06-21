@@ -21,8 +21,8 @@ public class ImageScanner {
 
     private static ImageProcessor processor = new ImageProcessor();
     private static final Logger logger = Logger.getLogger(ImageScanner.class);
-    private final static String IMG1 = "resources/images/sheep0.png";
-    private final static String IMG2 = "resources/images/sheep1.png";
+    private final static String IMG1 = "output/images/sheep0.png";
+    private final static String IMG2 = "output/images/sheep1.png";
     private final static int FILTER_SIZE = 15;
     private final static int WINDOW_SIDE = 20;
     private final static int CORRESPONDENCE_COUNT = 10;
@@ -50,7 +50,7 @@ public class ImageScanner {
         img2 = processor.removeGreen(img2);
         img1 = processor.toGrayScale(img1);
         img2 = processor.toGrayScale(img2);
-        processor.saveImage(img1, "resources/convolve/test.png");
+        processor.saveImage(img1, "output/convolve/test.png");
         det1 = new HashMap<>(img1.getHeight() * img1.getWidth());
         det2 = new HashMap<>(img1.getHeight() * img1.getWidth());
     }
@@ -61,7 +61,7 @@ public class ImageScanner {
         images.addAll(applyGaussianFilters(img2, FILTER_SIZE));
         int i = 0;
         /*for (BufferedImage b : images) {
-            processor.saveImage(b, "resources/convolve/scanner" + i++ +".png");
+            processor.saveImage(b, "output/convolve/scanner" + i++ +".png");
         }*/
         /*det1 = evaluatePoints(images.subList(0, 3));
         det2 = evaluatePoints(images.subList(3, 6));*/
@@ -91,7 +91,7 @@ public class ImageScanner {
             g.drawLine(x-2, y-2, x+2, y+2);
             g.drawLine(x+2, y-2, x-2, y+2);
         }
-        processor.saveImage(res, "resources/convolve/" + name + ".png");
+        processor.saveImage(res, "output/convolve/" + name + ".png");
     }
 
     private void saveToCombined(Map<ColoredImagePoint, ColoredImagePoint> map) {
@@ -106,7 +106,7 @@ public class ImageScanner {
             g.drawOval(p1.getX() - 2, p1.getY() - 2, 4, 4);
             g.drawOval(p2.getX() - 2 + combined.getWidth() / 2, p2.getY() - 2, 4, 4);
         }
-        processor.saveImage(combined, "resources/convolve/corresps.png");
+        processor.saveImage(combined, "output/convolve/corresps.png");
     }
 
 
@@ -118,7 +118,7 @@ public class ImageScanner {
                 img.setRGB(x, y, new Color(c, c, c).getRGB());
             }
         }
-        processor.saveImage(img, "resources/convolve/" + name + ".png");
+        processor.saveImage(img, "output/convolve/" + name + ".png");
     }
 
     private void calculateDeterminants(List<BufferedImage> imgs) {
@@ -165,7 +165,7 @@ public class ImageScanner {
         Kernel[] kernels = {KernelFactory.buildXXGaussianKernel(size), KernelFactory.buildXYGaussianKernel(size), KernelFactory.buildYYGaussianKernel(size)};
         for (int i = 0; i < 3; i++) {
             BufferedImage tmp = processor.applyKernel(img, kernels[i]);
-            //processor.saveImage(tmp, "resources/convolve/applied" + i + "" + FILTER_SIZE + ".png");
+            //processor.saveImage(tmp, "output/convolve/applied" + i + "" + FILTER_SIZE + ".png");
             res.add(tmp);
             /*NonMaxSuppression suppression = new NonMaxSuppression();
             int [] imgArr = processor.grayToIntArray(tmp);

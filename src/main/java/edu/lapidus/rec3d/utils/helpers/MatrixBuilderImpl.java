@@ -21,7 +21,7 @@ import java.util.Map;
  * Created by Егор on 16.11.2015.
  */
 public class MatrixBuilderImpl{
-    final static Logger logger = Logger.getLogger(MatrixBuilder.class);
+    final static Logger logger = Logger.getLogger(MatrixBuilderImpl.class);
 
     public DoubleMatrix createRotationMatrixFull(double xAng, double yAng, double zAng){
         return createRotationMatrix(zAng, MatrixBuilder.Z_AXIS)

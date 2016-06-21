@@ -115,7 +115,7 @@ public class NonMaxSuppression {
     public static void main(String[] args) {
         ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
-            BufferedImage img1 = p.loadImage("resources/images/sheep"+i+".png");
+            BufferedImage img1 = p.loadImage("output/images/sheep"+i+".png");
             img1 = p.removeGreen(img1);
             img1 = p.toGrayScale(img1);
             img1 = p.applyKernel(img1, KernelFactory.buildYYGaussianKernel(21));
@@ -124,7 +124,7 @@ public class NonMaxSuppression {
             suppression.init(input, img1.getWidth(), img1.getHeight());
             int[] res = suppression.process();
             BufferedImage result = p.intArrToImg(res, img1.getWidth(), img1.getHeight());
-            p.saveImage(result, "resources/convolve/suppression"+i+".png");
+            p.saveImage(result, "output/convolve/suppression"+i+".png");
         }
 
 

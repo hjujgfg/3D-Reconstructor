@@ -52,12 +52,12 @@ public class TwoImageCalculator {
                 .multiplyBy(matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS))
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep0.png";
-        String img2 = "resources/images/sheep1.png";
+        String img1 = "output/images/sheep0.png";
+        String img2 = "output/images/sheep1.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
-        //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", TwoImageCalculator.FILE_CORRESPS_SOURCE, 1);
+        //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", TwoImageCalculator.FILE_CORRESPS_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
@@ -330,7 +330,7 @@ public class TwoImageCalculator {
             //FileOutputStream fos = new FileOutputStream();
             logger.info("Writing results");
             Map<String, PairCorrespData> sorted = new TreeMap<String, PairCorrespData>(result);
-            FileWriter fw = new FileWriter(new File("resources/res/result.txt"));
+            FileWriter fw = new FileWriter(new File("output/res/result.txt"));
             for (Map.Entry<String, PairCorrespData> entry : sorted.entrySet()) {
                 fw.write(entry.getKey() + "      " + entry.getValue().toString());
                 PairCorrespData temp = entry.getValue();
@@ -358,10 +358,6 @@ public class TwoImageCalculator {
         VRMLData vrml = triangulator.triangulate();
 
         vrml.saveWrl();*/
-
-        /*XYZformatter xyz = new XYZformatter(result);
-
-        xyz.saveXYZ();*/
 
         /*VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
 

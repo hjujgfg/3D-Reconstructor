@@ -5,14 +5,13 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 .idea/
 out/
-resources — копия/
 target/
-resources/res/
-
+/output
 /logs
 # Windows Installer files
 *.cab

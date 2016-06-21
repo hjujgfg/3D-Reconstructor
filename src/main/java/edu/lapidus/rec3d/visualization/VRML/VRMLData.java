@@ -39,7 +39,7 @@ public class VRMLData {
         try {
             //FileOutputStream fos = new FileOutputStream();
             logger.info("Writing results");
-            FileWriter fw = new FileWriter(new File("resources/res/result.wrl"));
+            FileWriter fw = new FileWriter(new File("output/res/result.wrl"));
             fw.write("Shape {\n" +
                     "\tappearance Appearance{\n" +
                     "\t\tmaterial Material { \n" +

@@ -39,8 +39,8 @@ public class KmeansDoublePanel extends JPanel {
         addMouseListener(new LocalMouseListener());
     }
 
-    private final static String img0Path = "resources/images/sheep0.png";
-    private final static String img1Path = "resources/images/sheep2.png";
+    private final static String img0Path = "output/images/sheep0.png";
+    private final static String img1Path = "output/images/sheep2.png";
     private final static int NUM_OF_CLUSTERS = 50;
     private ImageProcessor imageProcessor = new ImageProcessor();
     private BufferedImage combined;

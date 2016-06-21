@@ -32,8 +32,8 @@ public class ImageDrawer extends JPanel{
     List<Centroid> centroids;
     List<List<ColoredImagePoint>> clusters;
     Kmeans kmeans;
-    private final static String img0Path = "resources/images/sheep0.png";
-    private final static String img1Path = "resources/images/sheep1.png";
+    private final static String img0Path = "output/images/sheep0.png";
+    private final static String img1Path = "output/images/sheep1.png";
     private static final Logger logger = Logger.getLogger(ImageDrawer.class);
     public ImageDrawer() {
         imageProcessor = new ImageProcessor();
@@ -123,7 +123,7 @@ public class ImageDrawer extends JPanel{
 
     private static void saveCorresps(List<CorrespondenceHolder> corresps) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("resources/clustering/corresps.txt"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter("output/clustering/corresps.txt"));
             for (CorrespondenceHolder c : corresps) {
                 bw.write(c.get(0).toString() + ":" + c.get(1).toString() + "; " + c.getDistance() + "\n") ;
             }
@@ -139,7 +139,7 @@ public class ImageDrawer extends JPanel{
             logger.info("Error saving centroids... ");
             return;
         }
-        File f = new File("Resources/clustering/centroids.txt");
+        File f = new File("output/clustering/centroids.txt");
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             for (int i = 0; i < l1.size(); i ++) {

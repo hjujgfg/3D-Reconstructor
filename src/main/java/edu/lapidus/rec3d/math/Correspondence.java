@@ -83,7 +83,7 @@ public class Correspondence {
     private Point[][] loadFromfile(String path) {
         ArrayList<Point[]> prePoints = new ArrayList<Point[]>();
         logger.info("Loading correspondences: " + path);
-        //File f = new File("resources/correspondences/" + name + ".csv");
+        //File f = new File("output/correspondences/" + name + ".csv");
         File f = new File(path);
         String line;
         try {

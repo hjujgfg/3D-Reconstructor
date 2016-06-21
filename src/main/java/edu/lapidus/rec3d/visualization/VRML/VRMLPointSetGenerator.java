@@ -78,7 +78,7 @@ public class VRMLPointSetGenerator {
                     "}");
             sb2.append("    }\n" +
                     "}");
-            StringBuilder nameBuilder = new StringBuilder("resources/res/");
+            StringBuilder nameBuilder = new StringBuilder("output/res/");
             if (state == State.MULTIPLE) {
                 nameBuilder.append(MULTIPLE_NAME);
             } else {
@@ -89,7 +89,7 @@ public class VRMLPointSetGenerator {
             fw.write(sb1.toString());
             fw.flush();
             fw.close();
-            fw = new FileWriter(new File("resources/res/pointSetPlain.wrl"));
+            fw = new FileWriter(new File("output/res/pointSetPlain.wrl"));
             fw.write(sb2.toString());
             fw.flush();
             fw.close();

@@ -300,7 +300,7 @@ public class Kmeans {
         }*/
         BufferedImage img = getClusterized();
         ImageProcessor processor = new ImageProcessor();
-        processor.saveImage(img, "resources/clustering/" + name + ".png");
+        processor.saveImage(img, "output/clustering/" + name + ".png");
     }
 
 

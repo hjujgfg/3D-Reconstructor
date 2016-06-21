@@ -22,7 +22,7 @@ import java.util.List;
 public class ImageProcessor {
     final static Logger logger = Logger.getLogger(ImageProcessor.class);
 
-    final static String STORAGE_DIR = "resources/res/";
+    final static String STORAGE_DIR = "output/res/";
 
     public BufferedImage loadImage(String path) {
         logger.info("Started loading " + path);
@@ -135,7 +135,7 @@ public class ImageProcessor {
             g.setColor(new Color(r.nextInt()));
             g.drawLine(x1, y1, x2, y2);
         }
-        saveImage(combined, "resources/res/corresps.png");
+        saveImage(combined, "output/res/corresps.png");
     }
 
     public void visualizeEpipolarLines(List<EpipolarLineHolder> lines, String i1, String i2, int numOfLines) {
@@ -169,7 +169,7 @@ public class ImageProcessor {
 
             g.drawLine(x1, y1, x2, y2);*/
         }
-        saveImage(combined, "resources/res/epipoles.png");
+        saveImage(combined, "output/res/epipoles.png");
     }
 
     public BufferedImage buildCombined(String i1, String i2) {
@@ -206,7 +206,7 @@ public class ImageProcessor {
     //TODO govnokod
     private static int counter = 0;
     public static void bulkResizeImages(String name, int newWidth, int newHeight) {
-        String dir = "resources/images/"+name +"/";
+        String dir = "output/images/"+name +"/";
         counter = 0;
         try {
             Files.walk(Paths.get(dir)).forEach(filePath -> {
@@ -265,7 +265,7 @@ public class ImageProcessor {
             Centroid b = c2.get(i);
             g.drawLine(a.getX(), a.getY(), b.getX() + combined.getWidth() / 2, b.getY());
         }
-        saveImage(combined, "resources/clustering/combined.png");
+        saveImage(combined, "output/clustering/combined.png");
     }
 
     public void saveCorrespsByKmeans(String i1, String i2, List<CorrespondenceHolder> corresps) {
@@ -282,7 +282,7 @@ public class ImageProcessor {
             g.drawOval(p2.getX() + (combined.getWidth() / 2) - 2, p2.getY() - 2, 4, 4);
             g.drawLine(p1.getX(), p1.getY(), p2.getX() + (combined.getWidth() / 2) , p2.getY());
         }
-        saveImage(combined, "resources/clustering/combined2.png");
+        saveImage(combined, "output/clustering/combined2.png");
     }
 
     public BufferedImage toGrayScale(BufferedImage source) {
@@ -361,8 +361,8 @@ public class ImageProcessor {
     }
 
     private static void createDirs(String model) {
-        boolean f = new File("resources/images/" + model + "/res").mkdir();
-        f = new File("resources/images/" + model + "/normalized").mkdir();
+        boolean f = new File("output/images/" + model + "/res").mkdir();
+        f = new File("output/images/" + model + "/normalized").mkdir();
     }
 
     public static void main(String [] args) {
@@ -371,22 +371,22 @@ public class ImageProcessor {
         bulkResizeImages(name, 800, 600);
         /*ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
-            BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
+            BufferedImage tst = p.loadImage("output/images/sheep" + i + ".png");
             tst = p.removeGreen(tst);
             tst = p.toGrayScale(tst);
-            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(9)), "resources/convolve/xy9" + i + ".png");
-            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(15)), "resources/convolve/xy15" + i + ".png");
-            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "resources/convolve/xy21" + i + ".png");
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(9)), "output/convolve/xy9" + i + ".png");
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(15)), "output/convolve/xy15" + i + ".png");
+            p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "output/convolve/xy21" + i + ".png");
         }*/
         ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 2; i ++) {
-            BufferedImage res = p.loadImage("resources/images/" + name + "/res/" + name + i + ".png");
-            p.saveImage(p.normalize(res, 10), "resources/images/" + name + "/normalized/" + name + i +".png");
+            BufferedImage res = p.loadImage("output/images/" + name + "/res/" + name + i + ".png");
+            p.saveImage(p.normalize(res, 10), "output/images/" + name + "/normalized/" + name + i +".png");
         }
         //ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 2; i ++) {
-            BufferedImage res = p.loadImage("resources/images/" + name + "/normalized/" + name +i+".png");
-            p.saveImage(p.removeGreen(res), "resources/images/" + name + i + ".png");
+            BufferedImage res = p.loadImage("output/images/" + name + "/normalized/" + name +i+".png");
+            p.saveImage(p.removeGreen(res), "output/images/" + name + i + ".png");
         }
     }
 
