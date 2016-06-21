@@ -1,15 +1,18 @@
 package edu.lapidus.rec3d.depth;
 
 import org.apache.commons.math3.linear.*;
-//import org.opencv.core.*;
-//import org.opencv.core.Point;
-import edu.lapidus.rec3d.math.Point;
+import org.opencv.core.*;
+import org.opencv.core.Point;
+import org.opencv.features2d.*;
+import org.opencv.highgui.Highgui;
+//import edu.lapidus.rec3d.math.Point;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.List;
 
 /**
  * Created by Егор on 10.03.2015.
@@ -30,13 +33,103 @@ public class MainTemp {
         System.out.println("Main initiated!");
 
         // Load the native library.
-        //System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         MainTemp m = new MainTemp();
-        m.run();
+        m.testOpenCv();
         //TriangulationLayer tr = new TriangulationLayer(m.depthPoints);
 
     }
 
+    public void testOpenCv() {
+        FeatureDetector featureDetector = FeatureDetector.create(FeatureDetector.SURF);
+        File img = new File("resources/images/sheep0.png");
+        //File img = new File("resources/book1.png");
+        Mat image = Highgui.imread(img.getPath());
+
+        File img1 = new File("resources/images/sheep2.png");
+        //File img1 = new File("resources/book2.png");
+        Mat image1 = Highgui.imread(img1.getPath());
+
+        MatOfKeyPoint keyPoints = new MatOfKeyPoint();
+        MatOfKeyPoint keyPoints1 = new MatOfKeyPoint();
+        featureDetector.detect(image, keyPoints);
+        featureDetector.detect(image1, keyPoints1);
+        DescriptorExtractor extractor = DescriptorExtractor.create(DescriptorExtractor.SURF);
+        List<Mat> images = new ArrayList<Mat>();
+        images.add(image);
+        images.add(image1);
+        List<MatOfKeyPoint> keyPointsList = new ArrayList<MatOfKeyPoint>();
+        keyPointsList.add(keyPoints);
+        keyPointsList.add(keyPoints1);
+        Mat descriptor = new Mat();
+        Mat descriptor1 = new Mat();
+        extractor.compute(image, keyPoints, descriptor);
+        extractor.compute(image1, keyPoints1, descriptor1);
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+        MatOfDMatch matches = new MatOfDMatch();
+        Mat mask = new MatOfByte();
+        matcher.match(descriptor, descriptor1, matches, mask);
+        double max_dist = 0;
+        double min_dist = 50;
+        DMatch[] matchesArray = matches.toArray();
+
+        System.out.println("All matches number: " + matchesArray.length);
+        //-- Quick calculation of max and min distances between keypoints
+        //for (int i = 0; i < descriptor.rows(); i++) {
+        for (int i = 0; i < matchesArray.length; i++) {
+            double dist = matchesArray[i].distance;
+            if (dist < min_dist) min_dist = dist;
+            if (dist > max_dist) max_dist = dist;
+        }
+        List<DMatch> goodMatches = new ArrayList<DMatch>();
+        //MatOfDMatch goodMatches = new MatOfDMatch();
+        //for (int i = 0; i < descriptor.rows(); i++) {
+        for (int i = 0; i < matchesArray.length; i++) {
+            if (matchesArray[i].distance <= 2.2 * min_dist) {
+                goodMatches.add(matchesArray[i]);
+            }
+        }
+
+        KeyPoint[] kp = keyPoints.toArray();
+        KeyPoint[] kp1 = keyPoints1.toArray();
+        System.out.println("numof kp = " + kp.length);
+        System.out.println("numof kp1 = " + kp1.length);
+        KeyPoint[] matchesQuery = new KeyPoint[goodMatches.size()];
+        KeyPoint[] matchesTrain = new KeyPoint[goodMatches.size()];
+        int k = 0;
+
+        int fundPointIndexer = 0;
+
+        System.out.println("Min dist: " + min_dist + " threshold: " + 2 * min_dist);
+        /*
+        for (DMatch d : goodMatches) {
+
+            System.out.println("match " + k + " train: " + d.trainIdx + " query: " + d.queryIdx + " distance: " + d.distance);
+            matchesQuery[k] = kp1[d.queryIdx];
+            matchesTrain[k] = kp[d.trainIdx];
+
+            if (Math.abs(matchesQuery[k].pt.y - matchesTrain[k].pt.y) <= 50 && fundPointIndexer < N_POINTS) {
+                points[fundPointIndexer] = new Point[2];
+                points[fundPointIndexer][1] = matchesQuery[k].pt;
+                points[fundPointIndexer][0] = matchesTrain[k].pt;
+                System.out.println(kp[d.trainIdx].toString());
+                System.out.println(kp1[d.queryIdx].toString());
+                fundPointIndexer++;
+            }
+
+
+            k++;
+        }*/
+        MatOfDMatch finalMatches = new MatOfDMatch();
+        finalMatches.fromList(goodMatches);
+
+        System.out.println("Good matches number: " + goodMatches.size());
+        Mat outImage = new Mat();
+        Features2d.drawMatches(image, keyPoints, image1, keyPoints1, finalMatches, outImage, Scalar.all(-1), new Scalar(1, 1, 0),
+                (MatOfByte) mask, Features2d.NOT_DRAW_SINGLE_POINTS);
+        String outImageFileName = "resources/matchedFeatures.png";
+        Highgui.imwrite(outImageFileName, outImage);
+    }
 
     public ArrayList<int[]> run() {
         System.out.println("\nProgram started");

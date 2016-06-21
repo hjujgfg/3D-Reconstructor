@@ -4,7 +4,6 @@ import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
-import edu.lapidus.rec3d.math.matrix.ColorMatrix;
 import edu.lapidus.rec3d.utils.PairCorrespData;
 import org.apache.log4j.Logger;
 
@@ -212,7 +211,7 @@ public class ImageProcessor {
         try {
             Files.walk(Paths.get(dir)).forEach(filePath -> {
                 try {
-                    if (filePath.toString().endsWith(".jpg")) {
+                    if (filePath.toString().endsWith(".jpg") || filePath.toString().endsWith(".png")) {
                         BufferedImage originalImage = ImageIO.read(filePath.toFile());
                         int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
                         BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
@@ -307,6 +306,7 @@ public class ImageProcessor {
                 Color c = new Color(img.getRGB(x, y));
                 int cVal = c.getRGB();
                 if (c.getGreen() > c.getBlue() && c.getGreen() > c.getRed()) {
+                //if (c.getGreen() == c.getBlue() && c.getGreen() == c.getRed() && c.getRed()==255) {
                     res.setRGB(x, y, Color.GREEN.getRGB());
                 } else {
                     res.setRGB(x, y, cVal);
@@ -360,8 +360,15 @@ public class ImageProcessor {
         return res;
     }
 
+    private static void createDirs(String model) {
+        boolean f = new File("resources/images/" + model + "/res").mkdir();
+        f = new File("resources/images/" + model + "/normalized").mkdir();
+    }
+
     public static void main(String [] args) {
-        //bulkResizeImages("sheep_holder", 800, 600);
+        String name = "speaker";
+        createDirs(name);
+        bulkResizeImages(name, 800, 600);
         /*ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
             BufferedImage tst = p.loadImage("resources/images/sheep" + i + ".png");
@@ -372,9 +379,14 @@ public class ImageProcessor {
             p.saveImage(p.applyKernel(tst, KernelFactory.buildYYGaussianKernel(21)), "resources/convolve/xy21" + i + ".png");
         }*/
         ImageProcessor p = new ImageProcessor();
-        for (int i = 0; i < 5; i ++) {
-            BufferedImage res = p.loadImage("resources/images/sheep/res/sheep" + i + ".png");
-            p.saveImage(p.normalize(res, 100), "resources/images/sheep/normalized/sheep" + i +".png");
+        for (int i = 0; i < 2; i ++) {
+            BufferedImage res = p.loadImage("resources/images/" + name + "/res/" + name + i + ".png");
+            p.saveImage(p.normalize(res, 10), "resources/images/" + name + "/normalized/" + name + i +".png");
+        }
+        //ImageProcessor p = new ImageProcessor();
+        for (int i = 0; i < 2; i ++) {
+            BufferedImage res = p.loadImage("resources/images/" + name + "/normalized/" + name +i+".png");
+            p.saveImage(p.removeGreen(res), "resources/images/" + name + i + ".png");
         }
     }
 

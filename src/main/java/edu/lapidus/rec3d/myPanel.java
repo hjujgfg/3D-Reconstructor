@@ -62,7 +62,7 @@ public class MyPanel extends JPanel {
         parent = f;
     }
 
-    private final static int COUNTER = 2;
+    private final static int COUNTER = 0;
 
     int width, height;
     ImageProcessor imgProcessor;

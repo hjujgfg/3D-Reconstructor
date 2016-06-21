@@ -23,6 +23,12 @@ import java.util.Map;
 public class MatrixBuilderImpl{
     final static Logger logger = Logger.getLogger(MatrixBuilder.class);
 
+    public DoubleMatrix createRotationMatrixFull(double xAng, double yAng, double zAng){
+        return createRotationMatrix(zAng, MatrixBuilder.Z_AXIS)
+                .multiplyBy(createRotationMatrix(yAng, MatrixBuilder.Y_AXIS))
+                .multiplyBy(createRotationMatrix(xAng, MatrixBuilder.X_AXIS));
+    }
+
     public DoubleMatrix createRotationMatrix(double angle, int axis) {
         angle = Math.PI * angle / 180;
         double[][] res = new double[3][];

@@ -25,6 +25,7 @@ public class DepthRegionCalculator implements Runnable {
 
     private final static int SECOND_POINT_LOOKUP_WIDTH = 60;
     private final static int SECOND_POINT_SHIFT = 0;
+    private final static int POINT_LOOKUP_STEP = 1;
 
     private final static int COLOR_REGION_RADIUS = 20;
     //sheep0 - 1
@@ -214,9 +215,9 @@ public class DepthRegionCalculator implements Runnable {
         }
         //TODO this is only for debugging, eats much resources
         EpipolarLineHolder TMP = new EpipolarLineHolder(firstPoint, coefficients.getVec());
-        for (int x2 = startX; x2 < endX - 4; x2 += 4) {
+        for (int x2 = startX; x2 < endX - 4; x2 += POINT_LOOKUP_STEP) {
             int y2 = (int)( ( - coefficients.get(2) - coefficients.get(0) * x2 )  / coefficients.get(1) );
-            if (Math.abs(y2 - firstPoint[1]) > 20) continue;
+            if (Math.abs(y2 - firstPoint[1]) > 10) continue;
             if (y2 < 0)
                 y2 = 0;
             if (y2 >= img2.getHeight())

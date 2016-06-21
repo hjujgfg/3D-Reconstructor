@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.max;
 
 /**
  * Created by Егор on 21.11.2015.
@@ -48,15 +49,15 @@ public class TwoImageCalculator {
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS)
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS)));
         DoubleMatrix r2 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Z_AXIS)
-                .multiplyBy(matrixBuilder.createRotationMatrix(-20, MatrixBuilder.Y_AXIS))
+                .multiplyBy(matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS))
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
 
-        String img1 = "resources/images/sheep1.png";
-        String img2 = "resources/images/sheep3.png";
+        String img1 = "resources/images/sheep0.png";
+        String img2 = "resources/images/sheep1.png";
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, null, TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "resources/correspondences/sheep0.csv", TwoImageCalculator.FILE_CORRESPS_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
@@ -77,6 +78,11 @@ public class TwoImageCalculator {
     CorrespondenceNormalizer normalizer;
     DoubleMatrix k1, k2, r1, r2;
     Vector epipole;
+
+    private final static double[] NormalizedModelShift = new double[] {0, 100, 0};
+    private final static double NormalizedModelHeight = 100;
+    private PairCorrespData maximalPair = new PairCorrespData();
+    private PairCorrespData minimumPair = new PairCorrespData();
 
     ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
 
@@ -128,7 +134,21 @@ public class TwoImageCalculator {
         this.modelScaleFactor = modelScaleFactor;
         logger.info("Starting pair calculation");
         homography = new Homography(this.k1, this.k2, this.r1, this.r2);
-    }
+        maximalPair.setX1(firstImage.getWidth());
+        maximalPair.setX2(secondImage.getWidth());
+        maximalPair.setY1(firstImage.getHeight());
+        maximalPair.setY2(secondImage.getHeight());
+        maximalPair.setX(0);
+        maximalPair.setY(0);
+        maximalPair.setZ(0);
+        minimumPair.setX1(0);
+        minimumPair.setX2(0);
+        minimumPair.setY1(0);
+        minimumPair.setY2(0);
+        minimumPair.setX(0);
+        minimumPair.setY(0);
+        minimumPair.setZ(0);
+        }
 
     private void buildFundamental() {
         DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
@@ -157,6 +177,7 @@ public class TwoImageCalculator {
                 logger.info("Starting loading correspondences from file: " + fileCorrespondencesPath);
                 buildFileCorrespondences();
                 Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
+                normalizer = new CorrespondenceNormalizer(correspondence.getInititalCorrespondences());
                 break;
             case KMEANS_CORREPS_SOURCE:
                 logger.info("Started building correspondences by Kmeans");
@@ -312,10 +333,18 @@ public class TwoImageCalculator {
             FileWriter fw = new FileWriter(new File("resources/res/result.txt"));
             for (Map.Entry<String, PairCorrespData> entry : sorted.entrySet()) {
                 fw.write(entry.getKey() + "      " + entry.getValue().toString());
+                PairCorrespData temp = entry.getValue();
+                if (temp.getY1() < maximalPair.getY1() && temp.getY2() < maximalPair.getY2()) {
+                    maximalPair = temp;
+                }
+                if (temp.getY1() > minimumPair.getY1() && temp.getY2() > minimumPair.getY2()) {
+                    minimumPair = temp;
+                }
             }
             fw.flush();
             fw.close();
             logger.info("Done writing results");
+            logger.info("Maximal point: " + maximalPair + "\nMinimum point: " + minimumPair);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             logger.error("Error writing result \n", e);
@@ -341,7 +370,7 @@ public class TwoImageCalculator {
         imageProcessor.visualizeCorresps(result.values(), img1Path, img2Path, 20);
 
         imageProcessor.visualizeEpipolarLines(lines, img1Path, img2Path, 20);
-
+        //normalizeResult(result);
         return result;
 
         //TODO after that we should somehow start initiation of threads, each will calc it own portion of lines
@@ -352,6 +381,22 @@ public class TwoImageCalculator {
         //everything else as value. This is required for calculators to be able to dump their results into single place
         //TODO Idea to the future - we can have a Set or a Map with depth points as Key to understand, that we've already calculated this point.
 
+    }
+
+    private void normalizeResult (Map<String, PairCorrespData> map) {
+        logger.info("Starting results normalization");
+        double height = maximalPair.getY() - minimumPair.getY();
+        double scale = NormalizedModelHeight / height;
+        double xShift = maximalPair.getX() - NormalizedModelShift[0];
+        double yShift = maximalPair.getY() - NormalizedModelShift[1];
+        double zShift = maximalPair.getZ() - NormalizedModelShift[2];
+        for (Map.Entry<String, PairCorrespData> entry : map.entrySet()) {
+            PairCorrespData temp = entry.getValue();
+            temp.setX(temp.getX() * scale - xShift);
+            temp.setY(temp.getY() * scale - yShift);
+            temp.setZ(temp.getZ() * scale - zShift);
+        }
+        logger.info("Finished results normalization");
     }
 
     /**

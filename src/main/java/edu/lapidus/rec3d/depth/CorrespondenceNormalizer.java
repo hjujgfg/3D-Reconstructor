@@ -40,6 +40,11 @@ public class CorrespondenceNormalizer {
         correspsToTwoLists(holder, left, right);
     }
 
+    public CorrespondenceNormalizer(Point[][] points) {
+        initLists(points.length);
+        correspsToTwoLists(points, left, right);
+    }
+
     public CorrespondenceNormalizer(List<CorrespondenceHolder> holder, Map<ColoredImagePoint, ColoredImagePoint> map) {
         initLists(holder.size() + map.size());
         correspsToTwoLists(holder, left, right);
@@ -60,6 +65,13 @@ public class CorrespondenceNormalizer {
         for (CorrespondenceHolder h : list) {
             first.add(new Point(h.getA()));
             second.add(new Point(h.getB()));
+        }
+    }
+
+    private void correspsToTwoLists(Point[][] points, List<Point> first, List<Point> second) {
+        for (Point[] pair : points) {
+            first.add(pair[0]);
+            second.add(pair[1]);
         }
     }
 

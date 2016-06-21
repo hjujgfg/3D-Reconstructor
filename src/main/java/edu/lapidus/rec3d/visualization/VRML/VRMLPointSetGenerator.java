@@ -56,8 +56,8 @@ public class VRMLPointSetGenerator {
 
                 //if (p.getY() != Double.NaN && p.getX() != Double.NaN && p.getZ() != Double.NaN) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    sb2.append(p.getX1() + " " +  ( -p.getY1()) + " " + (p.getZ() * 5) + ",\n");
-                    sb1.append( p.getX() * 1000 + " " + ( -p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
+                    sb2.append(p.getX1() + " " +  ( p.getY1()) + " " + (p.getZ() * 5) + ",\n");
+                    sb1.append( p.getX() * 1000 + " " + ( p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;

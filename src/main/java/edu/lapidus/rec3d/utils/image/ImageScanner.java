@@ -165,6 +165,7 @@ public class ImageScanner {
         Kernel[] kernels = {KernelFactory.buildXXGaussianKernel(size), KernelFactory.buildXYGaussianKernel(size), KernelFactory.buildYYGaussianKernel(size)};
         for (int i = 0; i < 3; i++) {
             BufferedImage tmp = processor.applyKernel(img, kernels[i]);
+            //processor.saveImage(tmp, "resources/convolve/applied" + i + "" + FILTER_SIZE + ".png");
             res.add(tmp);
             /*NonMaxSuppression suppression = new NonMaxSuppression();
             int [] imgArr = processor.grayToIntArray(tmp);
@@ -209,6 +210,7 @@ public class ImageScanner {
         for (int i = 0; i < CORRESPONDENCE_COUNT ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
             ColoredImagePoint curr = points.get(100 + r.nextInt(points.size()/10));
+            //ColoredImagePoint curr = points.get(i);
             List<Window> current = getWindow(filtered.subList(0, 3), curr.getX(), curr.getY());
             if (current == null) continue;
             double minDist = Double.MAX_VALUE;
