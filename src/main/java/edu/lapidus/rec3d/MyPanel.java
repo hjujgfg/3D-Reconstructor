@@ -2,6 +2,7 @@ package edu.lapidus.rec3d;
 
 import edu.lapidus.rec3d.StaticsForTests.BigStatic;
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.math.*;
 import edu.lapidus.rec3d.math.Point;
 import edu.lapidus.rec3d.math.matrix.ColorMatrix;
@@ -32,7 +33,7 @@ public class MyPanel extends JPanel {
     private final static Logger logger = Logger.getLogger(MyPanel.class);
     private JFrame parent;
 
-    public MyPanel() {
+    public MyPanel() throws FileLoadingException {
         imgProcessor = new ImageProcessor();
         img1 = imgProcessor.loadImage("output/images/" + POINTS_NAME + COUNTER +".png");
         img2 = imgProcessor.loadImage("output/images/" + POINTS_NAME + (COUNTER + 1) + ".png");

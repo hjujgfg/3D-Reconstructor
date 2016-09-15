@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.math.matrix;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.math.Correspondence;
 import edu.lapidus.rec3d.math.vector.Vector;
 import edu.lapidus.rec3d.utils.helpers.MatrixBuilderImpl;
@@ -18,9 +19,13 @@ public class DoubleMatrixTest {
     MatrixBuilderImpl matrixBuilder;
     @Test
     public void testSolveHomogeneous() {
-       DoubleMatrix tst = matrixBuilder.createAMatrix(new Correspondence("Data/points.csv").getInititalCorrespondences());
-        Vector v = tst.solveHomogeneous();
-        logger.debug(v.toString());
+        try {
+            DoubleMatrix tst = matrixBuilder.createAMatrix(new Correspondence("Data/points.csv").getInititalCorrespondences());
+            Vector v = tst.solveHomogeneous();
+            logger.debug(v.toString());
+        } catch (FileLoadingException ex) {
+            logger.error("File Loading error", ex);
+        }
     }
 
     @Before

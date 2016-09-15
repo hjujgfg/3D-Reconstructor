@@ -5,6 +5,7 @@ import edu.lapidus.rec3d.depth.Homography;
 import edu.lapidus.rec3d.depth.threaded.DepthRegionCalculator;
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
 import edu.lapidus.rec3d.depth.threaded.Lock;
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
@@ -22,6 +23,7 @@ import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 import edu.lapidus.rec3d.visualization.VRML.VRMLPointSetGenerator;
 import org.apache.commons.math3.linear.*;
 import org.apache.log4j.Logger;
+import org.lwjgl.Sys;
 
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
@@ -52,12 +54,12 @@ public class TwoImageCalculator {
                 .multiplyBy(matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS))
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
 
-        String img1 = "output/images/sheep0.png";
-        String img2 = "output/images/sheep1.png";
+        String img1 = "input/images/" + args[1];
+        String img2 = "input/images/" + args[2];
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", TwoImageCalculator.FILE_CORRESPS_SOURCE, 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
@@ -119,8 +121,13 @@ public class TwoImageCalculator {
         this.k2 = k2;
         this.r1 = r1;
         this.r2 = r2;
-        firstImage = imageProcessor.loadImage(img1Path);
-        secondImage = imageProcessor.loadImage(img2Path);
+        try {
+            firstImage = imageProcessor.loadImage(img1Path);
+            secondImage = imageProcessor.loadImage(img2Path);
+        } catch (FileLoadingException ex) {
+            logger.error("can't open files", ex);
+            System.exit(1);
+        }
         fileCorrespondencesPath = correspsFile;
         buildAMatrix(correspondenceType);
         buildFundamental();
@@ -148,7 +155,7 @@ public class TwoImageCalculator {
         minimumPair.setX(0);
         minimumPair.setY(0);
         minimumPair.setZ(0);
-        }
+    }
 
     private void buildFundamental() {
         DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
@@ -175,32 +182,52 @@ public class TwoImageCalculator {
         switch (correspondenceSource) {
             case FILE_CORRESPS_SOURCE:
                 logger.info("Starting loading correspondences from file: " + fileCorrespondencesPath);
-                buildFileCorrespondences();
+                try {
+                    buildFileCorrespondences();
+                } catch (FileLoadingException e) {
+                    logger.error("Error loading file correspondences, exiting!!!", e);
+                    System.exit(1);
+                }
                 Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
                 normalizer = new CorrespondenceNormalizer(correspondence.getInititalCorrespondences());
                 break;
             case KMEANS_CORREPS_SOURCE:
                 logger.info("Started building correspondences by Kmeans");
-                buildKmeansCorrespondences();
+                try {
+                    buildKmeansCorrespondences();
+                } catch (FileLoadingException e) {
+                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
+                    System.exit(1);
+                }
                 Amatrix = matrixBuilder.createAMatrix(kMeansCorrespondences);
                 normalizer = new CorrespondenceNormalizer(kMeansCorrespondences);
                 break;
             case CONVOLVE_CORRESPS_SOURCE:
                 logger.info("Started building correspondences by convolve");
-                buildConvolveCorrespondences();
+                try {
+                    buildConvolveCorrespondences();
+                } catch (FileLoadingException e) {
+                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
+                    System.exit(1);
+                }
                 Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences);
                 normalizer = new CorrespondenceNormalizer(convolveCorrespondences);
                 break;
             case KMEANS_AND_CONVOLVE_SOURCE:
                 logger.info("!!!Starting both kmeans and convolve!!!");
-                buildKmeansAndConvolveCorrespondences();
+                try {
+                    buildKmeansAndConvolveCorrespondences();
+                } catch (FileLoadingException e) {
+                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
+                    System.exit(1);
+                }
                 Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences, kMeansCorrespondences);
                 normalizer = new CorrespondenceNormalizer(kMeansCorrespondences, convolveCorrespondences);
                 break;
         }
     }
 
-    private void buildKmeansCorrespondences() {
+    private void buildKmeansCorrespondences() throws FileLoadingException {
         Kmeans kmeans1 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img1Path), null);
         kmeans1.runAlgorithm();
         Kmeans kmeans2 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img2Path), kmeans1.getCentroids());
@@ -213,19 +240,19 @@ public class TwoImageCalculator {
         imageProcessor.saveCorrClusters(img1Path, img2Path, kmeans1.getCentroids(), kmeans2.getCentroids());
     }
 
-    private void buildConvolveCorrespondences() {
+    private void buildConvolveCorrespondences() throws FileLoadingException {
         ImageScanner scanner = new ImageScanner(img1Path, img2Path);
         scanner.run();
         convolveCorrespondences = scanner.getCorrespondences();
     }
 
-    private void buildFileCorrespondences() {
+    private void buildFileCorrespondences() throws FileLoadingException {
         if (fileCorrespondencesPath == null || fileCorrespondencesPath.isEmpty())
             throw new IllegalArgumentException("Correspondence path is empty or null, but was specified as source");
         correspondence = new Correspondence(fileCorrespondencesPath);
     }
 
-    private void buildKmeansAndConvolveCorrespondences() {
+    private void buildKmeansAndConvolveCorrespondences() throws FileLoadingException {
         buildConvolveCorrespondences();
         buildKmeansCorrespondences();
     }
@@ -287,7 +314,12 @@ public class TwoImageCalculator {
             c.removeBackground();
         }
 
-        ImageScanner scanner = new ImageScanner(img1Path, img2Path);
+        ImageScanner scanner = null;
+        try {
+            scanner = new ImageScanner(img1Path, img2Path);
+        } catch (FileLoadingException e) {
+            logger.error("Error starting image scanner: file exception", e);
+        }
         scanner.initCorrespondenceChecker();
         int linesPerThread = images[0].getHeight() / THREAD_NUMBER;
         Set<Lock> semaphore = new HashSet<Lock>(THREAD_NUMBER);
@@ -358,6 +390,10 @@ public class TwoImageCalculator {
         VRMLData vrml = triangulator.triangulate();
 
         vrml.saveWrl();*/
+
+        /*XYZformatter xyz = new XYZformatter(result);
+
+        xyz.saveXYZ();*/
 
         /*VRMLPointSetGenerator pointSet = new VRMLPointSetGenerator(result);
 

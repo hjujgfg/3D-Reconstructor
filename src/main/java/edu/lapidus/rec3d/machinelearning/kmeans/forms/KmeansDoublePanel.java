@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.machinelearning.kmeans.forms;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.machinelearning.kmeans.Kmeans;
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class KmeansDoublePanel extends JPanel {
     private static final Logger logger = Logger.getLogger(KmeansDoublePanel.class);
-    public KmeansDoublePanel() {
+    public KmeansDoublePanel() throws FileLoadingException {
         logger.info("Entered building panel");
         BufferedImage b1 = imageProcessor.loadImage(img0Path);
         BufferedImage b2 = imageProcessor.loadImage(img1Path);

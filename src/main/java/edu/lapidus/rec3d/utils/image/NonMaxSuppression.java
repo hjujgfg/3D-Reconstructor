@@ -1,11 +1,17 @@
 package edu.lapidus.rec3d.utils.image;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
+import org.apache.log4j.Logger;
+
 import java.awt.image.BufferedImage;
 
 /**
  * Created by Егор on 15.05.2016.
  */
 public class NonMaxSuppression {
+
+    private final static Logger logger = Logger.getLogger(NonMaxSuppression.class);
+
     static int[] input;
     static int[] output;
     int progress;
@@ -115,7 +121,12 @@ public class NonMaxSuppression {
     public static void main(String[] args) {
         ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 3; i ++) {
-            BufferedImage img1 = p.loadImage("output/images/sheep"+i+".png");
+            BufferedImage img1 = null;
+            try {
+                img1 = p.loadImage("output/images/sheep"+i+".png");
+            } catch (FileLoadingException e) {
+                logger.error("error loading file", e);
+            }
             img1 = p.removeGreen(img1);
             img1 = p.toGrayScale(img1);
             img1 = p.applyKernel(img1, KernelFactory.buildYYGaussianKernel(21));

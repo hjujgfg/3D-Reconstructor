@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.machinelearning.kmeans.forms;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
 import edu.lapidus.rec3d.machinelearning.kmeans.ClusterComparator;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
@@ -35,7 +36,7 @@ public class ImageDrawer extends JPanel{
     private final static String img0Path = "output/images/sheep0.png";
     private final static String img1Path = "output/images/sheep1.png";
     private static final Logger logger = Logger.getLogger(ImageDrawer.class);
-    public ImageDrawer() {
+    public ImageDrawer() throws FileLoadingException {
         imageProcessor = new ImageProcessor();
         image = imageProcessor.loadImage(img0Path);
 
@@ -80,7 +81,13 @@ public class ImageDrawer extends JPanel{
                 List<Centroid> l1 = new ArrayList<>(centroids.size());
                 l1.addAll(centroids.stream().map(c -> new Centroid(c.getX(), c.getY(), c.getColor())).collect(Collectors.toList()));
                 logger.info("Starting second image");
-                BufferedImage img2 = imageProcessor.loadImage(img1Path);
+
+                BufferedImage img2 = null;
+                try {
+                    img2 = imageProcessor.loadImage(img1Path);
+                } catch (FileLoadingException e1) {
+                    logger.error("Failed to load img"+ img1Path, e1);
+                }
                 /*img2 = imageProcessor.removeGreen(img2);
                 img2 = imageProcessor.toGrayScale(img2);*/
                 Kmeans second = new Kmeans(centroids.size(), img2, centroids);

@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.math;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import org.apache.log4j.Logger;
 
 import javax.jnlp.IntegrationService;
@@ -13,7 +14,7 @@ import java.util.zip.Inflater;
 public class Correspondence {
     private Point[][] inititalCorrespondences;
     final static Logger logger = Logger.getLogger(Correspondence.class);
-    public Correspondence(String name) {
+    public Correspondence(String name) throws FileLoadingException {
         inititalCorrespondences = loadFromfile(name);
         logger.info("Correspondences created");
     }
@@ -80,7 +81,7 @@ public class Correspondence {
         return p;
     }
 
-    private Point[][] loadFromfile(String path) {
+    private Point[][] loadFromfile(String path) throws FileLoadingException {
         ArrayList<Point[]> prePoints = new ArrayList<Point[]>();
         logger.info("Loading correspondences: " + path);
         //File f = new File("output/correspondences/" + name + ".csv");
@@ -97,6 +98,7 @@ public class Correspondence {
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new FileLoadingException();
         } catch (IOException e) {
             e.printStackTrace();
         }

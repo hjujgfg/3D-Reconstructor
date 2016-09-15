@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.depth.threaded.EpipolarLineHolder;
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
@@ -24,18 +25,16 @@ public class ImageProcessor {
 
     final static String STORAGE_DIR = "output/res/";
 
-    public BufferedImage loadImage(String path) {
+    public BufferedImage loadImage(String path) throws FileLoadingException {
         logger.info("Started loading " + path);
         File f = new File(path);
         BufferedImage img = null;
         try {
             img = ImageIO.read(f);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            logger.error("error loading " + path + "\n" + e.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             logger.error("error loading " + path + "\n" + e.toString());
+            throw new FileLoadingException("Error with file: " + path, e);
         }
         logger.info("Successfully loaded " + path);
         return img;
@@ -173,8 +172,13 @@ public class ImageProcessor {
     }
 
     public BufferedImage buildCombined(String i1, String i2) {
-        BufferedImage img1 = loadImage(i1);
-        BufferedImage img2 = loadImage(i2);
+        BufferedImage img1 = null, img2 = null;
+        try {
+            img1 = loadImage(i1);
+            img2 = loadImage(i2);
+        } catch (FileLoadingException ex) {
+            logger.error("Error loading parts for combined", ex);
+        }
         BufferedImage combined = new BufferedImage(img1.getWidth() + img2.getWidth(), img1.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = combined.createGraphics();
         g.drawImage(img1, 0, 0, null);
@@ -206,24 +210,27 @@ public class ImageProcessor {
     //TODO govnokod
     private static int counter = 0;
     public static void bulkResizeImages(String name, int newWidth, int newHeight) {
-        String dir = "output/images/"+name +"/";
+        String dir = "input/images/" + name + "/";
+        logger.info("Starting resize " + name + " at " + dir);
         counter = 0;
+
         try {
-            Files.walk(Paths.get(dir)).forEach(filePath -> {
+            Files.walk(Paths.get(dir), 1).forEach(filePath -> {
                 try {
                     if (filePath.toString().endsWith(".jpg") || filePath.toString().endsWith(".png")) {
                         BufferedImage originalImage = ImageIO.read(filePath.toFile());
                         int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
                         BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
                         ImageIO.write(img, "png", new File(dir + "res/" + name + counter + ".png"));
+                        ImageIO.write(img, "png", new File("input/images/" + name + counter + ".png"));
                         counter++;
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("Name: " + name + "\ndir: " + dir, e);
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Name: " + name + "\ndir: " + dir, e);
         }
     }
 
@@ -236,7 +243,7 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    private void changeBackGround(String sourcePath) {
+    private void changeBackGround(String sourcePath) throws FileLoadingException {
         BufferedImage source = loadImage(sourcePath);
         BufferedImage result = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int x = 0; x < source.getWidth(); x ++) {
@@ -380,12 +387,22 @@ public class ImageProcessor {
         }*/
         ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 2; i ++) {
-            BufferedImage res = p.loadImage("output/images/" + name + "/res/" + name + i + ".png");
+            BufferedImage res = null;
+            try {
+                res = p.loadImage("output/images/" + name + "/res/" + name + i + ".png");
+            } catch (FileLoadingException e) {
+                e.printStackTrace();
+            }
             p.saveImage(p.normalize(res, 10), "output/images/" + name + "/normalized/" + name + i +".png");
         }
         //ImageProcessor p = new ImageProcessor();
         for (int i = 0; i < 2; i ++) {
-            BufferedImage res = p.loadImage("output/images/" + name + "/normalized/" + name +i+".png");
+            BufferedImage res = null;
+            try {
+                res = p.loadImage("output/images/" + name + "/normalized/" + name +i+".png");
+            } catch (FileLoadingException e) {
+                e.printStackTrace();
+            }
             p.saveImage(p.removeGreen(res), "output/images/" + name + i + ".png");
         }
     }

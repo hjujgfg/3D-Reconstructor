@@ -1,5 +1,6 @@
 package edu.lapidus.rec3d.utils.image;
 
+import edu.lapidus.rec3d.exceptions.FileLoadingException;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.*;
@@ -37,11 +38,17 @@ public class ImageScanner {
 
 
     public static void main(String[] args) {
-        ImageScanner scanner = new ImageScanner(IMG1, IMG2);
+        ImageScanner scanner = null;
+        try {
+            scanner = new ImageScanner(IMG1, IMG2);
+        } catch (FileLoadingException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
         scanner.run();
     }
 
-    public ImageScanner (String i1, String i2) {
+    public ImageScanner (String i1, String i2) throws FileLoadingException {
         img1Path = i1;
         img2Path = i2;
         img1 = processor.loadImage(i1);
