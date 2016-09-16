@@ -23,9 +23,6 @@ import edu.lapidus.rec3d.utils.interfaces.MatrixBuilder;
 import edu.lapidus.rec3d.visualization.VRML.VRMLPointSetGenerator;
 import org.apache.commons.math3.linear.*;
 import org.apache.log4j.Logger;
-import org.lwjgl.Sys;
-
-import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
@@ -65,6 +62,7 @@ public class TwoImageCalculator {
         generator.buildPointSet();
         //imageProcessor.createDepthMap(res);
     }
+
     public enum CorrespondenceLookupType {
         FILE_CORRESPS_SOURCE,
         KMEANS_CORREPS_SOURCE,
@@ -120,7 +118,8 @@ public class TwoImageCalculator {
      * @param k1 - calibration matrix for the first image
      * @param k2 - calibration matrix for the second image
      * @param r1 - rotation matrix of the first image
-     * @param r2 - rotation matrix of the second image
+     * @param r2 - rotation matrix of the second image, if it is null then an attempt to extract it
+     *           from Fundamental will be performed
      * @param img1Path - path to the first image location
      * @param img2Path - path to the second image location
      * @param correspsFile - path to location of the file containing user picked correspondences
@@ -170,6 +169,9 @@ public class TwoImageCalculator {
         minimumPair.setZ(0);
     }
 
+    /**
+     * Calculates Fundamental matrix
+     */
     private void buildFundamental() {
         DoubleMatrix fundamentalMatrix2 = matrixBuilder.buildFundamental(Amatrix);
         logger.info("Found fundamental without normalization: " + fundamentalMatrix2);
@@ -191,6 +193,11 @@ public class TwoImageCalculator {
         }
     }
 
+    /**
+     * Builds special matrix required for creation of the Fundamental matrix
+     * @param correspondenceSource
+     * @throws IllegalArgumentException
+     */
     private void buildAMatrix(CorrespondenceLookupType correspondenceSource) throws IllegalArgumentException {
         switch (correspondenceSource) {
             case FILE_CORRESPS_SOURCE:
@@ -270,12 +277,21 @@ public class TwoImageCalculator {
         buildKmeansCorrespondences();
     }
 
+    /**
+     * Computes Essential matrix from the Fundamental one
+     * @return
+     */
     private DoubleMatrix buildEssentialMatrix() {
         DoubleMatrix E = k2.transpose().multiplyBy(fundamentalMatrix).multiplyBy(k1);
         logger.info("Built essential matrix: " + E);
         return E;
     }
 
+    /**
+     * Calculates R2 from fundamental matrix
+     * @param essential
+     * @return R2
+     */
     private DoubleMatrix extractRotationMatrix(DoubleMatrix essential) {
         double[][] w = new double[3][];
         for (int i = 0; i < 3; i ++) {
@@ -298,6 +314,11 @@ public class TwoImageCalculator {
         return rotationM;
     }
 
+    /**
+     * Converts rotation matrix to angles around three axises
+     * @param rotationM - rotaion matrix
+     * @return array of 3 elements, 1 - x axis, 2 - y, 3 - z
+     */
     public double[] getRotationAngles(DoubleMatrix rotationM) {
         double x = Math.atan2(rotationM.get(2,1), rotationM.get(2,2));
         double y = Math.atan2(-rotationM.get(2,0), Math.sqrt(rotationM.get(2,1) * rotationM.get(2,1) + rotationM.get(2,2) * rotationM.get(2,2)));
@@ -317,6 +338,13 @@ public class TwoImageCalculator {
         //imageProcessor = new ImageProcessor();
 
     }*/
+
+    /**
+     * Starts the reconstruction algorithms
+     * @return Map \<String, PairCorrespData\>; String key is constructed as x_y
+     * where x and y are coordinates of the calculated 3D point on the first image,
+     * value is a complex object, which contains coordinates of the 3D point on both images and 3D point itself
+     */
     public Map<String, PairCorrespData> run () {
 
         Map<String, PairCorrespData> result = new ConcurrentHashMap<>();
@@ -470,6 +498,11 @@ public class TwoImageCalculator {
         return new Vector(result.toArray());
     }*/
 
+    /**
+     * Calculates vector representing Epipole from the Fundamental matrix
+     * @param fund - fundamental matrix
+     * @return true if the Epipole is formally correct (it does not have infinite values), false otherwise
+     */
     private boolean calculateEpipoleFromFundamental(DoubleMatrix fund) {
         //SingularValueDecomposition svd = fund.transpose().SVD();
         SingularValueDecomposition svd = fund.SVD();
