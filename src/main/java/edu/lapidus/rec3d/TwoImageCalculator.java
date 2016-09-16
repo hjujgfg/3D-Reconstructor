@@ -59,17 +59,18 @@ public class TwoImageCalculator {
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", CorrespondenceLookupType.CONVOLVE_CORRESPS_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
         //imageProcessor.createDepthMap(res);
     }
-
-    final static int FILE_CORRESPS_SOURCE = 1;
-    final static int KMEANS_CORREPS_SOURCE = 2;
-    final static int CONVOLVE_CORRESPS_SOURCE = 3;
-    final static int KMEANS_AND_CONVOLVE_SOURCE = 4;
+    public enum CorrespondenceLookupType {
+        FILE_CORRESPS_SOURCE,
+        KMEANS_CORREPS_SOURCE,
+        CONVOLVE_CORRESPS_SOURCE,
+        KMEANS_AND_CONVOLVE_SOURCE
+    }
 
     final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
     static MatrixBuilderImpl matrixBuilder;
@@ -114,7 +115,19 @@ public class TwoImageCalculator {
         this.homography = homography;
     }
 
-    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String correspsFile, int correspondenceType, double modelScaleFactor) {
+    /**
+     * Public constructor
+     * @param k1 - calibration matrix for the first image
+     * @param k2 - calibration matrix for the second image
+     * @param r1 - rotation matrix of the first image
+     * @param r2 - rotation matrix of the second image
+     * @param img1Path - path to the first image location
+     * @param img2Path - path to the second image location
+     * @param correspsFile - path to location of the file containing user picked correspondences
+     * @param correspondenceType - type of the correspondence lookup method
+     * @param modelScaleFactor - scale factor - multiplier to change size of the onstructed model
+     */
+    public TwoImageCalculator(DoubleMatrix k1, DoubleMatrix k2, DoubleMatrix r1, DoubleMatrix r2, String img1Path, String img2Path, String correspsFile, CorrespondenceLookupType correspondenceType, double modelScaleFactor) {
         this.img1Path = img1Path;
         this.img2Path = img2Path;
         this.k1 = k1;
@@ -178,7 +191,7 @@ public class TwoImageCalculator {
         }
     }
 
-    private void buildAMatrix(int correspondenceSource) throws IllegalArgumentException {
+    private void buildAMatrix(CorrespondenceLookupType correspondenceSource) throws IllegalArgumentException {
         switch (correspondenceSource) {
             case FILE_CORRESPS_SOURCE:
                 logger.info("Starting loading correspondences from file: " + fileCorrespondencesPath);
