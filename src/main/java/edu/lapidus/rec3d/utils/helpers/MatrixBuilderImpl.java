@@ -149,9 +149,9 @@ public class MatrixBuilderImpl{
         return new DoubleMatrix(A);
     }
 
-    public DoubleMatrix createAMatrix(Map<ColoredImagePoint, ColoredImagePoint> map, List<CorrespondenceHolder> list) {
-        DoubleMatrix m1 = createAMatrix(map);
-        DoubleMatrix m2 = createAMatrix(list);
+    public DoubleMatrix createAMatrix(List<CorrespondenceHolder> conv, List<CorrespondenceHolder> clust) {
+        DoubleMatrix m1 = createAMatrix(conv);
+        DoubleMatrix m2 = createAMatrix(clust);
         m1.rowsAppend(m2);
         return m1;
     }

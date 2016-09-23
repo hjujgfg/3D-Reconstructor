@@ -45,11 +45,11 @@ public class CorrespondenceNormalizer {
         correspsToTwoLists(points, left, right);
     }
 
-    public CorrespondenceNormalizer(List<CorrespondenceHolder> holder, Map<ColoredImagePoint, ColoredImagePoint> map) {
-        initLists(holder.size() + map.size());
-        correspsToTwoLists(holder, left, right);
+    public CorrespondenceNormalizer(List<CorrespondenceHolder> kmeans, List<CorrespondenceHolder> convolve) {
+        initLists(kmeans.size() + convolve.size());
+        correspsToTwoLists(kmeans, left, right);
         List<Point> t1 = new ArrayList<>(), t2 = new ArrayList<>();
-        correspsToTwoLists(map, t1, t2);
+        correspsToTwoLists(convolve, t1, t2);
         left.addAll(t1);
         right.addAll(t2);
     }

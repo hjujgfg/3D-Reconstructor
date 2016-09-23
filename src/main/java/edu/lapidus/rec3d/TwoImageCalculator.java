@@ -56,7 +56,7 @@ public class TwoImageCalculator {
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/correspondences/sheep0.csv", CorrespondenceLookupType.CONVOLVE_CORRESPS_SOURCE, 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "input/correspondences/sheep0.csv", CorrespondenceLookupType.CONVOLVE_CORRESPS_SOURCE, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
@@ -65,27 +65,27 @@ public class TwoImageCalculator {
 
     public enum CorrespondenceLookupType {
         FILE_CORRESPS_SOURCE,
-        KMEANS_CORREPS_SOURCE,
+        KMEANS_CORRESPS_SOURCE,
         CONVOLVE_CORRESPS_SOURCE,
         KMEANS_AND_CONVOLVE_SOURCE
     }
 
-    final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
-    static MatrixBuilderImpl matrixBuilder;
-    Correspondence correspondence;
-    static ImageProcessor imageProcessor;
-    Homography homography;
-    DoubleMatrix fundamentalMatrix;
-    CorrespondenceNormalizer normalizer;
-    DoubleMatrix k1, k2, r1, r2;
-    Vector epipole;
+    private final static Logger logger = Logger.getLogger(TwoImageCalculator.class);
+    private static MatrixBuilderImpl matrixBuilder;
+    private Correspondence correspondence;
+    private static ImageProcessor imageProcessor;
+    private Homography homography;
+    private DoubleMatrix fundamentalMatrix;
+    private CorrespondenceNormalizer normalizer;
+    private DoubleMatrix k1, k2, r1, r2;
+    private Vector epipole;
 
     private final static double[] NormalizedModelShift = new double[] {0, 100, 0};
     private final static double NormalizedModelHeight = 100;
     private PairCorrespData maximalPair = new PairCorrespData();
     private PairCorrespData minimumPair = new PairCorrespData();
 
-    ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
+    private ArrayList<EpipolarLineHolder> lines = new ArrayList<EpipolarLineHolder>();
 
     static {
         matrixBuilder = new MatrixBuilderImpl();
@@ -99,7 +99,7 @@ public class TwoImageCalculator {
     private double modelScaleFactor;
 
     private List<CorrespondenceHolder> kMeansCorrespondences;
-    private Map<ColoredImagePoint, ColoredImagePoint> convolveCorrespondences;
+    private List<CorrespondenceHolder> convolveCorrespondences;
     private String fileCorrespondencesPath;
     private DoubleMatrix Amatrix;
 
@@ -195,7 +195,8 @@ public class TwoImageCalculator {
 
     /**
      * Builds special matrix required for creation of the Fundamental matrix
-     * @param correspondenceSource
+     * @param correspondenceSource - source for correspondences: whether correspondences should be computed via algorithms
+     *                             or they are given as user picked located in special file
      * @throws IllegalArgumentException
      */
     private void buildAMatrix(CorrespondenceLookupType correspondenceSource) throws IllegalArgumentException {
@@ -211,7 +212,7 @@ public class TwoImageCalculator {
                 Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
                 normalizer = new CorrespondenceNormalizer(correspondence.getInititalCorrespondences());
                 break;
-            case KMEANS_CORREPS_SOURCE:
+            case KMEANS_CORRESPS_SOURCE:
                 logger.info("Started building correspondences by Kmeans");
                 try {
                     buildKmeansCorrespondences();
@@ -247,6 +248,10 @@ public class TwoImageCalculator {
         }
     }
 
+    /**
+     * Activates Kmeans clustering and correspondence lookup
+     * @throws FileLoadingException - if unable to open one or both images
+     */
     private void buildKmeansCorrespondences() throws FileLoadingException {
         Kmeans kmeans1 = new Kmeans(NUMBER_OF_CLUSTERS, imageProcessor.loadImage(img1Path), null);
         kmeans1.runAlgorithm();
@@ -260,18 +265,30 @@ public class TwoImageCalculator {
         imageProcessor.saveCorrClusters(img1Path, img2Path, kmeans1.getCentroids(), kmeans2.getCentroids());
     }
 
+    /**
+     * Activates convolution correspondence lookup
+     * @throws FileLoadingException - if unable to open one or both images
+     */
     private void buildConvolveCorrespondences() throws FileLoadingException {
         ImageScanner scanner = new ImageScanner(img1Path, img2Path);
         scanner.run();
         convolveCorrespondences = scanner.getCorrespondences();
     }
 
+    /**
+     * Loads correspondences specified in correspondence file
+     * @throws FileLoadingException - if nuable to open correspondence file
+     */
     private void buildFileCorrespondences() throws FileLoadingException {
         if (fileCorrespondencesPath == null || fileCorrespondencesPath.isEmpty())
             throw new IllegalArgumentException("Correspondence path is empty or null, but was specified as source");
         correspondence = new Correspondence(fileCorrespondencesPath);
     }
 
+    /**
+     * Starts convolve and clustering correspondences lookup
+     * @throws FileLoadingException - if one or both images can not be opened
+     */
     private void buildKmeansAndConvolveCorrespondences() throws FileLoadingException {
         buildConvolveCorrespondences();
         buildKmeansCorrespondences();

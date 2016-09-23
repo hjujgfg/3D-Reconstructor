@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import java.util.HashSet;
 import java.util.Set;
 
+import static edu.lapidus.rec3d.TwoImageCalculator.CorrespondenceLookupType.KMEANS_AND_CONVOLVE_SOURCE;
+
 /**
  * Created by Егор on 09.04.2016.
  */
@@ -54,7 +56,7 @@ public class Starter {
             double scaleFactor = 1;
             /*if (i == 0)
                 scaleFactor = 5;*/
-            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i + 1], images[i], images[i + 1], corresps[i], TwoImageCalculator.KMEANS_AND_CONVOLVE_SOURCE, scaleFactor);
+            TwoImageCalculator calculator = new TwoImageCalculator(k[i], k[i + 1], r[i], r[i + 1], images[i], images[i + 1], corresps[i], KMEANS_AND_CONVOLVE_SOURCE, scaleFactor);
             results.addAll(calculator.run().values());
             testRotation = calculator.getR2();
         }

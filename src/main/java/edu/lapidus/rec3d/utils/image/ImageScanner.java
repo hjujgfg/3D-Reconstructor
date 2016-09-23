@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.utils.image;
 
 import edu.lapidus.rec3d.exceptions.FileLoadingException;
+import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.*;
@@ -28,13 +29,13 @@ public class ImageScanner {
     private final static int WINDOW_SIDE = 20;
     private final static int CORRESPONDENCE_COUNT = 10;
 
-    BufferedImage img1, img2;
-    String img1Path, img2Path;
+    private BufferedImage img1, img2;
+    private String img1Path, img2Path;
 
-    Map<ColoredImagePoint, Double> det1, det2;
+    private Map<ColoredImagePoint, Double> det1, det2;
 
-    Map<ColoredImagePoint, ColoredImagePoint> correspondences;
-    List<BufferedImage> processed;
+    private List<CorrespondenceHolder> correspondences;
+    private List<BufferedImage> processed;
 
 
     public static void main(String[] args) {
@@ -101,13 +102,13 @@ public class ImageScanner {
         processor.saveImage(res, "output/convolve/" + name + ".png");
     }
 
-    private void saveToCombined(Map<ColoredImagePoint, ColoredImagePoint> map) {
+    private void saveToCombined(List<CorrespondenceHolder> list) {
         BufferedImage combined = processor.buildCombined(img1Path, img2Path);
         Graphics g = combined.createGraphics();
         Random r = new Random();
-        for (Map.Entry<ColoredImagePoint, ColoredImagePoint> entry : map.entrySet()) {
-            ColoredImagePoint p1 = entry.getKey();
-            ColoredImagePoint p2 = entry.getValue();
+        for (CorrespondenceHolder entry : list) {
+            ColoredImagePoint p1 = entry.getA();
+            ColoredImagePoint p2 = entry.getB();
             g.setColor(new Color(r.nextInt(256), r.nextInt(256), r.nextInt(256)));
             g.drawLine(p1.getX(), p1.getY(), p2.getX() + combined.getWidth()/2, p2.getY());
             g.drawOval(p1.getX() - 2, p1.getY() - 2, 4, 4);
@@ -210,9 +211,9 @@ public class ImageScanner {
         return null;
     }
 
-    private Map<ColoredImagePoint, ColoredImagePoint> compareImages(List<BufferedImage> filtered, List<ColoredImagePoint> points) {
+    private List<CorrespondenceHolder> compareImages(List<BufferedImage> filtered, List<ColoredImagePoint> points) {
         int topPointCount = CORRESPONDENCE_COUNT > points.size() ? points.size() : CORRESPONDENCE_COUNT;
-        Map<ColoredImagePoint, ColoredImagePoint> result = new HashMap<>();
+        List<CorrespondenceHolder> result = new ArrayList<>();
         Random r = new Random(points.size());
         for (int i = 0; i < CORRESPONDENCE_COUNT ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
@@ -240,7 +241,7 @@ public class ImageScanner {
                     }
                 }
             }
-            result.put(curr, candidate);
+            result.add(new CorrespondenceHolder(curr, candidate, minDist));
         }
         return result;
     }
@@ -305,7 +306,7 @@ public class ImageScanner {
         return compareWindowLists(w1, w2);
     }
 
-    public Map<ColoredImagePoint, ColoredImagePoint> getCorrespondences() {
+    public List<CorrespondenceHolder> getCorrespondences() {
         return correspondences;
     }
 
