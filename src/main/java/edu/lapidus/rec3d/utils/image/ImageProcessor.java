@@ -6,6 +6,7 @@ import edu.lapidus.rec3d.machinelearning.kmeans.Centroid;
 import edu.lapidus.rec3d.machinelearning.kmeans.CorrespondenceHolder;
 import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.utils.PairCorrespData;
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -16,14 +17,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.List;
+import static edu.lapidus.rec3d.utils.helpers.DirectoryHelper.*;
 
 /**
  * Created by Егор on 21.11.2015.
  */
 public class ImageProcessor {
-    final static Logger logger = Logger.getLogger(ImageProcessor.class);
+    private final static Logger logger = Logger.getLogger(ImageProcessor.class);
 
-    final static String STORAGE_DIR = "output/res/";
+//    final static String STORAGE_DIR = "output/res/";
+    private final static DirectoryHelper directoryHelper = new DirectoryHelper();
 
     public BufferedImage loadImage(String path) throws FileLoadingException {
         logger.info("Started loading " + path);
@@ -41,7 +44,7 @@ public class ImageProcessor {
     }
 
     public void createDepthMap(Map<String, PairCorrespData> points) {
-        File f = new File(STORAGE_DIR + "depth.png");
+        File f = new File(THREE_D_OUT + "depth.png");
         logger.info("Building depth image");
         BufferedImage map = new BufferedImage(3000, 3000, BufferedImage.TYPE_INT_RGB);
         for (Map.Entry<String, PairCorrespData> entry : points.entrySet()) {
@@ -134,7 +137,7 @@ public class ImageProcessor {
             g.setColor(new Color(r.nextInt()));
             g.drawLine(x1, y1, x2, y2);
         }
-        saveImage(combined, "output/res/corresps.png");
+        saveImage(combined, THREE_D_OUT + "corresps.png");
     }
 
     public void visualizeEpipolarLines(List<EpipolarLineHolder> lines, String i1, String i2, int numOfLines) {
@@ -168,7 +171,7 @@ public class ImageProcessor {
 
             g.drawLine(x1, y1, x2, y2);*/
         }
-        saveImage(combined, "output/res/epipoles.png");
+        saveImage(combined, THREE_D_OUT + "epipoles.png");
     }
 
     public BufferedImage buildCombined(String i1, String i2) {
@@ -210,7 +213,7 @@ public class ImageProcessor {
     //TODO govnokod
     private static int counter = 0;
     public static void bulkResizeImages(String name, int newWidth, int newHeight) {
-        String dir = "input/images/" + name + "/";
+        String dir = IMAGES_DIR + name + "/";
         logger.info("Starting resize " + name + " at " + dir);
         counter = 0;
 
@@ -222,7 +225,7 @@ public class ImageProcessor {
                         int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
                         BufferedImage img = resizeImage(originalImage, type, newWidth, newHeight);
                         ImageIO.write(img, "png", new File(dir + "res/" + name + counter + ".png"));
-                        ImageIO.write(img, "png", new File("input/images/" + name + counter + ".png"));
+                        ImageIO.write(img, "png", new File(IMAGES_DIR + "model" + counter + ".png"));
                         counter++;
                     }
                 } catch (IOException e) {
@@ -272,7 +275,7 @@ public class ImageProcessor {
             Centroid b = c2.get(i);
             g.drawLine(a.getX(), a.getY(), b.getX() + combined.getWidth() / 2, b.getY());
         }
-        saveImage(combined, "output/clustering/combined.png");
+        saveImage(combined, CLUSTERING_OUT + "combined.png");
     }
 
     public void saveCorrespsByKmeans(String i1, String i2, List<CorrespondenceHolder> corresps) {
@@ -289,7 +292,7 @@ public class ImageProcessor {
             g.drawOval(p2.getX() + (combined.getWidth() / 2) - 2, p2.getY() - 2, 4, 4);
             g.drawLine(p1.getX(), p1.getY(), p2.getX() + (combined.getWidth() / 2) , p2.getY());
         }
-        saveImage(combined, "output/clustering/combined2.png");
+        saveImage(combined, CLUSTERING_OUT + "combined2.png");
     }
 
     public BufferedImage toGrayScale(BufferedImage source) {

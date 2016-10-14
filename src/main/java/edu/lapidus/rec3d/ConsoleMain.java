@@ -1,6 +1,5 @@
 package edu.lapidus.rec3d;
 
-import com.sun.tools.classfile.ConstantPool;
 import edu.lapidus.rec3d.exceptions.DirectoryCreationException;
 import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
@@ -72,13 +71,14 @@ public class ConsoleMain {
             System.exit(1);
         }
         try {
-            dh.copyFile(args[2], dh.getImagesFolder());
-            dh.copyFile(args[3], dh.getImagesFolder());
+            dh.copyFile(args[2], dh.getImagesDir(args[1]));
+            dh.copyFile(args[3], dh.getImagesDir(args[1]));
         } catch (IOException e) {
             logger.error("error copying images to structure", e);
+            System.exit(1);
         }
         ImageProcessor.bulkResizeImages(args[1], 800, 600);
-        TwoImageCalculator.main(Arrays.copyOfRange(args, 2, args.length));
+        TwoImageCalculator.main();
     }
 
     private void handleSeveral(String ... args) {

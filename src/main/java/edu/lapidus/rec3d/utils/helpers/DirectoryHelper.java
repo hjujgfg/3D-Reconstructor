@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -35,6 +36,18 @@ public class DirectoryHelper {
 
     public void createDirs(String model) throws DirectoryCreationException{
         String innerDir = getImagesDir(model) + "res/";
+        File f = new File (IMAGES_DIR);
+        if (f.exists()) {
+            try {
+                Files.walk(Paths.get(IMAGES_DIR), 1).forEach(filepath -> {
+                    if (filepath.toString().endsWith(".jpg") || filepath.toString().endsWith(".png")) {
+                        filepath.toFile().delete();
+                    }
+                });
+            } catch (IOException e) {
+                throw new DirectoryCreationException("Error deleting old images", e);
+            }
+        }
         createDirsInner(innerDir);
         createDirsInner(CONVOLVE_OUT);
         createDirsInner(CLUSTERING_OUT);
@@ -42,14 +55,18 @@ public class DirectoryHelper {
     }
 
     private void createDirsInner(String name) throws DirectoryCreationException {
-        boolean success = new File(name).mkdirs();
+        File f = new File(name);
+        boolean success = true;
+        if (!f.exists()) {
+            success = f.mkdirs();
+        }
         if (!success) {
-            throw new DirectoryCreationException("Unable to create directory structure for input");
+            throw new DirectoryCreationException("Unable to create directory structure for " + name);
         }
     }
 
     public void copyFile(String from, String to) throws IOException {
-        Files.copy(Paths.get(from), Paths.get(to), REPLACE_EXISTING);
+        Files.copy(Paths.get(from), Paths.get(to).resolve(from), REPLACE_EXISTING);
     }
 
 }
