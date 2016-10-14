@@ -24,7 +24,6 @@ public class CorrespondenceHolder extends ArrayList<ColoredImagePoint> implement
 
     @Override
     public int compareTo(Object o) {
-        if (o == null) throw new NullPointerException();
         if (! (o instanceof CorrespondenceHolder) ) throw new ClassCastException();
         CorrespondenceHolder oo = (CorrespondenceHolder)o;
         if (this.distance < oo.distance) return -1;

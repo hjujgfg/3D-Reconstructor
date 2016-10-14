@@ -266,7 +266,7 @@ public class DepthRegionCalculator implements Runnable {
 
         int heightDiff = point1[1] - point2[1];
         heightDiff = (heightDiff - HEIGHT_DIFF_LIM) * (heightDiff - HEIGHT_DIFF_LIM);
-        int widthDiff = point1[0] - point2[0] - WIDTH_DIFF_LIM;; //TODO was - 30
+        int widthDiff = point1[0] - point2[0] - WIDTH_DIFF_LIM;//TODO was - 30
         widthDiff *= widthDiff * WIDTH_DIFF_WEIGHT;
         //logger.info("Mean diff: " + meanDiff + " height diff: " + heightDiff);
         meanDiff += heightDiff * HEIGHT_DIFF_WEIGHT + widthDiff;

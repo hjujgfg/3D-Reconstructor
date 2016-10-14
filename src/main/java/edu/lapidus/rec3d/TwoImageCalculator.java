@@ -51,8 +51,8 @@ public class TwoImageCalculator {
                 .multiplyBy(matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS))
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
 
-        String img1 = "input/images/" + args[1];
-        String img2 = "input/images/" + args[2];
+        String img1 = "input/images/" + args[0];
+        String img2 = "input/images/" + args[1];
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);

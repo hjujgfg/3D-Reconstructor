@@ -10,13 +10,13 @@ import edu.lapidus.rec3d.math.vector.Vector;
  */
 public interface MatrixBuilder {
 
-    final int LEARNING_POINT_NUMBER = 15;
+    int LEARNING_POINT_NUMBER = 15;
 
-    public final int X_AXIS = 1, Y_AXIS = 2, Z_AXIS = 3;
+    int X_AXIS = 1, Y_AXIS = 2, Z_AXIS = 3;
 
-    public DoubleMatrix createRotationMatrix(double angle, int axis);
+    DoubleMatrix createRotationMatrix(double angle, int axis);
 
-    public DoubleMatrix createCalibrationMatrix(double ax, double ay, double px, double py);
+    DoubleMatrix createCalibrationMatrix(double ax, double ay, double px, double py);
 
     /**
      * Build A matrix which represents a set of homogeneous equations, which should be solved to
@@ -24,10 +24,10 @@ public interface MatrixBuilder {
      * @param correspondences - array of points correspondences[0] - Point at first image, [1] - at the second one
      * @return matrix of homogeneous equations
      */
-    public DoubleMatrix createAMatrix(Point[][] correspondences);
+    DoubleMatrix createAMatrix(Point[][] correspondences);
 
-    public Matrix buildFromVector(Vector doubleVector, int rows, int colls);
+    Matrix buildFromVector(Vector doubleVector, int rows, int colls);
 
-    public DoubleMatrix buildFundamental(DoubleMatrix A);
+    DoubleMatrix buildFundamental(DoubleMatrix A);
 
 }

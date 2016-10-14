@@ -56,14 +56,14 @@ public class VRMLPointSetGenerator {
 
                 //if (p.getY() != Double.NaN && p.getX() != Double.NaN && p.getZ() != Double.NaN) {
                     //fw.write(p.getX() * 100000 + " " + p.getY() * 100000 + " " + p.getZ() * 100000 + ",\n");
-                    sb2.append(p.getX1() + " " +  ( p.getY1()) + " " + (p.getZ() * 5) + ",\n");
-                    sb1.append( p.getX() * 1000 + " " + ( p.getY() * 1000) + " " + p.getZ() * 1000 + ",\n");
+                    sb2.append(p.getX1()).append(" ").append(p.getY1()).append(" ").append(p.getZ() * 5).append(",\n");
+                    sb1.append(p.getX() * 1000).append(" ").append(p.getY() * 1000).append(" ").append(p.getZ() * 1000).append(",\n");
                     //fw.write(p.getX1() + " " + p.getY1() + " " + (p.getZ() * 100000) + ",\n");
                     Color c = p.getColor();
                     double r = c.getRed() / 256.;
                     double g = c.getGreen() / 256.;
                     double b = c.getBlue() / 256.;
-                    color.append(r + " " + g + " " + b +",\n");
+                    color.append(r).append(" ").append(g).append(" ").append(b).append(",\n");
                 //}
             }
             sb1.append("]\n" +

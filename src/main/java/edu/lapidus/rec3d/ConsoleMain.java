@@ -1,11 +1,21 @@
 package edu.lapidus.rec3d;
 
+import com.sun.tools.classfile.ConstantPool;
+import edu.lapidus.rec3d.exceptions.DirectoryCreationException;
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import edu.lapidus.rec3d.utils.image.ImageProcessor;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by egor.lapidus on 03/09/16.
  */
 public class ConsoleMain {
+
+    private final static Logger logger = Logger.getLogger(ConsoleMain.class);
+
     private enum OPTIONS {
         ti,
         si,
@@ -54,7 +64,21 @@ public class ConsoleMain {
     }
 
     private void handleTwoImages(String ... args) {
-        TwoImageCalculator.main(args);
+        DirectoryHelper dh = new DirectoryHelper();
+        try {
+            dh.createDirs(args[1]);
+        } catch (DirectoryCreationException e) {
+            logger.error("Error creating directory structure! ", e);
+            System.exit(1);
+        }
+        try {
+            dh.copyFile(args[2], dh.getImagesFolder());
+            dh.copyFile(args[3], dh.getImagesFolder());
+        } catch (IOException e) {
+            logger.error("error copying images to structure", e);
+        }
+        ImageProcessor.bulkResizeImages(args[1], 800, 600);
+        TwoImageCalculator.main(Arrays.copyOfRange(args, 2, args.length));
     }
 
     private void handleSeveral(String ... args) {

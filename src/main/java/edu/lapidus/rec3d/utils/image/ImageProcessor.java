@@ -122,7 +122,7 @@ public class ImageProcessor {
         logger.info("Saving correspondences");
         BufferedImage combined = buildCombined(i1, i2);
         Graphics g = combined.getGraphics();
-        ArrayList<PairCorrespData> inner = new ArrayList(points);
+        ArrayList<PairCorrespData> inner = new ArrayList<>(points);
         Random r = new Random();
         for (int i = 0; i < numOfPoints; i ++) {
             int index = r.nextInt(inner.size());

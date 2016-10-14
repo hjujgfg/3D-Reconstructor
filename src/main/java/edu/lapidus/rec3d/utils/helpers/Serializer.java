@@ -71,9 +71,7 @@ public class Serializer {
         File data = new File(SER_DIRECTORY);
         File[] files = data.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-                if (name.contains(fileName))
-                    return true;
-                return false;
+                return name.contains(fileName);
             }
         });
         if (files.length == 0)
