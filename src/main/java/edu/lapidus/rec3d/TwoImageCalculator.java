@@ -36,10 +36,20 @@ import static java.lang.Math.max;
  * This is going to be a main class to the program with
  */
 public class TwoImageCalculator {
+    /**
+     * Entry point into the algorithm for two images
+     * @param args [0],[1],[2] - rotation angles around x, y and z respectively
+     *             [3] - type of correspondences lookup: 1 - file, 2 - kMeans, 3 - convolve, 4 - kmeans & convolve
+     */
     public static void main(String ... args) {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //sheep01
+
+        double[] angles = new double[3];
+        for (int i = 0; i < 3; i ++) {
+            angles[i] = Double.parseDouble(args[i]);
+        }
         DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);
@@ -47,18 +57,27 @@ public class TwoImageCalculator {
         DoubleMatrix r1 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Z_AXIS)
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.Y_AXIS)
                 .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS)));
-        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(0, MatrixBuilder.Z_AXIS)
-                .multiplyBy(matrixBuilder.createRotationMatrix(-9, MatrixBuilder.Y_AXIS))
-                .multiplyBy(matrixBuilder.createRotationMatrix(0, MatrixBuilder.X_AXIS));
+        DoubleMatrix r2 = matrixBuilder.createRotationMatrix(angles[2], MatrixBuilder.Z_AXIS)
+                .multiplyBy(matrixBuilder.createRotationMatrix(angles[1], MatrixBuilder.Y_AXIS))
+                .multiplyBy(matrixBuilder.createRotationMatrix(angles[0], MatrixBuilder.X_AXIS));
 
         String img1 = "input/images/model0.png";
         String img2 = "input/images/model1.png";
         //String img1 = "input/images/" + args[0];
         //String img2 = "input/images/" + args[1];
+
+        CorrespondenceLookupType type;
+        switch (Integer.parseInt(args[3])) {
+            case 1: type = CorrespondenceLookupType.FILE_CORRESPS_SOURCE; break;
+            case 2: type = CorrespondenceLookupType.KMEANS_CORRESPS_SOURCE; break;
+            case 3: type = CorrespondenceLookupType.CONVOLVE_CORRESPS_SOURCE; break;
+            case 4: type = CorrespondenceLookupType.KMEANS_AND_CONVOLVE_SOURCE; break;
+            default: type = CorrespondenceLookupType.KMEANS_AND_CONVOLVE_SOURCE;
+        }
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
-        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "input/correspondences/sheep0.csv", CorrespondenceLookupType.CONVOLVE_CORRESPS_SOURCE, 1);
+        TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "input/correspondences/sheep0.csv", type, 1);
         Map<String, PairCorrespData> res = init.run();
         VRMLPointSetGenerator generator = new VRMLPointSetGenerator(res, VRMLPointSetGenerator.State.SINGLE);
         generator.buildPointSet();
