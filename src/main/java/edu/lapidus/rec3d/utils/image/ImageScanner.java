@@ -16,6 +16,8 @@ import java.nio.Buffer;
 import java.util.*;
 import java.util.List;
 
+import static edu.lapidus.rec3d.exceptions.handlers.ExceptionHandler.handle;
+
 /**
  * Created by Егор on 12.05.2016.
  */
@@ -43,8 +45,7 @@ public class ImageScanner {
         try {
             scanner = new ImageScanner(IMG1, IMG2);
         } catch (FileLoadingException e) {
-            e.printStackTrace();
-            System.exit(1);
+            handle("Error initializing ImageScanner", e);
         }
         scanner.run();
     }

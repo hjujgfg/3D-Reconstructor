@@ -8,6 +8,8 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static edu.lapidus.rec3d.exceptions.handlers.ExceptionHandler.handle;
+
 /**
  * Created by egor.lapidus on 03/09/16.
  */
@@ -53,7 +55,7 @@ public class ConsoleMain {
 
     private void showHelp() {
         System.out.print("Usage:\njava -jar 3d_reconstructor.jar [option] \nOptions:\n" +
-        "\tti - run two images\n" +
+        "\tti [modelName] [file1] [file2] [xAngle] [yAngle] [zAngle] [correspondencesType] - run two images\n" +
         "\tsi - run several images\n" +
         "\tcon - run convolution test\n" +
         "\tclu - run clusterization\n" +
@@ -67,8 +69,7 @@ public class ConsoleMain {
         try {
             dh.createDirs(args[1]);
         } catch (DirectoryCreationException e) {
-            logger.error("Error creating directory structure! ", e);
-            System.exit(1);
+            handle(e);
         }
         try {
             dh.copyFile(args[2], dh.getImagesDir(args[1]));
@@ -78,7 +79,7 @@ public class ConsoleMain {
             System.exit(1);
         }
         ImageProcessor.bulkResizeImages(args[1], 800, 600);
-        TwoImageCalculator.main();
+        TwoImageCalculator.main(Arrays.copyOfRange(args, 4, args.length));
     }
 
     private void handleSeveral(String ... args) {

@@ -39,8 +39,9 @@ public class DirectoryHelper {
         File f = new File (IMAGES_DIR);
         if (f.exists()) {
             try {
-                Files.walk(Paths.get(IMAGES_DIR), 1).forEach(filepath -> {
+                Files.walk(Paths.get(IMAGES_DIR), 2).forEach(filepath -> {
                     if (filepath.toString().endsWith(".jpg") || filepath.toString().endsWith(".png")) {
+                        logger.info("Removing: " + filepath.toString());
                         filepath.toFile().delete();
                     }
                 });
@@ -66,6 +67,7 @@ public class DirectoryHelper {
     }
 
     public void copyFile(String from, String to) throws IOException {
+        logger.info("Copying: from " + from + "; to " + to);
         Files.copy(Paths.get(from), Paths.get(to).resolve(from), REPLACE_EXISTING);
     }
 

@@ -28,6 +28,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static edu.lapidus.rec3d.exceptions.handlers.ExceptionHandler.handle;
 import static java.lang.Math.PI;
 import static java.lang.Math.max;
 
@@ -45,11 +46,12 @@ public class TwoImageCalculator {
         //DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(1700.4641287642511, 1700.4641287642511, 1600, 1184);
         //sheep01
-
+        logger.info("Starting working with angles:  " + args[0] + "; " + args [1] + "; " + args[2] + ";" );
         double[] angles = new double[3];
         for (int i = 0; i < 3; i ++) {
             angles[i] = Double.parseDouble(args[i]);
         }
+
         DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         DoubleMatrix k2 = matrixBuilder.createCalibrationMatrix(692, 519, 400, 300);
         /*DoubleMatrix k1 = matrixBuilder.createCalibrationMatrix(700, 500, 400, 300);
@@ -74,6 +76,7 @@ public class TwoImageCalculator {
             case 4: type = CorrespondenceLookupType.KMEANS_AND_CONVOLVE_SOURCE; break;
             default: type = CorrespondenceLookupType.KMEANS_AND_CONVOLVE_SOURCE;
         }
+        logger.info("Correspondence lookup type: " + type.name());
         /*Vector c1 = new Vector(0.0, 0.0, 0.0);
         Vector c2 = new Vector(57., 0.0, 7.);*/
         //TwoImageCalculator init = new TwoImageCalculator(k1, k2, r1, r2, img1, img2, "output/kMeansCorrespondences/sheep0.csv", 1);
@@ -158,8 +161,7 @@ public class TwoImageCalculator {
             firstImage = imageProcessor.loadImage(img1Path);
             secondImage = imageProcessor.loadImage(img2Path);
         } catch (FileLoadingException ex) {
-            logger.error("can't open files", ex);
-            System.exit(1);
+            handle("Error loading initial images", ex);
         }
         fileCorrespondencesPath = correspsFile;
         buildAMatrix(correspondenceType);
@@ -227,8 +229,7 @@ public class TwoImageCalculator {
                 try {
                     buildFileCorrespondences();
                 } catch (FileLoadingException e) {
-                    logger.error("Error loading file correspondences, exiting!!!", e);
-                    System.exit(1);
+                    handle("Error loading file correspondences", e);
                 }
                 Amatrix = matrixBuilder.createAMatrix(correspondence.getInititalCorrespondences());
                 normalizer = new CorrespondenceNormalizer(correspondence.getInititalCorrespondences());
@@ -238,8 +239,7 @@ public class TwoImageCalculator {
                 try {
                     buildKmeansCorrespondences();
                 } catch (FileLoadingException e) {
-                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
-                    System.exit(1);
+                    handle("Error loading kMeans correspondences", e);
                 }
                 Amatrix = matrixBuilder.createAMatrix(kMeansCorrespondences);
                 normalizer = new CorrespondenceNormalizer(kMeansCorrespondences);
@@ -249,8 +249,7 @@ public class TwoImageCalculator {
                 try {
                     buildConvolveCorrespondences();
                 } catch (FileLoadingException e) {
-                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
-                    System.exit(1);
+                    handle("Error loading convolve correspondences", e);
                 }
                 Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences);
                 normalizer = new CorrespondenceNormalizer(convolveCorrespondences);
@@ -260,8 +259,7 @@ public class TwoImageCalculator {
                 try {
                     buildKmeansAndConvolveCorrespondences();
                 } catch (FileLoadingException e) {
-                    logger.error("Error loading Kmeans correspondences, exiting!!!", e);
-                    System.exit(1);
+                    handle("Error loading kMeans correspondences", e);
                 }
                 Amatrix = matrixBuilder.createAMatrix(convolveCorrespondences, kMeansCorrespondences);
                 normalizer = new CorrespondenceNormalizer(kMeansCorrespondences, convolveCorrespondences);
