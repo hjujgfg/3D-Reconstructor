@@ -13,6 +13,7 @@ out/
 target/
 /output
 /logs
+/src/main/resources/log4j.properties
 # Windows Installer files
 *.cab
 *.msi
