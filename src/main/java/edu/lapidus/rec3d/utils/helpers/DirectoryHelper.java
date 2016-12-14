@@ -25,6 +25,8 @@ public class DirectoryHelper {
     public static final String CONVOLVE_OUT = "output/convolve/";
     public static final String CLUSTERING_OUT = "output/clustering/";
     public static final String THREE_D_OUT = "output/3D/";
+    public static final String POINTS_SET_PLAIN = "output/3D/pointsSetPlain.wrl";
+    public static final String POINT_SET_SINGLE = "output/3D/pointSetSingle.wrl";
 
     public String getImagesFolder() {
         return IMAGES_DIR;

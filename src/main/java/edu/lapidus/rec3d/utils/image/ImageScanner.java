@@ -6,6 +6,7 @@ import edu.lapidus.rec3d.math.ColoredImagePoint;
 import edu.lapidus.rec3d.math.matrix.DoubleMatrix;
 import edu.lapidus.rec3d.math.vector.*;
 import edu.lapidus.rec3d.math.vector.Vector;
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -25,15 +26,15 @@ public class ImageScanner {
 
     private static ImageProcessor processor = new ImageProcessor();
     private static final Logger logger = Logger.getLogger(ImageScanner.class);
-    private final static String IMG1 = "output/images/sheep0.png";
-    private final static String IMG2 = "output/images/sheep1.png";
+    private final static String IMG1 = "input/images/model0.png";
+    private final static String IMG2 = "input/images/model1.png";
     private final static int FILTER_SIZE = 15;
     private final static int WINDOW_SIDE = 20;
     private final static int CORRESPONDENCE_COUNT = 10;
 
     private BufferedImage img1, img2;
     private String img1Path, img2Path;
-
+    private double maxD1 = Double.MIN_VALUE, minD1 = Double.MAX_VALUE, maxD2 = Double.MIN_VALUE, minD2 = Double.MAX_VALUE;
     private Map<ColoredImagePoint, Double> det1, det2;
 
     private List<CorrespondenceHolder> correspondences;
@@ -59,7 +60,7 @@ public class ImageScanner {
         img2 = processor.removeGreen(img2);
         img1 = processor.toGrayScale(img1);
         img2 = processor.toGrayScale(img2);
-        processor.saveImage(img1, "output/convolve/test.png");
+        processor.saveImage(img1, DirectoryHelper.CONVOLVE_OUT + "test.png");
         det1 = new HashMap<>(img1.getHeight() * img1.getWidth());
         det2 = new HashMap<>(img1.getHeight() * img1.getWidth());
     }
@@ -75,12 +76,13 @@ public class ImageScanner {
         /*det1 = evaluatePoints(images.subList(0, 3));
         det2 = evaluatePoints(images.subList(3, 6));*/
 
-        //calculateDeterminants(images);
+        calculateDeterminants(images);
         /*
         saveToImg(det1, "afterGauss1");
         saveToImg(det2, "afterGauss2");*/
-
-        det1 = evaluatePoints(images.subList(0, 3));
+        visualizeDeterminant(det1, img1.getWidth(), img1.getHeight(), minD1, maxD1, "1");
+        visualizeDeterminant(det2, img2.getWidth(), img2.getHeight(), minD2, maxD2, "2");
+        //det1 = evaluatePoints(images.subList(0, 3));
         correspondences = compareImages(images, mapToSortedList(det1));
         saveToCombined(correspondences);
         /*saveTopPoints(img1, det1, "topPoints1");
@@ -100,7 +102,7 @@ public class ImageScanner {
             g.drawLine(x-2, y-2, x+2, y+2);
             g.drawLine(x+2, y-2, x-2, y+2);
         }
-        processor.saveImage(res, "output/convolve/" + name + ".png");
+        processor.saveImage(res, DirectoryHelper.CONVOLVE_OUT + name + ".png");
     }
 
     private void saveToCombined(List<CorrespondenceHolder> list) {
@@ -115,7 +117,7 @@ public class ImageScanner {
             g.drawOval(p1.getX() - 2, p1.getY() - 2, 4, 4);
             g.drawOval(p2.getX() - 2 + combined.getWidth() / 2, p2.getY() - 2, 4, 4);
         }
-        processor.saveImage(combined, "output/convolve/corresps.png");
+        processor.saveImage(combined, DirectoryHelper.CONVOLVE_OUT + "corresps.png");
     }
 
 
@@ -127,7 +129,7 @@ public class ImageScanner {
                 img.setRGB(x, y, new Color(c, c, c).getRGB());
             }
         }
-        processor.saveImage(img, "output/convolve/" + name + ".png");
+        processor.saveImage(img, DirectoryHelper.CONVOLVE_OUT + name + ".png");
     }
 
     private void calculateDeterminants(List<BufferedImage> imgs) {
@@ -135,27 +137,60 @@ public class ImageScanner {
         for (int y = 0; y < img1.getHeight(); y ++) {
             for (int x = 0; x < img1.getWidth(); x ++) {
                 int i = 0;
+                int backgrounds = 0;
                 for (BufferedImage b : imgs) {
                     Color color = new Color(b.getRGB(x, y));
+                    if (color.getRed() == 0) {
+                        backgrounds ++;
+                    }
                     colors[i ++ ] = color.getRed();
                 }
+                if (backgrounds >= 3) continue;
                 double mult = 0.9;
                 double d1 = colors[0] * colors[2] - (mult * colors[1]) * (mult * colors[1]);
                 double d2 = colors[3] * colors[5] - (mult * colors[4]) * (mult * colors[4]);
+                if (d1 > maxD1) maxD1 = d1;
+                if (d1 < minD1) minD1 = d1;
+                if (d2 > maxD2) maxD2 = d2;
+                if (d2 < minD2) minD2 = d2;
                 det1.put(new ColoredImagePoint(x, y), d1);
                 det2.put(new ColoredImagePoint(x, y), d2);
             }
         }
     }
 
+    private void visualizeDeterminant(Map<ColoredImagePoint, Double> det, int width, int height, double min, double max, String suffix) {
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(Color.gray);
+        g.drawRect(0,0,img.getWidth(), img.getHeight());
+        double scale = (max - min) / 255;
+        logger.info("Maxd1: " + maxD1 + " MinD1: " + minD1 + " maxd2: " + maxD2 + " minD2: " + minD2);
+        logger.info("Scale: " + scale);
+        for (Map.Entry<ColoredImagePoint, Double> entry : det.entrySet()) {
+            int val = (int) ((entry.getValue() - min) / scale);
+            if (val < 0) {
+                logger.info("Negative determinant at point: " + entry.getKey().toString() + " val: " + entry.getValue());
+                val = 0;
+            }
+            if (val > 255) {
+                logger.info("Positive and > 255 determinant at point: " + entry.getKey().toString() + " val: " + entry.getValue());
+                val = 255;
+            }
+            if (val == 255) {
+                img.setRGB(entry.getKey().getX(), entry.getKey().getY(), new Color(val, val, val).getRGB());
+            } else if (val == 0) {
+                img.setRGB(entry.getKey().getX(), entry.getKey().getY(), Color.GREEN.getRGB());
+            } /*else {
+                img.setRGB(entry.getKey().getX(), entry.getKey().getY(), Color.GRAY.getRGB());
+            }*/
+        }
+        processor.saveImage(img, DirectoryHelper.CONVOLVE_OUT + "det" + suffix + ".png");
+    }
+
     private List<Map.Entry<ColoredImagePoint, Double>> sortMap(Map<ColoredImagePoint, Double> map) {
         List<Map.Entry<ColoredImagePoint, Double>> list = new LinkedList<>(map.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<ColoredImagePoint, Double>>() {
-            @Override
-            public int compare(Map.Entry<ColoredImagePoint, Double> o1, Map.Entry<ColoredImagePoint, Double> o2) {
-                return -o1.getValue().compareTo(o2.getValue());
-            }
-        });
+        Collections.sort(list, (o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
         return list;
     }
 
@@ -174,7 +209,7 @@ public class ImageScanner {
         Kernel[] kernels = {KernelFactory.buildXXGaussianKernel(size), KernelFactory.buildXYGaussianKernel(size), KernelFactory.buildYYGaussianKernel(size)};
         for (int i = 0; i < 3; i++) {
             BufferedImage tmp = processor.applyKernel(img, kernels[i]);
-            //processor.saveImage(tmp, "output/convolve/applied" + i + "" + FILTER_SIZE + ".png");
+            processor.saveImage(tmp, DirectoryHelper.CONVOLVE_OUT + "applied" + i + "" + FILTER_SIZE + ".png");
             res.add(tmp);
             /*NonMaxSuppression suppression = new NonMaxSuppression();
             int [] imgArr = processor.grayToIntArray(tmp);
@@ -219,7 +254,7 @@ public class ImageScanner {
         for (int i = 0; i < CORRESPONDENCE_COUNT ; i += 1) {
             logger.info("Processing point " + i + " out of " + topPointCount);
             ColoredImagePoint curr = points.get(100 + r.nextInt(points.size()/10));
-            //ColoredImagePoint curr = points.get(i);
+            //ColoredImagePoint curr = points.get(points.size() - 1 - i);
             List<Window> current = getWindow(filtered.subList(0, 3), curr.getX(), curr.getY());
             if (current == null) continue;
             double minDist = Double.MAX_VALUE;

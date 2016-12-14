@@ -1,5 +1,7 @@
 package edu.lapidus.rec3d.utils.image;
 
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.Kernel;
@@ -153,7 +155,7 @@ public class KernelFactory {
                 k[counter ++] = 1;
             }
         }
-        //visualizeKernel(k, 9);
+        //visualizeKernel(k, side);
         return new Kernel(side, side, k);
     }
 
@@ -173,7 +175,7 @@ public class KernelFactory {
                 counter ++;
             }
         }
-        p.saveImage(img, "output/convolve/box" + anInt++ + ".png");
+        p.saveImage(img, DirectoryHelper.CONVOLVE_OUT + "box" + anInt++ + ".png");
     }
     static int anInt = 0;
 }

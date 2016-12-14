@@ -1,6 +1,7 @@
 package edu.lapidus.rec3d.visualization.VRML;
 
 import edu.lapidus.rec3d.utils.PairCorrespData;
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -78,7 +79,7 @@ public class VRMLPointSetGenerator {
                     "}");
             sb2.append("    }\n" +
                     "}");
-            StringBuilder nameBuilder = new StringBuilder("output/res/");
+            StringBuilder nameBuilder = new StringBuilder(DirectoryHelper.THREE_D_OUT);
             if (state == State.MULTIPLE) {
                 nameBuilder.append(MULTIPLE_NAME);
             } else {
@@ -89,7 +90,7 @@ public class VRMLPointSetGenerator {
             fw.write(sb1.toString());
             fw.flush();
             fw.close();
-            fw = new FileWriter(new File("output/res/pointSetPlain.wrl"));
+            fw = new FileWriter(new File(DirectoryHelper.POINTS_SET_PLAIN));
             fw.write(sb2.toString());
             fw.flush();
             fw.close();
