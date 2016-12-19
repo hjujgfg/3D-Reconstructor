@@ -66,9 +66,16 @@ public class DirectoryHelper {
         }
     }
 
-    public void copyFile(String from, String to) throws IOException {
-        logger.info("Copying: from " + from + "; to " + to);
-        Files.copy(Paths.get(from), Paths.get(to).resolve(from), REPLACE_EXISTING);
+    public void copyFile(String fromPath, String to) throws IOException {
+        logger.info("Copying: from " + fromPath + "; to " + to);
+        String fromFileName;
+        if (fromPath.contains("/")) {
+            String [] temp = fromPath.split("/");
+            fromFileName = temp [temp.length - 1];
+        } else {
+            fromFileName = fromPath;
+        }
+        Files.copy(Paths.get(fromPath), Paths.get(to).resolve(fromFileName), REPLACE_EXISTING);
     }
 
 }
