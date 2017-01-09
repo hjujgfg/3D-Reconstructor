@@ -1,14 +1,14 @@
 package edu.lapidus.rec3d.visualization.VRML;
 
+import edu.lapidus.rec3d.math.calculators.PairCorrespFilter;
 import edu.lapidus.rec3d.utils.PairCorrespData;
+import edu.lapidus.rec3d.utils.helpers.DirectoryHelper;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.geom.Arc2D;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,18 +19,18 @@ public class VRMLPointSetGenerator {
 
     private final static String MULTIPLE_NAME = "pointSet3D_Mult";
     private final static String SINGLE_NAME = "pointSet3D_Single";
-    Set<PairCorrespData> points;
+    private Set<PairCorrespData> points;
     private final static Logger logger = Logger.getLogger(VRMLPointSetGenerator.class);
     public enum State { SINGLE, MULTIPLE}
-
-
 
     State state;
 
     public VRMLPointSetGenerator(Map<String, PairCorrespData> points, State state) {
-        this.points = new HashSet<PairCorrespData>(points.values());
+        PairCorrespFilter filter = new PairCorrespFilter(points.values());
+        this.points = filter.getResults();
         this.state = state;
     }
+
     public VRMLPointSetGenerator(Set<PairCorrespData> res, State state) {
         this.points = res;
         this.state = state;
@@ -78,7 +78,7 @@ public class VRMLPointSetGenerator {
                     "}");
             sb2.append("    }\n" +
                     "}");
-            StringBuilder nameBuilder = new StringBuilder("output/res/");
+            StringBuilder nameBuilder = new StringBuilder(DirectoryHelper.THREE_D_OUT);
             if (state == State.MULTIPLE) {
                 nameBuilder.append(MULTIPLE_NAME);
             } else {
@@ -89,7 +89,7 @@ public class VRMLPointSetGenerator {
             fw.write(sb1.toString());
             fw.flush();
             fw.close();
-            fw = new FileWriter(new File("output/res/pointSetPlain.wrl"));
+            fw = new FileWriter(new File(DirectoryHelper.POINTS_SET_PLAIN));
             fw.write(sb2.toString());
             fw.flush();
             fw.close();
