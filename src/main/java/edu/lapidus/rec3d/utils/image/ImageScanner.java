@@ -16,6 +16,7 @@ import java.awt.image.Kernel;
 import java.nio.Buffer;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static edu.lapidus.rec3d.exceptions.handlers.ExceptionHandler.handle;
 
@@ -41,7 +42,7 @@ public class ImageScanner {
     private List<BufferedImage> processed;
 
 
-    public static void main(String[] args) {
+    public static void mainEx(String[] args) {
         ImageScanner scanner = null;
         try {
             scanner = new ImageScanner(IMG1, IMG2);
@@ -49,6 +50,59 @@ public class ImageScanner {
             handle("Error initializing ImageScanner", e);
         }
         scanner.run();
+    }
+
+    public static void main(String [] args) {
+        ImageScanner scanner;
+        DirectoryHelper dh = new DirectoryHelper();
+        ImageProcessor proc = new ImageProcessor();
+        try {
+            BufferedImage img = proc.loadImage(DirectoryHelper.IMAGES_DIR + "table/res/table0.png");
+            BufferedImage img1 = proc.loadImage(DirectoryHelper.IMAGES_DIR + "table/res/table0.png");
+            img = proc.toGrayScale(img);
+            img1 = proc.toGrayScale(img1);
+            BufferedImage tmp = proc.toGrayScale(img);
+            tmp = proc.applyKernel(tmp, KernelFactory.buildXXGaussianKernel(6));
+            proc.saveImage(tmp, DirectoryHelper.OUTPUT_DIR + "gaustst.png");
+            PointDescriptor descriptor1 = new PointDescriptor(img, 128);
+            PointDescriptor descriptor2 = new PointDescriptor(img1, 123);
+            ImageScanner sc = new ImageScanner(DirectoryHelper.IMAGES_DIR + "table/res/table0.png", DirectoryHelper.IMAGES_DIR + "table/res/table0.png");
+            sc.run();
+            List<ColoredImagePoint> points = sc.sortDeterminant(sc.det1);
+            Graphics2D g = img.createGraphics();
+            g.setColor(Color.BLACK);
+            for (int i = 0; i < 1000; i ++) {
+                Random r = new Random();
+                int index = r.nextInt(points.size());
+                ColoredImagePoint point = points.get(points.size() - 1 - i);
+                Vector v = descriptor1.getGradientAtPoint(point.getX(), point.getY());
+                int gradx = (int)v.get(0);
+                int grady = (int)v.get(1);
+                if (gradx == 0 || grady == 0) continue;
+                sc.drawArrow(g, point.getX(), point.getY(), gradx, grady);
+            }
+            proc.saveImage(img, DirectoryHelper.OUTPUT_DIR + "SomeGradients.png");
+            /*
+            BufferedImage res = proc.applyKernel(img, KernelFactory.buildXSimpleGradientKernel());
+            BufferedImage res1 = proc.applyKernel(img1, KernelFactory.buildYSimpleGradientKernel());
+            proc.saveImage(res, DirectoryHelper.OUTPUT_DIR + "gradient1.png");
+            proc.saveImage(res1, DirectoryHelper.OUTPUT_DIR + "gradient2.png");
+            */
+        } catch (FileLoadingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<ColoredImagePoint> sortDeterminant(Map<ColoredImagePoint, Double> map) {
+        Map<ColoredImagePoint, Double> result = new HashMap<>();
+        return map.entrySet().stream().sorted((o1, o2) -> o1.getValue().compareTo(o2.getValue())).
+            map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
+    private void drawArrow(Graphics2D g, int x, int y, int xMag, int yMag) {
+        g.drawLine(x - 2, y - 2, x + 2, y + 2);
+        g.drawLine(x + 2, y - 2, x - 2, y + 2);
+        g.drawLine(x, y, x + xMag, y + yMag);
     }
 
     public ImageScanner (String i1, String i2) throws FileLoadingException {

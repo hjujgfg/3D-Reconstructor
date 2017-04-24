@@ -159,6 +159,14 @@ public class KernelFactory {
         return new Kernel(side, side, k);
     }
 
+    public static Kernel buildYSimpleGradientKernel() {
+        return new Kernel(1, 3, new float[] {-1.f, 0.f, 1.f});
+    }
+
+    public static Kernel buildXSimpleGradientKernel() {
+        return new Kernel(3, 1, new float[] {-1.f, 0.f, 1.f});
+    }
+
     public static void visualizeKernel(float[] k, int dim) {
         ImageProcessor p = new ImageProcessor();
         BufferedImage img = new BufferedImage(dim, dim, BufferedImage.TYPE_BYTE_GRAY);
